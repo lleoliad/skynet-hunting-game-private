@@ -1,0 +1,213 @@
+skynet:
+  domain-name: mpmf.skynet.org
+  project:
+    name: hunting
+    code: 1
+  profiles:
+    active: dev
+  service:
+    master: false
+    server-id: -1
+    watcher-id: -1
+    deploy-id: -1
+    instance-id: -1
+    name: game-server
+    port: 17950
+  service-url:
+    agent: http://agent
+    deploy: http://deploy
+    gateway: http://gateway
+    matrix: http://matrix
+    watchdog: http://watchdog
+    watcher: http://watcher
+  config:
+    mycat:
+      url: mycat.${skynet.domain-name}:8066
+      database: HUNTING_GAME
+      username: mycat
+      password: 123456
+    mysql:
+      url: mysql.${skynet.domain-name}:3306
+      database: hunting_game
+      username: root
+      password: 4KowHp6kmd9Xgffe
+    mongodb:
+      host: mongodb.hunting.${skynet.domain-name}
+      port: 27017
+      database: hunting_game
+      username: user
+      password: p8bb3acnx
+    redis:
+      host: redis.${skynet.domain-name}
+      port: 6379
+      password: 4KowHp6
+      database: 0
+      root-key: ${skynet.project.name}-${skynet.service.name}
+    codis-local:
+      host: redis.${skynet.domain-name}
+      port: 6379
+      password: 4KowHp6
+      database: 0
+      root-key: ${skynet.project.name}-${skynet.service.name}
+    codis:
+      host: 192.168.2.200
+      port: 6380
+      password: crs-32m8b7oz:lM47dp7W
+      database: 0
+      timeout: 10000
+      root-key: ${skynet.project.name}-${skynet.service.name}
+      config:
+        max-total: 100 # 资源池最大连接数
+        max-idle: 20 # 资源池允许最大空闲连接数
+        min-idle: 20 # 资源池允许最小空闲连接数
+        max-wait-millis: 10000 # 当资源池耗尽后，调用者的最大等待时间（单位为毫秒）
+        jmx-enabled: true # 是否开启jmx监控, 可用于监控
+        test-on-create: false # 向资源池创建连接时是否做连接有效性检测（ping），无效连接会被移除
+        test-on-borrow: false # 向资源池借用连接时是否做连接有效性检测（ping），无效连接会被移除
+        test-on-return: false # 向资源池归还连接时是否做连接有效性检测（ping），无效连接会被移除
+        test-while-idle: true
+    nacos:
+      url: nacos.${skynet.domain-name}:8848   # http://nacos.skynet.org:8848/nacos
+      namespace: ${skynet.project.name} # DEFAULT_GROUP
+      group: ${skynet.profiles.active} # DEFAULT_GROUP
+    sentinel:
+      url: sentinel.${skynet.domain-name}:8089   # http://sentinel.skynet.org:8089/#/dashboard
+    rocketmq:
+      url: rocketmq.${skynet.domain-name}:9876
+    rocketmq-console:
+      url: rocketmq.console.${skynet.domain-name}:8190   # http://rocketmq.console.skynet.org:8190
+    kafka:
+      url: kafka.${skynet.domain-name}:9092
+      group-id: ${skynet.project.name}-group
+    logstash:
+      host: localhost
+
+  rocketmq:
+    server:
+      topic:
+        server-install: server-install
+    service:
+      producer:
+        group: ${skynet.project.name}-${skynet.service.name}-producer
+      consumer:
+        group: ${skynet.project.name}-${skynet.service.name}-consumer
+        service-launch-group: ${skynet.project.name}-${skynet.service.name}-service-launch-consumer
+        service-closed-group: ${skynet.project.name}-${skynet.service.name}-service-closed-consumer
+        service-cluster-group: ${skynet.project.name}-${skynet.service.name}-service-cluster-consumer
+      topic:
+        service-deploy: service-deploy
+        service-launch: service-launch
+        service-launch-lose: service-launch-lose
+        service-closed: service-closed
+        service-cluster: service-cluster
+    cache:
+      topic:
+        mongo-db-cache: mongo-db-cache
+      consumer:
+        cache-segment-group: cache-segment-group
+
+server:
+  port: ${skynet.service.port}
+#  compression:
+#    enabled: true
+
+spring:
+  application:
+    name: ${skynet.service.name}
+  profiles:
+    active: ${skynet.profiles.active}
+  datasource:
+    druid:
+      type: com.alibaba.druid.pool.DruidDataSource                # 当前数据源操作类型
+      driver-class-name: com.mysql.cj.jdbc.Driver                 # mysql 驱动包
+      url: jdbc:mysql://${skynet.config.mycat.url}/${skynet.config.mycat.database}
+      username: ${skynet.config.mycat.username}
+      password: ${skynet.config.mycat.password}
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${skynet.config.nacos.url} # Nacos 服务注册中心地址
+        namespace: ${skynet.config.nacos.namespace}
+        group: ${skynet.config.nacos.group}
+      config:
+        server-addr: ${skynet.config.nacos.url} # Nacos 作为配置中心地址
+        file-extension: yaml # 指定 yaml 格式配置
+        namespace: ${skynet.config.nacos.namespace}
+        group: ${skynet.config.nacos.group} # DEFAULT_GROUP
+
+  data:
+    mongodb:
+      auto-index-creation: true
+      host: ${skynet.config.mongodb.host}
+      port: ${skynet.config.mongodb.port}
+      database: ${skynet.config.mongodb.database}
+      username: ${skynet.config.mongodb.username}
+      password: ${skynet.config.mongodb.password}
+
+  redis:
+    host: ${skynet.config.redis.host}
+    port: ${skynet.config.redis.port}  # Redis服务器连接端口
+    password: ${skynet.config.redis.password}
+    database: ${skynet.config.redis.database}
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1s
+        max-idle: 8
+        min-idle: 0
+    shutdown-timeout: 100s
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 10GB
+
+#开启端点
+management:
+  endpoints:
+    web:
+      base-path: /skyent/system/actuator
+      exposure:
+        include: '*'
+#        exclude: '*'
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
+    shutdown:
+      enabled: true  # 关闭服务：curl -X POST http://host:port/actuator/shutdown
+
+rocketmq:
+  name-server: ${skynet.config.rocketmq.url}
+  producer:
+    group: ${skynet.rocketmq.service.producer.group}
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml,classpath*:org/skynet/**/mapper/xml/*.xml
+  type-aliases-package: org.skynet.**.dao.entity          # 所有 Entity 别名类所在包
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+#设置 feign 客户端超时时间（OpenFeigh 默认支持 ribbon）
+ribbon:
+  # 指的是建立连接所用的时间，适用于网络状况正常的情况下，两端连接所用的时间
+  ReadTimeout: 5000
+  # 指的是建立连接后从服务器读取到可用资源所用的时间
+  ConnectTimeout: 5000
+
+logging:
+  level:
+    com.alibaba.nacos.client.naming: warn
+    com.alibaba.nacos.client.config.impl: WARN

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.skynet.service.provider.hunting.obsolete.dao.mapper.TopUpOrderMapper">
+
+    <!--    <select id="showNeedSupplement" resultType="com.cn.huntingrivalserver.pojo.entity.TopUpOrder">-->
+    <!--        SELECT  * FROM server_info-->
+    <!--            WHERE "order_omit_state" &lt;&gt; 0;-->
+    <!--    </select>-->
+</mapper>
