@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.skynet.cloud</groupId>
+        <artifactId>hunting-game-server</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>game-server</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.skynet.cloud</groupId>
+            <artifactId>skynet-hunting-service-provider-obsolete</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--被打包项目必须配置项-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
+                <configuration>
+                    <!--配置为执行-->
+                    <classifier>exec</classifier>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
+                <configuration><!-- 指定该Main Class为全局的唯一入口 -->
+                    <mainClass>org.skynet.server.hunting.GameServer</mainClass>
+                    <layout>ZIP</layout>
+                    <includes>
+                        <include>
+                            <!-- 排除所有Jar -->
+                            <groupId>nothing</groupId>
+                            <artifactId>nothing</artifactId>
+                        </include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中-->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 将生成的jar复制到指定目录的插件 -->
+            <!--<plugin>-->
+            <!--    <artifactId>maven-antrun-plugin</artifactId>-->
+            <!--    <executions>-->
+            <!--        <execution>-->
+            <!--            <id>copy-jar</id>-->
+            <!--            <phase>package</phase>-->
+            <!--            <configuration>-->
+            <!--                <tasks>-->
+            <!--                    <copy todir="${project.release.dir}">-->
+            <!--                        <fileset dir="${project.build.directory}">-->
+            <!--                            <include name="*-exec.jar" />-->
+            <!--                        </fileset>-->
+            <!--                    </copy>-->
+            <!--                </tasks>-->
+            <!--            </configuration>-->
+            <!--            <goals>-->
+            <!--                <goal>run</goal>-->
+            <!--            </goals>-->
+            <!--        </execution>-->
+            <!--    </executions>-->
+            <!--</plugin>-->
+
+            <!-- 执行 shell 脚本 -->
+            <!--<plugin>-->
+            <!--    <groupId>org.codehaus.mojo</groupId>-->
+            <!--    <artifactId>exec-maven-plugin</artifactId>-->
+            <!--    <version>1.6.0</version>-->
+            <!--    <executions>-->
+            <!--        <execution>-->
+            <!--            <id>uncompress</id>-->
+            <!--            <phase>install</phase>-->
+            <!--            <goals>-->
+            <!--                <goal>exec</goal>-->
+            <!--            </goals>-->
+            <!--            <configuration>-->
+            <!--                &lt;!&ndash;<executable>${basedir}/src/main/resources/uncompress.sh</executable>&ndash;&gt;-->
+            <!--                <executable>${basedir}/../../bin/skynet/admin-releases.sh</executable>-->
+            <!--            </configuration>-->
+            <!--        </execution>-->
+            <!--    </executions>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+
+</project>
