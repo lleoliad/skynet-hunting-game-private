@@ -9,7 +9,6 @@ import org.skynet.service.provider.hunting.obsolete.common.util.DeflaterUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.CloudUserDataDto;
-import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataVOService;

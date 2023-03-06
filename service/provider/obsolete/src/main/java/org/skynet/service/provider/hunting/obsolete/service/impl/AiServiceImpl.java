@@ -13,9 +13,7 @@ import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordCh
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CalculateAIFilterParametersBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.LocalPlayerCalculateAIFilterParametersBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.RecordDataAndBase64;
-import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import com.cn.huntingrivalserver.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.AiRecordChooseRuleService;
 import org.skynet.service.provider.hunting.obsolete.service.AiService;
 import org.skynet.service.provider.hunting.obsolete.service.HuntingMatchService;

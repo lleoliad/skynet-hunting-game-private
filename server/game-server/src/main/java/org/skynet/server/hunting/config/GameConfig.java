@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan(basePackages = {
         "org.skynet.service.provider.hunting",
+        "org.skynet.components.hunting.data",
 })
 @RefreshScope
 public class GameConfig {

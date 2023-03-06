@@ -15,7 +15,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateD
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PreparePurchaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.RemoveFailureDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.SyncPendingDTO;
-import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
 import org.skynet.service.provider.hunting.obsolete.service.IAPService;

@@ -4,6 +4,13 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.skynet.components.hunting.data.service.DataService;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.exception.Assert;
 import org.skynet.service.provider.hunting.obsolete.common.result.ResponseEnum;
@@ -12,14 +19,8 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.enums.Table;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
-import com.cn.huntingrivalserver.pojo.table.*;
-import org.skynet.service.provider.hunting.obsolete.service.GameResourceService;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
+import org.skynet.service.provider.hunting.obsolete.service.GameResourceService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,13 +89,13 @@ public class GameEnvironment {
     public static Map<String, Map<String, PromotionEventPackageTableValue>> promotionEventPackageTableMap = new ConcurrentHashMap<>();
 
     @ApiModelProperty("系统当前促销活动V2礼包组数据库")
-    public static Map<String, Map<String, PromotionEventPackageGroupV2TableValue>> promotionEventPackageGroupV2TableMap = new ConcurrentHashMap<>();
+    public static Map<String, Map<String, PromotionGiftPackageGroupV2TableValue>> promotionGiftPackageGroupV2TableMap = new ConcurrentHashMap<>();
 
     @ApiModelProperty("系统当前促销活动V2礼包数据库")
-    public static Map<String, Map<String, PromotionEventPackageV2TableValue>> promotionEventPackageV2TableMap = new ConcurrentHashMap<>();
+    public static Map<String, Map<String, PromotionGiftPackageV2TableValue>> promotionGiftPackageV2TableMap = new ConcurrentHashMap<>();
 
     @ApiModelProperty("系统当前促销活动礼包V2武器礼包数据")
-    public static Map<String, Map<String, PromotionEventGunGiftPackageV2TableValue>> promotionEventGunGiftPackageV2TableMap = new ConcurrentHashMap<>();
+    public static Map<String, Map<String, PromotionGunGiftPackageV2TableValue>> promotionGunGiftPackageV2TableMap = new ConcurrentHashMap<>();
 
     @ApiModelProperty("系统当前促销活动礼包数据库")
     public static Map<String, Map<String, SigninDiamondRewardTableValue>> signinDiamondRewardTableMap = new ConcurrentHashMap<>();
@@ -255,6 +257,39 @@ public class GameEnvironment {
         loadDataTable(systemPropertiesConfig.getClientGameVersion());
 
 
+    }
+
+    @Resource
+    private DataService dataService;
+
+    public void initialize() {
+        for (Table table : Table.values()) {
+            loadTable(table, table.getClasses());
+        }
+    }
+
+    @SneakyThrows
+    public <T> void loadTable(Table table, Class<T> tClass) {
+        if (null == tClass) {
+            log.error("load:error {}", table.name());
+            return;
+        }
+
+        Map<Object, Map<Object, T>> values = dataService.load(tClass, null, table.name());
+        if (values.isEmpty()) {
+            log.error("name:{}, version:{}", table.name(), values.keySet());
+        }
+        for (Map.Entry<Object, Map<Object, T>> entry : values.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                log.error("\tversion:{}, name:{}, size:{}", entry.getKey(), table.name(), entry.getValue().size());
+            }
+
+            Field field = GameEnvironment.class.getDeclaredField(StrUtil.lowerFirst(table.getName()) + "Map");
+            field.setAccessible(true);
+            Map<Object, Map<Object, T>> data = (Map<Object, Map<Object, T>>) field.get(null);
+            data.put(entry.getKey().toString(), entry.getValue());
+            // log.info("{}", o);
+        }
     }
 
 

@@ -7,7 +7,6 @@ import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.result.ResponseResult;
-import com.cn.huntingrivalserver.common.util.*;
 import org.skynet.service.provider.hunting.obsolete.common.util.*;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.enums.ABTestGroup;
@@ -15,13 +14,9 @@ import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordCh
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CalculateAIFilterParametersBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.LocalPlayerCalculateAIFilterParametersBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.RecordDataAndBase64;
-import com.cn.huntingrivalserver.pojo.dto.*;
-import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import com.cn.huntingrivalserver.pojo.table.*;
-import com.cn.huntingrivalserver.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

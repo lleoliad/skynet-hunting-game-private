@@ -16,7 +16,6 @@ import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DownloadPlayersIconDto;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.RankOtherPlayerDetailDto;
-import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;

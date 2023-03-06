@@ -15,8 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "PromotionEventGunGiftPackageTableValueV2对象", description = "第二版活动礼包的第二三档，枪械礼包")
-public class PromotionEventGunGiftPackageV2TableValue implements Serializable {
+@ApiModel(value = "PromotionGunGiftPackageV2TableValue对象", description = "第二版活动礼包的第二三档，枪械礼包")
+public class PromotionGunGiftPackageV2TableValue implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

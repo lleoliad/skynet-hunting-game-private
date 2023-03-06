@@ -56,7 +56,7 @@ skynet:
       database: 0
       root-key: ${skynet.project.name}-${skynet.service.name}
     codis:
-      host: redis.${skynet.domain-name}
+      host: codis.${skynet.domain-name}
       port: 6379
       password: 4KowHp6
       database: 0

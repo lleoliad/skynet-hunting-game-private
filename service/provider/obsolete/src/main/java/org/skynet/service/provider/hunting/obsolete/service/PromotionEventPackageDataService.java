@@ -2,7 +2,7 @@ package org.skynet.service.provider.hunting.obsolete.service;
 
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PromotionEventPackageData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
-import org.skynet.service.provider.hunting.obsolete.pojo.table.PromotionEventPackageGroupV2TableValue;
+import org.skynet.service.provider.hunting.obsolete.pojo.table.PromotionGiftPackageGroupV2TableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PromotionEventPackageTableValue;
 
 public interface PromotionEventPackageDataService {
@@ -33,5 +33,5 @@ public interface PromotionEventPackageDataService {
 
     void refreshPromotionEventPackageV2Now(UserData userData, String gameVersion);
 
-    PromotionEventPackageGroupV2TableValue findUserPromotionEventPackageV2DataByPackageId(UserData userData, String gameVersion, String productName);
+    PromotionGiftPackageGroupV2TableValue findUserPromotionEventPackageV2DataByPackageId(UserData userData, String gameVersion, String productName);
 }

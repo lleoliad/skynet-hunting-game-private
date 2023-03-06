@@ -14,10 +14,7 @@ import org.skynet.service.provider.hunting.obsolete.config.VipV2Config;
 import org.skynet.service.provider.hunting.obsolete.config.VipV3Config;
 import org.skynet.service.provider.hunting.obsolete.enums.OrderState;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateDTO;
-import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import com.cn.huntingrivalserver.pojo.table.*;
-import com.cn.huntingrivalserver.service.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
@@ -368,7 +365,7 @@ public class IAPServiceImpl implements IAPService {
                 productPrice = promotionPackageData.getPrice();
             }
 //            内购活动礼包V2
-            PromotionEventPackageGroupV2TableValue promotionEventPackageGroupV2 = packageDataService.findUserPromotionEventPackageV2DataByPackageId(userData, gameVersion, productName);
+            PromotionGiftPackageGroupV2TableValue promotionEventPackageGroupV2 = packageDataService.findUserPromotionEventPackageV2DataByPackageId(userData, gameVersion, productName);
             if (promotionEventPackageGroupV2 != null) {
                 ChestOpenResult chestOpenResult = null;
                 List<PromotionGiftPackageV2Data> giftPackagesV2Data = userData.getPromotionGiftPackagesV2Data();
@@ -376,8 +373,8 @@ public class IAPServiceImpl implements IAPService {
                     if (Objects.equals(giftPackagesV2Datum.getPackageGroupId(), promotionEventPackageGroupV2.getId())) {
                         if (giftPackagesV2Datum.getPackageType() == 1) {
                             String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + giftPackagesV2Datum.getPackageType() + "_" + giftPackagesV2Datum.getPackageId();
-                            Map<String, PromotionEventPackageV2TableValue> packageV2TableValueMap = GameEnvironment.promotionEventPackageV2TableMap.get(gameVersion);
-                            PromotionEventPackageV2TableValue promotionEventPackageV2 = packageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
+                            Map<String, PromotionGiftPackageV2TableValue> packageV2TableValueMap = GameEnvironment.promotionGiftPackageV2TableMap.get(gameVersion);
+                            PromotionGiftPackageV2TableValue promotionEventPackageV2 = packageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
                             chestOpenResult = purchasePromotionEventPackageV2(userData, promotionEventPackageV2, purchaseKey, gameVersion);
 
                             result.setChestOpenResult(chestOpenResult);
@@ -390,8 +387,8 @@ public class IAPServiceImpl implements IAPService {
                             productPrice = promotionEventPackageGroupV2.getPrice();
                         } else {
                             String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + promotionEventPackageGroupV2.getPackageTypesArray().get(0) + "_" + giftPackagesV2Datum.getPackageId();
-                            Map<String, PromotionEventGunGiftPackageV2TableValue> gunGiftPackageV2TableValueMap = GameEnvironment.promotionEventGunGiftPackageV2TableMap.get(gameVersion);
-                            PromotionEventGunGiftPackageV2TableValue gunGiftPackageV2 = gunGiftPackageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
+                            Map<String, PromotionGunGiftPackageV2TableValue> gunGiftPackageV2TableValueMap = GameEnvironment.promotionGunGiftPackageV2TableMap.get(gameVersion);
+                            PromotionGunGiftPackageV2TableValue gunGiftPackageV2 = gunGiftPackageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
                             chestOpenResult = promotionGunPackageRewardDelivery(gunGiftPackageV2, userData, gameVersion, purchaseKey);
                             result.setChestOpenResult(chestOpenResult);
 
@@ -577,7 +574,7 @@ public class IAPServiceImpl implements IAPService {
         return result;
     }
 
-    private ChestOpenResult promotionGunPackageRewardDelivery(PromotionEventGunGiftPackageV2TableValue packageTableValue, UserData userData, String gameVersion, String purchaseKey) {
+    private ChestOpenResult promotionGunPackageRewardDelivery(PromotionGunGiftPackageV2TableValue packageTableValue, UserData userData, String gameVersion, String purchaseKey) {
         List<String> eventPackagesV2Keys = userData.getServerOnly().getPurchasedPromotionEventPackagesV2Keys();
 
         if (eventPackagesV2Keys.contains(purchaseKey)) {
@@ -640,7 +637,7 @@ public class IAPServiceImpl implements IAPService {
         return chestOpenResult;
     }
 
-    private ChestOpenResult purchasePromotionEventPackageV2(UserData userData, PromotionEventPackageV2TableValue promotionEventPackageV2, String purchaseKey, String gameVersion) {
+    private ChestOpenResult purchasePromotionEventPackageV2(UserData userData, PromotionGiftPackageV2TableValue promotionEventPackageV2, String purchaseKey, String gameVersion) {
 
         List<String> packagesV2Keys = userData.getServerOnly().getPurchasedPromotionEventPackagesV2Keys();
         if (packagesV2Keys.contains(purchaseKey)) {
@@ -713,9 +710,9 @@ public class IAPServiceImpl implements IAPService {
 
         }
 
-        Map<String, PromotionEventGunGiftPackageV2TableValue> promotionEventGunGiftPackageTable = GameEnvironment.promotionEventGunGiftPackageV2TableMap.get(gameVersion);
+        Map<String, PromotionGunGiftPackageV2TableValue> promotionEventGunGiftPackageTable = GameEnvironment.promotionGunGiftPackageV2TableMap.get(gameVersion);
         //奖励
-        PromotionEventGunGiftPackageV2TableValue packageTableValue = promotionEventGunGiftPackageTable.get(String.valueOf(purchasePackageData.getPackageId()));
+        PromotionGunGiftPackageV2TableValue packageTableValue = promotionEventGunGiftPackageTable.get(String.valueOf(purchasePackageData.getPackageId()));
 
 
         ChestOpenResult chestOpenResult = new ChestOpenResult();

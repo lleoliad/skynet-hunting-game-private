@@ -8,9 +8,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.config.IAPProductPrefix;
 import org.skynet.service.provider.hunting.obsolete.enums.ForceTutorialStepNames;
-import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import com.cn.huntingrivalserver.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.PromotionEventPackageDataService;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
 import lombok.extern.slf4j.Slf4j;
@@ -164,19 +162,19 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
     }
 
     @Override
-    public PromotionEventPackageGroupV2TableValue findUserPromotionEventPackageV2DataByPackageId(UserData userData, String gameVersion, String productName) {
+    public PromotionGiftPackageGroupV2TableValue findUserPromotionEventPackageV2DataByPackageId(UserData userData, String gameVersion, String productName) {
 
         if (userData.getPromotionGiftPackagesV2Data() == null || userData.getPromotionGiftPackagesV2Data().size() == 0) {
             return null;
         }
 
-        Map<String, PromotionEventPackageGroupV2TableValue> groupV2TableValueMap = GameEnvironment.promotionEventPackageGroupV2TableMap.get(gameVersion);
+        Map<String, PromotionGiftPackageGroupV2TableValue> groupV2TableValueMap = GameEnvironment.promotionGiftPackageGroupV2TableMap.get(gameVersion);
 
 
-        List<PromotionEventPackageGroupV2TableValue> targetPackages = new ArrayList<>();
-        groupV2TableValueMap.forEach(new BiConsumer<String, PromotionEventPackageGroupV2TableValue>() {
+        List<PromotionGiftPackageGroupV2TableValue> targetPackages = new ArrayList<>();
+        groupV2TableValueMap.forEach(new BiConsumer<String, PromotionGiftPackageGroupV2TableValue>() {
             @Override
-            public void accept(String s, PromotionEventPackageGroupV2TableValue groupV2TableValue) {
+            public void accept(String s, PromotionGiftPackageGroupV2TableValue groupV2TableValue) {
                 if (groupV2TableValue.getProductName().equals(productName)) {
                     targetPackages.add(groupV2TableValue);
                 }
@@ -730,11 +728,11 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         List<String> purchasedPromotionEventPackagesV2Keys = userData.getServerOnly().getPurchasedPromotionEventPackagesV2Keys();
 
         //拿到所有礼包信息
-        Map<String, PromotionEventPackageGroupV2TableValue> groupMap = GameEnvironment.promotionEventPackageGroupV2TableMap.get(gameVersion);
+        Map<String, PromotionGiftPackageGroupV2TableValue> groupMap = GameEnvironment.promotionGiftPackageGroupV2TableMap.get(gameVersion);
 
 
         for (String key : groupMap.keySet()) {
-            PromotionEventPackageGroupV2TableValue groupV2TableValue = groupMap.get(key);
+            PromotionGiftPackageGroupV2TableValue groupV2TableValue = groupMap.get(key);
 
             //检查数据
             if (groupV2TableValue.getPackageTypesArray().size() != groupV2TableValue.getActiveTimeArray().size() ||
@@ -746,11 +744,11 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                 Integer packageType = groupV2TableValue.getPackageTypesArray().get(i);
 
                 PromotionGiftPackageV2Data packageData = new PromotionGiftPackageV2Data();
-                PromotionEventPackageV2TableValue packageTableValue = findPackageV2TableValueByPackageTypeAndLevelAsync(packageType, packageLevel, gameVersion);
+                PromotionGiftPackageV2TableValue packageTableValue = findPackageV2TableValueByPackageTypeAndLevelAsync(packageType, packageLevel, gameVersion);
                 packageData.setPackageType(1);
                 if (packageTableValue == null) {
-                    PromotionEventGunGiftPackageV2TableValue gunGiftPackageV2 = findPromotionEventGunGiftPackageV2(packageType, packageLevel, gameVersion);
-                    packageTableValue = new PromotionEventPackageV2TableValue();
+                    PromotionGunGiftPackageV2TableValue gunGiftPackageV2 = findPromotionEventGunGiftPackageV2(packageType, packageLevel, gameVersion);
+                    packageTableValue = new PromotionGiftPackageV2TableValue();
                     packageTableValue.setId(gunGiftPackageV2.getId());
                     packageTableValue.setPackageType(gunGiftPackageV2.getPackageType());
                     packageTableValue.setChestType(gunGiftPackageV2.getRewardChestType());
@@ -829,11 +827,11 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
     }
 
 
-    private PromotionEventPackageV2TableValue findPackageV2TableValueByPackageTypeAndLevelAsync(Integer packageType, Integer packageLevel, String gameVersion) {
-        Map<String, PromotionEventPackageV2TableValue> promotionEventPackageTable = GameEnvironment.promotionEventPackageV2TableMap.get(gameVersion);
-        PromotionEventPackageV2TableValue lowestLevelPackageTableValue = null;
+    private PromotionGiftPackageV2TableValue findPackageV2TableValueByPackageTypeAndLevelAsync(Integer packageType, Integer packageLevel, String gameVersion) {
+        Map<String, PromotionGiftPackageV2TableValue> promotionEventPackageTable = GameEnvironment.promotionGiftPackageV2TableMap.get(gameVersion);
+        PromotionGiftPackageV2TableValue lowestLevelPackageTableValue = null;
         for (String key : promotionEventPackageTable.keySet()) {
-            PromotionEventPackageV2TableValue tableValue = promotionEventPackageTable.get(key);
+            PromotionGiftPackageV2TableValue tableValue = promotionEventPackageTable.get(key);
             if (tableValue.getPackageType() == packageType) {
                 if (tableValue.getPackageLevel() == packageLevel) {
                     return tableValue;
@@ -852,13 +850,13 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
     }
 
 
-    private PromotionEventGunGiftPackageV2TableValue findPromotionEventGunGiftPackageV2(Integer packageType, Integer packageLevel, String gameVersion) {
-        Map<String, PromotionEventGunGiftPackageV2TableValue> promotionEventGunGiftPackageTable = GameEnvironment.promotionEventGunGiftPackageV2TableMap.get(gameVersion);
-        PromotionEventGunGiftPackageV2TableValue lowestLevelPackageTableValue = null;
+    private PromotionGunGiftPackageV2TableValue findPromotionEventGunGiftPackageV2(Integer packageType, Integer packageLevel, String gameVersion) {
+        Map<String, PromotionGunGiftPackageV2TableValue> promotionEventGunGiftPackageTable = GameEnvironment.promotionGunGiftPackageV2TableMap.get(gameVersion);
+        PromotionGunGiftPackageV2TableValue lowestLevelPackageTableValue = null;
 
         //新增，第二，三档的章节礼包，单独配置了另一张表，所以需要二次查找
         for (String key : promotionEventGunGiftPackageTable.keySet()) {
-            PromotionEventGunGiftPackageV2TableValue tableValue = promotionEventGunGiftPackageTable.get(key);
+            PromotionGunGiftPackageV2TableValue tableValue = promotionEventGunGiftPackageTable.get(key);
             if (tableValue.getPackageType() == packageType) {
                 if (tableValue.getPackageLevel() == packageLevel) {
                     return tableValue;

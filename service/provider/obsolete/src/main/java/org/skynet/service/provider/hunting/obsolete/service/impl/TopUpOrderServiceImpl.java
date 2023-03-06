@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.skynet.service.provider.hunting.obsolete.mapper.TopUpOrderMapper;
+import org.skynet.service.provider.hunting.obsolete.dao.mapper.TopUpOrderMapper;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.TopUpOrder;
 import org.skynet.service.provider.hunting.obsolete.service.TopUpOrderService;
 import org.springframework.stereotype.Service;

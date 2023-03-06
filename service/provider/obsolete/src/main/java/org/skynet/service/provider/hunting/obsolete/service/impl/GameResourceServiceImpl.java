@@ -7,7 +7,6 @@ import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.DeflaterUtils;
 import org.skynet.service.provider.hunting.obsolete.enums.Table;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import com.cn.huntingrivalserver.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.GameResourceService;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.springframework.stereotype.Service;
@@ -160,11 +159,11 @@ public class GameResourceServiceImpl implements GameResourceService {
             Map<String, ChestTableValue> chestTableValueMap = JSONObject.parseObject(content, new TypeReference<Map<String, ChestTableValue>>() {
             });
             GameEnvironment.chestTableMap.put(version, chestTableValueMap);
-        } else if (tableName.equals(Table.GunGiftPackageTable.getName()) && CommonUtils.compareVersion(version)) {
+        } else if (tableName.equals(Table.GunGiftPackage.getName()) && CommonUtils.compareVersion(version)) {
             Map<String, GunGiftPackageTableValue> gunGiftPackageTableValueMap = JSONObject.parseObject(content, new TypeReference<Map<String, GunGiftPackageTableValue>>() {
             });
             GameEnvironment.gunGiftPackageTableMap.put(version, gunGiftPackageTableValueMap);
-        } else if (tableName.equals(Table.GunGiftPackageGroupTable.getName()) && CommonUtils.compareVersion(version)) {
+        } else if (tableName.equals(Table.GunGiftPackageGroup.getName()) && CommonUtils.compareVersion(version)) {
             Map<String, GunGiftPackageGroupTableValue> gunGiftPackageGroupTableValueMap = JSONObject.parseObject(content, new TypeReference<Map<String, GunGiftPackageGroupTableValue>>() {
             });
             GameEnvironment.gunGiftPackageGroupTableMap.put(version, gunGiftPackageGroupTableValueMap);
@@ -187,22 +186,22 @@ public class GameResourceServiceImpl implements GameResourceService {
             Map<String, LuckyWheelV2SectorContentTableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, LuckyWheelV2SectorContentTableValue>>() {
             });
             GameEnvironment.luckyWheelV2SectorContentTableMap.put(version, map);
-        } else if (tableName.equals(Table.chapterGunGiftPackage.getName()) && CommonUtils.compareVersion(version)) {
+        } else if (tableName.equals(Table.ChapterGunGiftPackage.getName()) && CommonUtils.compareVersion(version)) {
             Map<String, ChapterGunGiftPackageTableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, ChapterGunGiftPackageTableValue>>() {
             });
             GameEnvironment.chapterGunGiftPackageTableMap.put(version, map);
         } else if (tableName.equals(Table.PromotionGiftPackageGroupV2.getName()) && CommonUtils.compareVersion(version)) {
-            Map<String, PromotionEventPackageGroupV2TableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, PromotionEventPackageGroupV2TableValue>>() {
+            Map<String, PromotionGiftPackageGroupV2TableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, PromotionGiftPackageGroupV2TableValue>>() {
             });
-            GameEnvironment.promotionEventPackageGroupV2TableMap.put(version, map);
+            GameEnvironment.promotionGiftPackageGroupV2TableMap.put(version, map);
         } else if (tableName.equals(Table.PromotionGiftPackageV2.getName()) && CommonUtils.compareVersion(version)) {
-            Map<String, PromotionEventPackageV2TableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, PromotionEventPackageV2TableValue>>() {
+            Map<String, PromotionGiftPackageV2TableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, PromotionGiftPackageV2TableValue>>() {
             });
-            GameEnvironment.promotionEventPackageV2TableMap.put(version, map);
+            GameEnvironment.promotionGiftPackageV2TableMap.put(version, map);
         } else if (tableName.equals(Table.PromotionGunGiftPackageV2.getName()) && CommonUtils.compareVersion(version)) {
-            Map<String, PromotionEventGunGiftPackageV2TableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, PromotionEventGunGiftPackageV2TableValue>>() {
+            Map<String, PromotionGunGiftPackageV2TableValue> map = JSONObject.parseObject(content, new TypeReference<Map<String, PromotionGunGiftPackageV2TableValue>>() {
             });
-            GameEnvironment.promotionEventGunGiftPackageV2TableMap.put(version, map);
+            GameEnvironment.promotionGunGiftPackageV2TableMap.put(version, map);
         }
 
     }
