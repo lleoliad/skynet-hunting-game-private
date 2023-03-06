@@ -87,19 +87,19 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
             throw new BusinessException("无法找到合适的" + Table.LuckyWheelReward.getName() + "value");
         }
 
-        if (targetRewardTableValue.getRewardIndexWeightsArray().size() != targetRewardTableValue.getRewardIndicesArray().size()) {
+        if (targetRewardTableValue.getRewardIndexWeights().size() != targetRewardTableValue.getRewardIndices().size()) {
             throw new BusinessException(Table.LuckyWheelReward.getName() + "的id" + targetRewardTableValue.getId() + "中的rewardIndexWeightsArray长度 不等于 rewardIndicesArray长度");
         }
 
         int rewardTotalWeight = 0;
-        rewardTotalWeight = targetRewardTableValue.getRewardIndexWeightsArray().stream().mapToInt(Integer::intValue).sum();
+        rewardTotalWeight = targetRewardTableValue.getRewardIndexWeights().stream().mapToInt(Integer::intValue).sum();
 
         //找到reward index
         Integer targetRewardIndex = null;
-        for (int i = 0; i < targetRewardTableValue.getRewardIndicesArray().size(); i++) {
+        for (int i = 0; i < targetRewardTableValue.getRewardIndices().size(); i++) {
 
-            int rewardIndex = targetRewardTableValue.getRewardIndicesArray().get(i);
-            int rewardIndexWeight = targetRewardTableValue.getRewardIndexWeightsArray().get(i);
+            int rewardIndex = targetRewardTableValue.getRewardIndices().get(i);
+            int rewardIndexWeight = targetRewardTableValue.getRewardIndexWeights().get(i);
 
             Integer random = NumberUtils.randomInt(0.0, (rewardTotalWeight + 1) * 1.0);
             if (random <= rewardIndexWeight) {
@@ -113,7 +113,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
 
         if (targetRewardIndex == null) {
 
-            targetRewardIndex = targetRewardTableValue.getRewardIndicesArray().get(targetRewardTableValue.getRewardIndicesArray().size() - 1);
+            targetRewardIndex = targetRewardTableValue.getRewardIndices().get(targetRewardTableValue.getRewardIndices().size() - 1);
         }
 
         log.info("找到 reward index" + targetRewardIndex);
@@ -126,7 +126,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
             throw new BusinessException(Table.LuckyWheelSectorContent.getName() + "中 没有id" + luckyWheelChapterId);
         }
 
-        Integer rewardChestType = sectorContentTableValue.getChestTypesArray().get(targetRewardIndex);
+        Integer rewardChestType = sectorContentTableValue.getChestTypes().get(targetRewardIndex);
         if (rewardChestType >= ChestType.SILVER.getType()) {
 
             //宝箱奖励
@@ -138,7 +138,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
         } else {
 
             //金币奖励
-            Integer coinRewardAmount = sectorContentTableValue.getCoinAmountsArray().get(targetRewardIndex);
+            Integer coinRewardAmount = sectorContentTableValue.getCoinAmounts().get(targetRewardIndex);
             log.info("转盘获得金币奖励" + coinRewardAmount);
             userData.setCoin(userData.getCoin() + coinRewardAmount);
             return new LuckyWheelSpinReward(targetRewardIndex, coinRewardAmount, null);
@@ -305,21 +305,21 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
         if (targetRewardTableValue == null) {
             throw new BusinessException("无法找到合适的LuckyWheelRewardTableValue");
         }
-        if (targetRewardTableValue.getRewardIndexWeightsArray().size() != targetRewardTableValue.getRewardIndicesArray().size()) {
+        if (targetRewardTableValue.getRewardIndexWeights().size() != targetRewardTableValue.getRewardIndices().size()) {
             throw new BusinessException("LuckyWheelRewardTable id " + targetRewardTableValue.getId() + " 中的rewardIndexWeightsArray长度 不等于 rewardIndicesArray长度");
         }
 
         int rewardTotalWeight = 0;
-        for (int i = 0; i < targetRewardTableValue.getRewardIndexWeightsArray().size(); i++) {
-            Integer weight = targetRewardTableValue.getRewardIndexWeightsArray().get(i);
+        for (int i = 0; i < targetRewardTableValue.getRewardIndexWeights().size(); i++) {
+            Integer weight = targetRewardTableValue.getRewardIndexWeights().get(i);
             rewardTotalWeight += weight;
         }
 
         //找到reward index
         Integer targetRewardIndex = null;
-        for (int i = 0; i < targetRewardTableValue.getRewardIndicesArray().size(); i++) {
-            Integer rewardIndex = targetRewardTableValue.getRewardIndicesArray().get(i);
-            Integer rewardIndexWeight = targetRewardTableValue.getRewardIndexWeightsArray().get(i);
+        for (int i = 0; i < targetRewardTableValue.getRewardIndices().size(); i++) {
+            Integer rewardIndex = targetRewardTableValue.getRewardIndices().get(i);
+            Integer rewardIndexWeight = targetRewardTableValue.getRewardIndexWeights().get(i);
 
             Integer random = NumberUtils.randomInt(0d, rewardTotalWeight + 1d);
             if (random <= rewardIndexWeight) {
@@ -331,7 +331,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
 
         //防止找不到
         if (targetRewardIndex == null) {
-            targetRewardIndex = targetRewardTableValue.getRewardIndicesArray().get(targetRewardTableValue.getRewardIndicesArray().size() - 1);
+            targetRewardIndex = targetRewardTableValue.getRewardIndices().get(targetRewardTableValue.getRewardIndices().size() - 1);
         }
 //        log.info("targetRewardTableValue:" + targetRewardTableValue.toString());
 //        log.info("targetRewardIndex:" + targetRewardIndex);
@@ -345,14 +345,14 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
             throw new BusinessException("LuckyWheelV2SectorContentTable中 没有id " + sectorContentId);
         }
 
-        if (sectorContentTableValue.getRewardTypesArray().size() != sectorContentTableValue.getRewardAmountsArray().size()) {
+        if (sectorContentTableValue.getRewardTypes().size() != sectorContentTableValue.getRewardAmounts().size()) {
             throw new BusinessException("LuckyWheelV2SectorContentTable表中id " + sectorContentTableValue.getId() + " 的rewardTypesArray数组长度!=rewardAmountsArray数组长度");
         }
 
-        LuckyWheelV2RewardType rewardType = LuckyWheelV2RewardType.values()[sectorContentTableValue.getRewardTypesArray().get(targetRewardIndex) - 1];
+        LuckyWheelV2RewardType rewardType = LuckyWheelV2RewardType.values()[sectorContentTableValue.getRewardTypes().get(targetRewardIndex) - 1];
 //        log.info("rewardType:" + rewardType.getType());
 //        log.info("luckyWheelV2SectorContentTable:" + luckyWheelV2SectorContentTable.toString());
-        Integer rewardCount = sectorContentTableValue.getRewardAmountsArray().get(targetRewardIndex);
+        Integer rewardCount = sectorContentTableValue.getRewardAmounts().get(targetRewardIndex);
         int playerHighestUnlockedChapterID = userDataService.getPlayerHighestUnlockedChapterID(userData);
 
         LuckyWheelV2SpinRewardBO spinRewardResult = new LuckyWheelV2SpinRewardBO();

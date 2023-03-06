@@ -1318,12 +1318,12 @@ public class UserDataServiceImpl implements UserDataService {
         Map<String, GunTableValue> gunTable = GameEnvironment.gunTableMap.get(gameVersion);
         GunTableValue gunTableValue = gunTable.get(String.valueOf(gunId));
 
-        if (gunLevel - 1 >= gunTableValue.getLevelCultivateScoresArray().size()) {
+        if (gunLevel - 1 >= gunTableValue.getLevelCultivateScores().size()) {
             throw new BusinessException("gun level-1" + (gunLevel - 1) + "大于GunTable" + gunId + "中的levelCultivateScoresArray数组长度" +
-                    JSONObject.toJSONString(gunTableValue.getLevelCultivateScoresArray()));
+                    JSONObject.toJSONString(gunTableValue.getLevelCultivateScores()));
         }
 
-        Integer gunCultivateScore = gunTableValue.getLevelCultivateScoresArray().get(gunLevel - 1);
+        Integer gunCultivateScore = gunTableValue.getLevelCultivateScores().get(gunLevel - 1);
 
         Map<String, BulletTableValue> bulletTable = GameEnvironment.bulletTableMap.get(gameVersion);
         BulletTableValue bulletTableValue = bulletTable.get(String.valueOf(bulletId));

@@ -35,8 +35,8 @@ public class GunTableValue implements Serializable {
     private Integer maxLevel;
 
     @ApiModelProperty(value = "升级所需金币")
-    private List<Integer> upgradeCoinRequiresArray;
+    private List<Integer> upgradeCoinRequires;
 
     @ApiModelProperty(value = "养成分数(对应等级)")
-    private List<Integer> levelCultivateScoresArray;
+    private List<Integer> levelCultivateScores;
 }

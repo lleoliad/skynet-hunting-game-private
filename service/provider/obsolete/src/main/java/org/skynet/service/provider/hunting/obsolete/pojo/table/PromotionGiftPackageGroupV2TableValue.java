@@ -26,13 +26,13 @@ public class PromotionGiftPackageGroupV2TableValue implements Serializable {
     private String productName;
 
     @ApiModelProperty(value = "礼包类型")
-    private List<Integer> packageTypesArray;
+    private List<Integer> packageTypes;
 
     @ApiModelProperty(value = "开启时间(相对于玩家注册事件)")
-    private List<Integer> activeTimeArray;
+    private List<Integer> activeTime;
 
     @ApiModelProperty(value = "过期时间(相对于玩家注册事件)")
-    private List<Integer> expireTimeArray;
+    private List<Integer> expireTime;
 
     @ApiModelProperty(value = "价格")
     private Double price;

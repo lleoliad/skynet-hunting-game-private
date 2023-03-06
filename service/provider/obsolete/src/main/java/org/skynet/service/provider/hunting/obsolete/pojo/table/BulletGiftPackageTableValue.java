@@ -25,9 +25,9 @@ public class BulletGiftPackageTableValue implements Serializable {
     @ApiModelProperty(value = "价格", notes = "1:小型 2:中型 3:大型")
     private Double price;
     @ApiModelProperty(value = "奖励子弹id")
-    private List<Integer> rewardBulletIdArray;
+    private List<Integer> rewardBulletId;
     @ApiModelProperty(value = "奖励子弹数量")
-    private List<Integer> rewardBulletCountArray;
+    private List<Integer> rewardBulletCount;
     @ApiModelProperty(value = "奖励宝箱类型")
     private Integer rewardChestType;
     @ApiModelProperty(value = "奖励钻石")
@@ -35,9 +35,9 @@ public class BulletGiftPackageTableValue implements Serializable {
     @ApiModelProperty(value = "第几天可见")
     private Integer visibleDaysAfterSignUp;
     @ApiModelProperty(value = "开启时间")
-    private List<Long> enableStandardTimeArray;
+    private List<Long> enableStandardTime;
     @ApiModelProperty(value = "结束时间")
-    private List<Long> disableStandardTimeArray;
+    private List<Long> disableStandardTime;
     @ApiModelProperty(value = "商品名")
     private String productName;
 

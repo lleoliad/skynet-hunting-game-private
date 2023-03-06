@@ -29,8 +29,8 @@ public class ChestBulletTableValue implements Serializable {
     private Integer chestLevel;
 
     @ApiModelProperty(value = "子弹id")
-    private List<Integer> rewardBulletIdsArray;
+    private List<Integer> rewardBulletIds;
 
     @ApiModelProperty(value = "备用子弹id")
-    private List<Integer> fallbackRewardBulletIdsArray;
+    private List<Integer> fallbackRewardBulletIds;
 }

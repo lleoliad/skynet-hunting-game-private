@@ -144,7 +144,7 @@ public class WeaponController {
                 throw new BusinessException("升级枪械,用户" + userData.getUuid() + "枪械" + request.getGunId() + "数量不足.有" + gunCountBeforeUpgrade + ",需要" + upgradeCountRequires);
             }
 
-            int upgradeCoinRequires = gunValue.getUpgradeCoinRequiresArray().get(gunLevelBeforeUpgrade - 1);
+            int upgradeCoinRequires = gunValue.getUpgradeCoinRequires().get(gunLevelBeforeUpgrade - 1);
 
             if (userData.getCoin() < upgradeCoinRequires) {
                 throw new BusinessException("升级枪械,用户" + userData.getUuid() + "枪械" + request.getGunId() + "升级金币数量不足.有" + userData.getCoin() + ",需要" + upgradeCoinRequires);

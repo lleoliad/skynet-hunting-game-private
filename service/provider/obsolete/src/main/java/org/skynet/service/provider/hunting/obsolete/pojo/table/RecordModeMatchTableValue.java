@@ -26,10 +26,10 @@ public class RecordModeMatchTableValue implements Serializable {
     private Integer chapterId;
 
     @ApiModelProperty("match序列")
-    private List<Integer> matchIdSequenceArray;
+    private List<Integer> matchIdSequence;
 
     @ApiModelProperty("玩家的奖杯区间")
-    private List<Integer> playerTrophyRangeArray;
+    private List<Integer> playerTrophyRange;
 
     @ApiModelProperty("玩家枪id")
     private Integer playerGunId;

@@ -29,8 +29,8 @@ public class LuckyWheelPropertyTable implements Serializable {
     private Integer freeSpinIncreaseOnceSeconds;
 
     @ApiModelProperty("累计奖励旋转次数")
-    private List<Integer> cumulativeRewardSpinCountArray;
+    private List<Integer> cumulativeRewardSpinCount;
 
     @ApiModelProperty("累计奖励对应的钻石奖励")
-    private List<Integer> cumulativeRewardDiamondCountArray;
+    private List<Integer> cumulativeRewardDiamondCount;
 }

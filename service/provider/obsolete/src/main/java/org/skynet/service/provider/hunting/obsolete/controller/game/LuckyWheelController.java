@@ -127,17 +127,17 @@ public class LuckyWheelController {
             luckyWheelData.setCumulativeRewardSpinCount(luckyWheelData.getCumulativeRewardSpinCount() + spinCount);
             Integer cumulativeRewardSpinCountEnd = luckyWheelData.getCumulativeRewardSpinCount();
 
-            if (luckyWheelProperty.getCumulativeRewardSpinCountArray().size() !=
-                    luckyWheelProperty.getCumulativeRewardDiamondCountArray().size()
+            if (luckyWheelProperty.getCumulativeRewardSpinCount().size() !=
+                    luckyWheelProperty.getCumulativeRewardDiamondCount().size()
             ) {
                 throw new BusinessException("LuckyWheelProperty表中cumulativeRewardSpinCountArray数组长度 != cumulativeRewardDiamondCountArray数组长度");
             }
 
-            List<Integer> luckyWheelCumulativeRewardSpinCountArray = luckyWheelProperty.getCumulativeRewardSpinCountArray();
+            List<Integer> luckyWheelCumulativeRewardSpinCountArray = luckyWheelProperty.getCumulativeRewardSpinCount();
             for (int i = 0; i < luckyWheelCumulativeRewardSpinCountArray.size(); i++) {
 
                 Integer rewardRequiresCumulativeCount = luckyWheelCumulativeRewardSpinCountArray.get(i);
-                Integer diamondReward = luckyWheelProperty.getCumulativeRewardDiamondCountArray().get(i);
+                Integer diamondReward = luckyWheelProperty.getCumulativeRewardDiamondCount().get(i);
 
                 //vip转盘，可能一次获得多次累计奖励
                 if (rewardRequiresCumulativeCount >= cumulativeRewardSpinCountStart && rewardRequiresCumulativeCount <= cumulativeRewardSpinCountEnd) {

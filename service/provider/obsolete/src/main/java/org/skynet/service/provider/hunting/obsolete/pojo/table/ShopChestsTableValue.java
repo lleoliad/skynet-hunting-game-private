@@ -26,5 +26,5 @@ public class ShopChestsTableValue implements Serializable {
     private Integer chestType;
 
     @ApiModelProperty("价格")
-    private List<Integer> diamondPriceArray;
+    private List<Integer> diamondPrice;
 }

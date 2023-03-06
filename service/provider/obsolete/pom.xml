@@ -56,7 +56,7 @@
 
         <dependency>
             <groupId>org.skynet.cloud</groupId>
-            <artifactId>skynet-hunting-data</artifactId>
+            <artifactId>skynet-hunting-components-data</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

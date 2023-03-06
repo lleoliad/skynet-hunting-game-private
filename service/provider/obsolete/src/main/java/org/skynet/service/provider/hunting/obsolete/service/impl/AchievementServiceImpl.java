@@ -142,12 +142,12 @@ public class AchievementServiceImpl implements AchievementService {
 
             int round = detail.getRound();
             int animalIndex = round - 1;
-            if (animalIndex >= chapterTableValue.getMatchRouteAnimalSequenceArray().size()) {
+            if (animalIndex >= chapterTableValue.getMatchRouteAnimalSequence().size()) {
                 throw new BusinessException("animalIndex >= matchRouteAnimalSequenceArray. animalIndex " + animalIndex + ", matchRouteAnimalSequenceArray:" +
-                        JSONObject.toJSONString(chapterTableValue.getMatchRouteAnimalSequenceArray()));
+                        JSONObject.toJSONString(chapterTableValue.getMatchRouteAnimalSequence()));
             }
 
-            int animalId = chapterTableValue.getMatchRouteAnimalSequenceArray().get(animalIndex);
+            int animalId = chapterTableValue.getMatchRouteAnimalSequence().get(animalIndex);
             AnimalTableValue animalTableValue = animalTable.get(String.valueOf(animalId));
             AnimalSizeType[] values = AnimalSizeType.values();
             AnimalSizeType animalSize = values[animalTableValue.getSizeType()];

@@ -32,7 +32,7 @@ public class MatchAIRoundRuleTableValue implements Serializable {
     private Integer winLoseProne;
 
     @ApiModelProperty("AI规则编号")
-    private List<Integer> ruleIndexArray;
+    private List<Integer> ruleIndex;
 
     @ApiModelProperty("参与循环")
     private Boolean allowLoopPick;
@@ -41,5 +41,5 @@ public class MatchAIRoundRuleTableValue implements Serializable {
     private Boolean isPlayerFirst;
 
     @ApiModelProperty("AI可用武器组合")
-    private List<Integer> aiWeaponCombinationIdArray;
+    private List<Integer> aiWeaponCombinationId;
 }

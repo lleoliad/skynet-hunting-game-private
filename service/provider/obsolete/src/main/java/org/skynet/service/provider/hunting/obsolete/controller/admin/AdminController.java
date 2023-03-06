@@ -391,7 +391,7 @@ public class AdminController {
                 //ai库编号
                 fightMessageMap.put("matchAIRoundRuleID", matchAiRoundRuleTableValue.getId());
                 //武器id
-                List<Integer> weaponCombinationIdArray = matchAiRoundRuleTableValue.getAiWeaponCombinationIdArray();
+                List<Integer> weaponCombinationIdArray = matchAiRoundRuleTableValue.getAiWeaponCombinationId();
                 Integer randomId = (Integer) NumberUtils.randomElementInArray(weaponCombinationIdArray);
                 fightMessageMap.put("weaponId", randomId);
                 fightMessageMap.put("gunId", opponentPlayerWeaponInfo.getGunId());
@@ -726,12 +726,12 @@ public class AdminController {
 
 
         int animalSequenceIndex = round - 1;
-        if (animalSequenceIndex >= chapterTableValue.getMatchRouteAnimalSequenceArray().size()) {
+        if (animalSequenceIndex >= chapterTableValue.getMatchRouteAnimalSequence().size()) {
 
             return new MatchAiRoundRecordFilterParameters(null, null, null, null, null, null, "Round exceed");
         }
 
-        int animalId = chapterTableValue.getMatchRouteAnimalSequenceArray().get(animalSequenceIndex);
+        int animalId = chapterTableValue.getMatchRouteAnimalSequence().get(animalSequenceIndex);
 
 
         //ruleIndex的index
@@ -740,9 +740,9 @@ public class AdminController {
             throw new BusinessException("过滤AI规则 filter：" + round + "round - 1 < 0");
         }
 
-        ruleIndexIndex %= matchAiRuleTableValue.getRuleIndexArray().size();
+        ruleIndexIndex %= matchAiRuleTableValue.getRuleIndex().size();
 
-        int ruleIndex = matchAiRuleTableValue.getRuleIndexArray().get(ruleIndexIndex);
+        int ruleIndex = matchAiRuleTableValue.getRuleIndex().get(ruleIndexIndex);
 
         //是否是玩家先开枪
         Boolean isPlayerFirst = matchAiRuleTableValue.getIsPlayerFirst();
@@ -870,8 +870,8 @@ public class AdminController {
 
         Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(gameVersion);
         ChapterTableValue chapterTableValue = chapterTable.get(String.valueOf(chapterId));
-        List<Integer> matchIdArray = chapterTableValue.getMatchIdArray();
-        List<Integer> loopMatchIdsArray = chapterTableValue.getLoopMatchIdsArray();
+        List<Integer> matchIdArray = chapterTableValue.getMatchId();
+        List<Integer> loopMatchIdsArray = chapterTableValue.getLoopMatchIds();
         int resultMatchId = 0;
         if (chapterEnteredCount >= matchIdArray.size()) {
             int loopIndex = (chapterEnteredCount - matchIdArray.size()) % loopMatchIdsArray.size();

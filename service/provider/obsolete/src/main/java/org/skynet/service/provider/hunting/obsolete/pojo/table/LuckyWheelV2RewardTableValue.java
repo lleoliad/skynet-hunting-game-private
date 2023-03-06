@@ -29,10 +29,10 @@ public class LuckyWheelV2RewardTableValue implements Serializable {
     private Boolean loop;
 
     @ApiModelProperty("奖励索引")
-    private List<Integer> rewardIndicesArray;
+    private List<Integer> rewardIndices;
 
     @ApiModelProperty("奖励索引权重")
-    private List<Integer> rewardIndexWeightsArray;
+    private List<Integer> rewardIndexWeights;
 
 
 }

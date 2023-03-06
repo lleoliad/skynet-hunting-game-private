@@ -26,13 +26,13 @@ public class GunGiftPackageGroupTableValue implements Serializable {
     @ApiModelProperty("第几天可见")
     private Integer visibleDaysAfterSignUp;
     @ApiModelProperty("开启时间")
-    private List<Long> enableStandardTimeArray;
+    private List<Long> enableStandardTime;
     @ApiModelProperty("结束时间")
-    private List<Long> disableStandardTimeArray;
+    private List<Long> disableStandardTime;
     @ApiModelProperty("商品名")
     private String productName;
     @ApiModelProperty("可用礼包id")
-    private List<Integer> availablePackageIdArray;
+    private List<Integer> availablePackageId;
 
 
 }

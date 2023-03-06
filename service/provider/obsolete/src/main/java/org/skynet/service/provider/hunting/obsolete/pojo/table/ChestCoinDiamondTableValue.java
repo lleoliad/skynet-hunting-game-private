@@ -29,14 +29,14 @@ public class ChestCoinDiamondTableValue implements Serializable {
     private Integer chestLevel;
 
     @ApiModelProperty("金币奖励")
-    private List<Integer> rewardCoinCountArray;
+    private List<Integer> rewardCoinCount;
 
     @ApiModelProperty("备用金币奖励")
-    private List<Integer> fallbackRewardCoinCountArray;
+    private List<Integer> fallbackRewardCoinCount;
 
     @ApiModelProperty("钻石奖励")
-    private List<Integer> rewardDiamondCountArray;
+    private List<Integer> rewardDiamondCount;
 
     @ApiModelProperty("备用钻石奖励")
-    private List<Integer> fallbackRewardDiamondCountArray;
+    private List<Integer> fallbackRewardDiamondCount;
 }

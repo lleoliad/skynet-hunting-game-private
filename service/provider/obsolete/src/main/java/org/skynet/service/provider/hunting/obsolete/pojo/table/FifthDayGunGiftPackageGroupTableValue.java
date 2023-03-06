@@ -28,11 +28,11 @@ public class FifthDayGunGiftPackageGroupTableValue implements Serializable {
     @ApiModelProperty(value = "持续时间")
     private Long enableDurationSeconds;
     @ApiModelProperty(value = "可启用最高章节")
-    private List<Integer> activeHighestChaptersArray;
+    private List<Integer> activeHighestChapters;
     @ApiModelProperty(value = "商品名")
     private String productName;
     @ApiModelProperty(value = "可用礼包id")
-    private List<Integer> availablePackageIdArray;
+    private List<Integer> availablePackageId;
 
 
 }

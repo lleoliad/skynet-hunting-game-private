@@ -23,8 +23,8 @@ public class LuckyWheelSectorContentTableValue implements Serializable {
     private Integer id;
 
     @ApiModelProperty("分区宝箱类型")
-    private List<Integer> chestTypesArray;
+    private List<Integer> chestTypes;
 
     @ApiModelProperty("分区金币数量")
-    private List<Integer> coinAmountsArray;
+    private List<Integer> coinAmounts;
 }

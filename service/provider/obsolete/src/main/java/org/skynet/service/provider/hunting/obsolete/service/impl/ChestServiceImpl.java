@@ -249,11 +249,11 @@ public class ChestServiceImpl implements ChestService {
         int winChestIndex = Math.max(0, chapterWinCount - 1);
 
         //获取宝箱类型,如果第一个奖励数组遍历完成,在第二个数组中循环
-        List<Integer> rewardChestTypeArray = chapterTableValue.getWinRewardChestTypeArray();
-        if (winChestIndex >= chapterTableValue.getWinRewardChestTypeArray().size()) {
+        List<Integer> rewardChestTypeArray = chapterTableValue.getWinRewardChestType();
+        if (winChestIndex >= chapterTableValue.getWinRewardChestType().size()) {
 
-            rewardChestTypeArray = chapterTableValue.getFallbackWinRewardChestTypeArray();
-            winChestIndex -= chapterTableValue.getWinRewardChestTypeArray().size();
+            rewardChestTypeArray = chapterTableValue.getFallbackWinRewardChestType();
+            winChestIndex -= chapterTableValue.getWinRewardChestType().size();
             winChestIndex %= rewardChestTypeArray.size();
         }
         int chestIndex = rewardChestTypeArray.get(winChestIndex);
@@ -455,8 +455,8 @@ public class ChestServiceImpl implements ChestService {
 
         int index = chestOpenIndexMap.getGunRewardIndexMap().getOrDefault(key, 0);
 
-        List<Integer> rewardGunIds = flattenGetElementFromRewardArray(chestGunTableValue.getRewardGunIdsArray(),
-                chestGunTableValue.getFallbackRewardGunIdsArray(),
+        List<Integer> rewardGunIds = flattenGetElementFromRewardArray(chestGunTableValue.getRewardGunIds(),
+                chestGunTableValue.getFallbackRewardGunIds(),
                 index,
                 getGunCount);
 
@@ -492,7 +492,7 @@ public class ChestServiceImpl implements ChestService {
         String key = bulletLibraryType + "_" + chestLevel;
         int index = chestOpenIndexMap.getBulletRewardIndexMap().getOrDefault(key, 0);
 
-        List<Integer> rewardBulletIds = flattenGetElementFromRewardArray(chestBulletTableValue.getRewardBulletIdsArray(), chestBulletTableValue.getFallbackRewardBulletIdsArray(), index, getBulletCount);
+        List<Integer> rewardBulletIds = flattenGetElementFromRewardArray(chestBulletTableValue.getRewardBulletIds(), chestBulletTableValue.getFallbackRewardBulletIds(), index, getBulletCount);
 
         chestOpenIndexMap.getBulletRewardIndexMap().put(key, index + getBulletCount);
 
@@ -592,8 +592,8 @@ public class ChestServiceImpl implements ChestService {
         String key = gunLibraryType.getType() + "_" + chestLevel;
         Integer index = chestOpenIndexMap.getGunRewardIndexMap().getOrDefault(key, 0);
 
-        List<Integer> rewardGunIds = flattenGetElementFromRewardArray(chestGunTableValue.getRewardGunIdsArray(),
-                chestGunTableValue.getFallbackRewardGunIdsArray(),
+        List<Integer> rewardGunIds = flattenGetElementFromRewardArray(chestGunTableValue.getRewardGunIds(),
+                chestGunTableValue.getFallbackRewardGunIds(),
                 index,
                 getGunCount);
 
@@ -684,15 +684,15 @@ public class ChestServiceImpl implements ChestService {
             coinAndDiamondRewardIndex = chestOpenIndexMap.getCoinAndDiamondRewardIndex();
         }
 
-        List<Integer> coinList = coinAndDiamondFlattenGetElementFromRewardArray(chestCoinDiamondTableValue.getRewardCoinCountArray(),
-                chestCoinDiamondTableValue.getFallbackRewardCoinCountArray(),
+        List<Integer> coinList = coinAndDiamondFlattenGetElementFromRewardArray(chestCoinDiamondTableValue.getRewardCoinCount(),
+                chestCoinDiamondTableValue.getFallbackRewardCoinCount(),
                 coinAndDiamondRewardIndex,
                 1);
 
         int coinRewardCount = coinList.get(0);
 
-        List<Integer> diamondList = coinAndDiamondFlattenGetElementFromRewardArray(chestCoinDiamondTableValue.getRewardDiamondCountArray(),
-                chestCoinDiamondTableValue.getFallbackRewardDiamondCountArray(),
+        List<Integer> diamondList = coinAndDiamondFlattenGetElementFromRewardArray(chestCoinDiamondTableValue.getRewardDiamondCount(),
+                chestCoinDiamondTableValue.getFallbackRewardDiamondCount(),
                 coinAndDiamondRewardIndex,
                 1);
 
@@ -775,8 +775,8 @@ public class ChestServiceImpl implements ChestService {
         String key = gunLibraryType.getType() + "_" + chestLevel;
         Integer index = chestOpenIndexMap.getGunRewardIndexMap().getOrDefault(key, 0);
 
-        List<Integer> rewardGunIds = flattenGetElementFromRewardArray(chestGunTableValue.getRewardGunIdsArray(),
-                chestGunTableValue.getFallbackRewardGunIdsArray(),
+        List<Integer> rewardGunIds = flattenGetElementFromRewardArray(chestGunTableValue.getRewardGunIds(),
+                chestGunTableValue.getFallbackRewardGunIds(),
                 index,
                 getGunCount);
 
@@ -813,7 +813,7 @@ public class ChestServiceImpl implements ChestService {
         ChestOpenIndexMap chestOpenIndexMap = userData.getServerOnly().getChestOpenIndexMap();
         String key = bulletLibraryType.getType() + "_" + level;
         Integer index = chestOpenIndexMap.getBulletRewardIndexMap().getOrDefault(key, 0);
-        List<Integer> rewardBulletIds = flattenGetElementFromRewardArray(chestBulletTableValue.getRewardBulletIdsArray(), chestBulletTableValue.getFallbackRewardBulletIdsArray(), index, randomBulletCount);
+        List<Integer> rewardBulletIds = flattenGetElementFromRewardArray(chestBulletTableValue.getRewardBulletIds(), chestBulletTableValue.getFallbackRewardBulletIds(), index, randomBulletCount);
 
         chestOpenIndexMap.getBulletRewardIndexMap().put(key, index + randomBulletCount);
 

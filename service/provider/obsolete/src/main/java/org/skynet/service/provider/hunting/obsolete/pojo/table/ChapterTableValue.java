@@ -45,22 +45,22 @@ public class ChapterTableValue implements Serializable {
     private Integer round;
 
     @ApiModelProperty(value = "赛事id")
-    private List<Integer> matchIdArray;
+    private List<Integer> matchId;
 
     @ApiModelProperty(value = "循环赛事id")
-    private List<Integer> loopMatchIdsArray;
+    private List<Integer> loopMatchIds;
 
     @ApiModelProperty(value = "比赛路线动物顺序")
-    private List<Integer> matchRouteAnimalSequenceArray;
+    private List<Integer> matchRouteAnimalSequence;
 
     @ApiModelProperty(value = "胜利获得宝箱类型", notes = "1:木,2:银,3:金,4:白金,5:king")
-    private List<Integer> winRewardChestTypeArray;
+    private List<Integer> winRewardChestType;
 
     @ApiModelProperty(value = "胜利获得宝箱类型循环", notes = "1:木,2:银,3:金,4:白金,5:king")
-    private List<Integer> fallbackWinRewardChestTypeArray;
+    private List<Integer> fallbackWinRewardChestType;
 
     @ApiModelProperty(value = "强制使用偏向胜利回合匹配的章节进入次数（用于AI匹配）")
-    private Integer forceWinProneRoundMatchChapterEnterCount;
+    private int forceWinProneRoundMatchChapterEnterCount;
 
     @ApiModelProperty(value = "强制使用回合匹配的章节进入次数（用于AI匹配）")
     private Integer forceRoundMatchChapterEnterCount;
@@ -84,5 +84,5 @@ public class ChapterTableValue implements Serializable {
     private Double maxCultivateScore;
 
     @ApiModelProperty(value = "录像奖杯分段（用于AI匹配）")
-    private List<Integer> recordsTrophySegmentArray;
+    private List<Integer> recordsTrophySegment;
 }

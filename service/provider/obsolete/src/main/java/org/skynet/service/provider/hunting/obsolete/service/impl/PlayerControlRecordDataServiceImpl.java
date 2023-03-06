@@ -189,7 +189,7 @@ public class PlayerControlRecordDataServiceImpl implements PlayerControlRecordDa
         if (recordModeData != null) {
 
             Map<String, RecordModeMatchTableValue> recordModeMatchTable = GameEnvironment.recordModeMatchTableMap.get(gameVersion);
-            List<Integer> recordModeTrophyRange = recordModeMatchTable.get(String.valueOf(recordModeData.getRecordModeMatchTableId())).getPlayerTrophyRangeArray();
+            List<Integer> recordModeTrophyRange = recordModeMatchTable.get(String.valueOf(recordModeData.getRecordModeMatchTableId())).getPlayerTrophyRange();
             playerTrophy = NumberUtils.randomInt(recordModeTrophyRange.get(0) * 1.0, recordModeTrophyRange.get(1) * 1.0 + 1);
         }
 
@@ -359,7 +359,7 @@ public class PlayerControlRecordDataServiceImpl implements PlayerControlRecordDa
     public List<RangeInt> getChapterRecordsTrophySegmentRanges(ChapterTableValue chapterTableValue) {
 
         List<RangeInt> results = new ArrayList<>();
-        List<Integer> trophySegmentArray = chapterTableValue.getRecordsTrophySegmentArray();
+        List<Integer> trophySegmentArray = chapterTableValue.getRecordsTrophySegment();
         for (int i = 0; i < trophySegmentArray.size(); i++) {
             int trophyCount = trophySegmentArray.get(i);
             int segmentStart = trophyCount;

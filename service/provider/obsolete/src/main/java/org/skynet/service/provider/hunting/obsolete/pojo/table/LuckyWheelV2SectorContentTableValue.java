@@ -23,10 +23,10 @@ public class LuckyWheelV2SectorContentTableValue implements Serializable {
     private Integer id;
 
     @ApiModelProperty("奖励类型")
-    private List<Integer> rewardTypesArray;
+    private List<Integer> rewardTypes;
 
     @ApiModelProperty("奖励类型")
-    private List<Integer> rewardAmountsArray;
+    private List<Integer> rewardAmounts;
 
 
 }

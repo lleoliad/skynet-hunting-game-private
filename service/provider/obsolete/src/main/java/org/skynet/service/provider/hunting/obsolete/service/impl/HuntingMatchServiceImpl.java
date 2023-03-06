@@ -154,19 +154,19 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
             RecordModeMatchTableValue targetRecordModeMatchTableValue = recordModeMatchTable.get(String.valueOf(recordModeData.getRecordModeMatchTableId()));
 
             int matchSequenceId = recordModeData.getMatchSequenceId();
-            int resultMatchId = targetRecordModeMatchTableValue.getMatchIdSequenceArray().get(matchSequenceId);
+            int resultMatchId = targetRecordModeMatchTableValue.getMatchIdSequence().get(matchSequenceId);
             log.info("录制模式，玩家 进入match " + resultMatchId + ",sequence id" + matchSequenceId);
 
             matchSequenceId++;
-            matchSequenceId %= targetRecordModeMatchTableValue.getMatchIdSequenceArray().size();
+            matchSequenceId %= targetRecordModeMatchTableValue.getMatchIdSequence().size();
             recordModeData.setMatchSequenceId(matchSequenceId);
 
             return resultMatchId;
         } else {
             Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(gameVersion);
             ChapterTableValue chapterTableValue = chapterTable.get(String.valueOf(chapterId));
-            List<Integer> matchIdArray = chapterTableValue.getMatchIdArray();
-            List<Integer> loopMatchIdsArray = chapterTableValue.getLoopMatchIdsArray();
+            List<Integer> matchIdArray = chapterTableValue.getMatchId();
+            List<Integer> loopMatchIdsArray = chapterTableValue.getLoopMatchIds();
             int resultMatchId = 0;
             if (chapterEnteredCount >= matchIdArray.size()) {
                 int loopIndex = (chapterEnteredCount - matchIdArray.size()) % loopMatchIdsArray.size();

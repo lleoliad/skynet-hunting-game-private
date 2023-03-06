@@ -35,14 +35,14 @@ public class PromotionGiftPackageV2TableValue implements Serializable {
     private Integer diamond;
 
     @ApiModelProperty(value = "枪械奖励ID")
-    private List<Integer> rewardGunIDsArray;
+    private List<Integer> rewardGunIDs;
 
     @ApiModelProperty(value = "枪械奖励数量")
-    private List<Integer> rewardGunCountsArray;
+    private List<Integer> rewardGunCounts;
 
     @ApiModelProperty(value = "子弹奖励ID")
-    private List<Integer> rewardBulletIDsArray;
+    private List<Integer> rewardBulletIDs;
 
     @ApiModelProperty(value = "子弹奖励数量")
-    private List<Integer> rewardBulletCountArray;
+    private List<Integer> rewardBulletCount;
 }

@@ -275,6 +275,16 @@ public class GameEnvironment {
             return;
         }
 
+        if (table.isConfig()) {
+            Map<String, T> configMap = dataService.loadConfig(tClass, table.name());
+            Field field = GameEnvironment.class.getDeclaredField(StrUtil.lowerFirst(table.getName()) + "Map");
+            field.setAccessible(true);
+            Map<Object, T> data = (Map<Object, T>) field.get(null);
+            data.putAll(configMap);
+            log.error("\tconfig:{}, info:{}", table.name(), data);
+            return;
+        }
+
         Map<Object, Map<Object, T>> values = dataService.load(tClass, null, table.name());
         if (values.isEmpty()) {
             log.error("name:{}, version:{}", table.name(), values.keySet());
@@ -282,7 +292,11 @@ public class GameEnvironment {
         for (Map.Entry<Object, Map<Object, T>> entry : values.entrySet()) {
             if (entry.getValue().isEmpty()) {
                 log.error("\tversion:{}, name:{}, size:{}", entry.getKey(), table.name(), entry.getValue().size());
+                continue;
             }
+
+            Iterator<T> iterator = entry.getValue().values().iterator();
+            log.info("{}", iterator.next());
 
             Field field = GameEnvironment.class.getDeclaredField(StrUtil.lowerFirst(table.getName()) + "Map");
             field.setAccessible(true);

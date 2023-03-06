@@ -58,15 +58,15 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
             PromotionEventPackageGroupTableValue packageGroupTableValue = promotionEventPackageGroupTable.get(key);
 
             //检查数据
-            if (packageGroupTableValue.getPackageTypesArray().size() != packageGroupTableValue.getActiveTimeArray().size() ||
-                    packageGroupTableValue.getPackageTypesArray().size() != packageGroupTableValue.getExpireTimeArray().size()) {
+            if (packageGroupTableValue.getPackageTypes().size() != packageGroupTableValue.getActiveTime().size() ||
+                    packageGroupTableValue.getPackageTypes().size() != packageGroupTableValue.getExpireTime().size()) {
 
                 throw new BusinessException("PromotionEventPackageGroupTable表格 第 " + key + "行数据, packageTypes activeTime expireDuration 数组长度不一致 " + JSONObject.toJSONString(packageGroupTableValue));
             }
 
-            for (Integer index : packageGroupTableValue.getPackageTypesArray()) {
+            for (Integer index : packageGroupTableValue.getPackageTypes()) {
 
-                Integer packageType = packageGroupTableValue.getPackageTypesArray().get(index);
+                Integer packageType = packageGroupTableValue.getPackageTypes().get(index);
                 String purchaseKey = packageGroupTableValue.getId() + "_" + index;
 
                 //如果已经购买过了,跳过
@@ -75,8 +75,8 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                 }
 
                 PromotionEventPackageTableValue packageTableValue = findPackageTableValueByPackageTypeAndLevel(packageType, packageLevel, gameVersion);
-                Integer activeTime = packageGroupTableValue.getActiveTimeArray().get(index);
-                Integer expireTime = packageGroupTableValue.getExpireTimeArray().get(index);
+                Integer activeTime = packageGroupTableValue.getActiveTime().get(index);
+                Integer expireTime = packageGroupTableValue.getExpireTime().get(index);
 
                 if (activeTime > expireTime) {
 
@@ -223,13 +223,13 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                 PromotionEventPackageGroupTableValue packageGroupTableValue = promotionEventPackageGroupTable.get(key);
 
                 //检查数据
-                if (packageGroupTableValue.getPackageTypesArray().size() != packageGroupTableValue.getActiveTimeArray().size() ||
-                        packageGroupTableValue.getPackageTypesArray().size() != packageGroupTableValue.getExpireTimeArray().size()) {
+                if (packageGroupTableValue.getPackageTypes().size() != packageGroupTableValue.getActiveTime().size() ||
+                        packageGroupTableValue.getPackageTypes().size() != packageGroupTableValue.getExpireTime().size()) {
                     throw new BusinessException("PromotionEventPackageGroupTable表格 第 " + key + " 行数据, packageTypes activeTime expireDuration 数组长度不一致 " + JSON.toJSONString(packageGroupTableValue));
                 }
 
-                for (int i = 0; i < packageGroupTableValue.getPackageTypesArray().size(); i++) {
-                    Integer packageType = packageGroupTableValue.getPackageTypesArray().get(i);
+                for (int i = 0; i < packageGroupTableValue.getPackageTypes().size(); i++) {
+                    Integer packageType = packageGroupTableValue.getPackageTypes().get(i);
 
                     String purchaseKey = packageGroupTableValue.getId() + "_" + i;
                     //如果已经购买过了,跳过
@@ -238,8 +238,8 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                     }
 
                     PromotionEventPackageTableValue packageTableValue = findPackageTableValueByPackageTypeAndLevelAsync(packageType, packageLevel, gameVersion);
-                    Integer activeTime = packageGroupTableValue.getActiveTimeArray().get(i);
-                    Integer expireTime = packageGroupTableValue.getExpireTimeArray().get(i);
+                    Integer activeTime = packageGroupTableValue.getActiveTime().get(i);
+                    Integer expireTime = packageGroupTableValue.getExpireTime().get(i);
 
                     if (activeTime > expireTime) {
                         throw new BusinessException("`PromotionEventPackageGroupTable表格 第 " + key + " 行数据, 有expire time < active time " + JSON.toJSONString(packageGroupTableValue));
@@ -283,13 +283,13 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                     PromotionEventPackageGroupTableValue packageGroupTableValue = promotionEventPackageGroupTable.get(key);
 
                     //检查数据
-                    if (packageGroupTableValue.getPackageTypesArray().size() != packageGroupTableValue.getActiveTimeArray().size() ||
-                            packageGroupTableValue.getPackageTypesArray().size() != packageGroupTableValue.getExpireTimeArray().size()) {
+                    if (packageGroupTableValue.getPackageTypes().size() != packageGroupTableValue.getActiveTime().size() ||
+                            packageGroupTableValue.getPackageTypes().size() != packageGroupTableValue.getExpireTime().size()) {
                         throw new BusinessException("PromotionEventPackageGroupTable表格 第 " + key + " 行数据, packageTypes activeTime expireDuration 数组长度不一致 " + JSON.toJSONString(packageGroupTableValue));
                     }
 
-                    for (int i = 0; i < packageGroupTableValue.getPackageTypesArray().size(); i++) {
-                        Integer packageType = packageGroupTableValue.getPackageTypesArray().get(i);
+                    for (int i = 0; i < packageGroupTableValue.getPackageTypes().size(); i++) {
+                        Integer packageType = packageGroupTableValue.getPackageTypes().get(i);
 
                         String purchaseKey = packageGroupTableValue.getId() + "_" + i;
                         //如果已经购买过了,跳过
@@ -298,8 +298,8 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                         }
 
                         PromotionEventPackageTableValue packageTableValue = findPackageTableValueByPackageTypeAndLevelAsync(packageType, packageLevel, gameVersion);
-                        Integer activeTime = packageGroupTableValue.getActiveTimeArray().get(i);
-                        Integer expireTime = packageGroupTableValue.getExpireTimeArray().get(i);
+                        Integer activeTime = packageGroupTableValue.getActiveTime().get(i);
+                        Integer expireTime = packageGroupTableValue.getExpireTime().get(i);
 
                         if (activeTime > expireTime) {
                             throw new BusinessException("`PromotionEventPackageGroupTable表格 第 " + key + " 行数据, 有expire time < active time " + JSON.toJSONString(packageGroupTableValue));
@@ -470,8 +470,8 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                 continue;
             }
 
-            List<Long> enableStandardTimeArray = giftPackageTableValue.getEnableStandardTimeArray();
-            List<Long> disableStandardTimeArray = giftPackageTableValue.getDisableStandardTimeArray();
+            List<Long> enableStandardTimeArray = giftPackageTableValue.getEnableStandardTime();
+            List<Long> disableStandardTimeArray = giftPackageTableValue.getDisableStandardTime();
             for (int i = 0; i < enableStandardTimeArray.size(); i++) {
                 if (standardSecond >= enableStandardTimeArray.get(i) && standardSecond <= disableStandardTimeArray.get(i)) {
                     packageDataChanged = true;
@@ -564,7 +564,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
             }
 
             //玩家最高章节不在激活章节中
-            if (!groupTableValue.getActiveHighestChaptersArray().contains(playerHighestUnlockedChapterID)) {
+            if (!groupTableValue.getActiveHighestChapters().contains(playerHighestUnlockedChapterID)) {
                 continue;
             }
 
@@ -622,7 +622,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                 Map<String, Integer> iapProductPurchasedCountMap = userData.getIapProductPurchasedCountMap();
                 for (String key : gunGiftPackageGroupTable.keySet()) {
                     GunGiftPackageGroupTableValue groupTableValue = gunGiftPackageGroupTable.get(key);
-                    for (Integer packageId : groupTableValue.getAvailablePackageIdArray()) {
+                    for (Integer packageId : groupTableValue.getAvailablePackageId()) {
                         String purchaseKey = IAPProductPrefix.gunGiftPackage + "_" + groupTableValue.getProductName() + "_" + packageId;
                         iapProductPurchasedCountMap.remove(purchaseKey);
                     }
@@ -665,8 +665,8 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                 continue;
             }
 
-            List<Long> enableStandardTimeArray = groupTableValue.getEnableStandardTimeArray();
-            List<Long> disableStandardTimeArray = groupTableValue.getDisableStandardTimeArray();
+            List<Long> enableStandardTimeArray = groupTableValue.getEnableStandardTime();
+            List<Long> disableStandardTimeArray = groupTableValue.getDisableStandardTime();
             for (int i = 0; i < enableStandardTimeArray.size(); i++) {
                 if (standardTimeSecond >= enableStandardTimeArray.get(i) && standardTimeSecond <= disableStandardTimeArray.get(i)) {
 
@@ -735,13 +735,13 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
             PromotionGiftPackageGroupV2TableValue groupV2TableValue = groupMap.get(key);
 
             //检查数据
-            if (groupV2TableValue.getPackageTypesArray().size() != groupV2TableValue.getActiveTimeArray().size() ||
-                    groupV2TableValue.getPackageTypesArray().size() != groupV2TableValue.getExpireTimeArray().size()) {
+            if (groupV2TableValue.getPackageTypes().size() != groupV2TableValue.getActiveTime().size() ||
+                    groupV2TableValue.getPackageTypes().size() != groupV2TableValue.getExpireTime().size()) {
                 throw new BusinessException("PromotionEventPackageGroupTable表格 第 " + key + " 行数据, packageTypes activeTime expireDuration 数组长度不一致 " + JSON.toJSONString(groupV2TableValue));
             }
 
-            for (int i = 0; i < groupV2TableValue.getPackageTypesArray().size(); i++) {
-                Integer packageType = groupV2TableValue.getPackageTypesArray().get(i);
+            for (int i = 0; i < groupV2TableValue.getPackageTypes().size(); i++) {
+                Integer packageType = groupV2TableValue.getPackageTypes().get(i);
 
                 PromotionGiftPackageV2Data packageData = new PromotionGiftPackageV2Data();
                 PromotionGiftPackageV2TableValue packageTableValue = findPackageV2TableValueByPackageTypeAndLevelAsync(packageType, packageLevel, gameVersion);
@@ -762,8 +762,8 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                     continue;
                 }
 
-                Integer activeTime = groupV2TableValue.getActiveTimeArray().get(i);
-                Integer expireTime = groupV2TableValue.getExpireTimeArray().get(i);
+                Integer activeTime = groupV2TableValue.getActiveTime().get(i);
+                Integer expireTime = groupV2TableValue.getExpireTime().get(i);
 
                 if (activeTime > expireTime) {
                     throw new BusinessException("`PromotionEventPackageGroupTable表格 第 " + key + " 行数据, 有expire time < active time " + JSON.toJSONString(groupV2TableValue));
@@ -773,7 +773,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
                 if (elapseSecondsSinceSignup >= activeTime && elapseSecondsSinceSignup <= expireTime) {
                     packageData.setPackageId(packageTableValue.getId());
                     packageData.setPackageGroupId(groupV2TableValue.getId());
-                    packageData.setExpireTime(signUpTime + groupV2TableValue.getExpireTimeArray().get(0));
+                    packageData.setExpireTime(signUpTime + groupV2TableValue.getExpireTime().get(0));
                     promotionGiftPackagesV2Data.add(packageData);
                     break;
                 }
@@ -885,7 +885,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         List<Integer> purchasedGroupIds = new ArrayList<>();
         for (String key : gunGiftPackageGroupTable.keySet()) {
             GunGiftPackageGroupTableValue groupTableValue = gunGiftPackageGroupTable.get(key);
-            for (Integer packageId : groupTableValue.getAvailablePackageIdArray()) {
+            for (Integer packageId : groupTableValue.getAvailablePackageId()) {
                 String purchaseKey = IAPProductPrefix.gunGiftPackage + "_" + groupTableValue.getProductName() + "_" + packageId;
                 if (iapProductPurchasedCountMap.get(purchaseKey) != null) {
                     purchasedGroupIds.add(groupTableValue.getId());
@@ -902,7 +902,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
 
         Map<String, GunGiftPackageTableValue> gunGiftPackageTable = GameEnvironment.gunGiftPackageTableMap.get(gameVersion);
 
-        for (Integer packageId : packageGroupTableValue.getAvailablePackageIdArray()) {
+        for (Integer packageId : packageGroupTableValue.getAvailablePackageId()) {
             GunGiftPackageTableValue tableValue = gunGiftPackageTable.get(packageId.toString());
             //至少是选择第一个
             if (targetTableValue == null) {
@@ -938,7 +938,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         List<Integer> purchasedGroupIds = new ArrayList<>();
         for (String key : fifthDayGunGiftPackageGroupTable.keySet()) {
             FifthDayGunGiftPackageGroupTableValue groupTableValue = fifthDayGunGiftPackageGroupTable.get(key);
-            for (Integer packageId : groupTableValue.getAvailablePackageIdArray()) {
+            for (Integer packageId : groupTableValue.getAvailablePackageId()) {
                 String purchaseKey = IAPProductPrefix.fifthDayGunGiftPackage + "_" + groupTableValue.getProductName() + "_" + packageId;
                 if (iapProductPurchasedCountMap.get(purchaseKey) != null) {
                     purchasedGroupIds.add(groupTableValue.getId());
@@ -956,7 +956,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
 
         Map<String, FifthDayGunGiftPackageTableValue> fifthDayGunGiftPackageTable = GameEnvironment.fifthDayGunGiftPackageTableMap.get(gameVersion);
 
-        for (int packageId : packageGroupTableValue.getAvailablePackageIdArray()) {
+        for (int packageId : packageGroupTableValue.getAvailablePackageId()) {
             FifthDayGunGiftPackageTableValue tableValue = fifthDayGunGiftPackageTable.get("" + packageId);
             //至少是选择第一个
             if (targetTableValue == null) {

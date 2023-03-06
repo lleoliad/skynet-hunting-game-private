@@ -117,11 +117,11 @@ public class ShopController {
             Map<String, ShopChestsTableValue> shopChestsTable = GameEnvironment.shopChestsTableMap.get(request.getGameVersion());
             ShopChestsTableValue tableValue = shopChestsTable.get(String.valueOf(request.getShopChestTableId()));
 
-            if (chestLevel - 1 >= tableValue.getDiamondPriceArray().size()) {
-                throw new BusinessException("玩家" + userData.getUuid() + "商店购买的箱子id" + request.getShopChestTableId() + ",箱子等级" + (chestLevel - 1) + "超过价格数组上限" + JSONObject.toJSONString(tableValue.getDiamondPriceArray()));
+            if (chestLevel - 1 >= tableValue.getDiamondPrice().size()) {
+                throw new BusinessException("玩家" + userData.getUuid() + "商店购买的箱子id" + request.getShopChestTableId() + ",箱子等级" + (chestLevel - 1) + "超过价格数组上限" + JSONObject.toJSONString(tableValue.getDiamondPrice()));
             }
 
-            int price = tableValue.getDiamondPriceArray().get(chestLevel - 1);
+            int price = tableValue.getDiamondPrice().get(chestLevel - 1);
             if (userData.getDiamond() < price) {
 
                 throw new BusinessException("玩家" + userData.getUuid() + "商店购买箱子id" + request.getShopChestTableId() + ",玩家钻石不足,无法购买");
@@ -281,13 +281,13 @@ public class ShopController {
 
             int price = 0;
 
-            if (bulletValue.getPurchaseDiamondPriceArray().size() < request.getPurchaseIndex() + 1) {
+            if (bulletValue.getPurchaseDiamondPrice().size() < request.getPurchaseIndex() + 1) {
 
                 throw new BusinessException("用户" + playerUUID + " 想要购买子弹 bullet id:" + request.getBulletId() + ",无法查询到价格 purchase index:"
-                        + request.getPurchaseIndex() + ",price array" + bulletValue.getPurchaseDiamondPriceArray());
+                        + request.getPurchaseIndex() + ",price array" + bulletValue.getPurchaseDiamondPrice());
             }
 
-            price = bulletValue.getPurchaseDiamondPriceArray().get(request.getPurchaseIndex());
+            price = bulletValue.getPurchaseDiamondPrice().get(request.getPurchaseIndex());
 
             if (userData.getDiamond() < price) {
                 throw new BusinessException("用户" + playerUUID + " 想要购买子弹 bullet id:" + request.getBulletId() + ",钻石不足,now: "

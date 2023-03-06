@@ -29,7 +29,7 @@ public class BulletTableValue {
     private Boolean defaultBullet;
 
     @ApiModelProperty(value = "购买价格")
-    private List<Integer> purchaseDiamondPriceArray;
+    private List<Integer> purchaseDiamondPrice;
 
     @ApiModelProperty(value = "养成分数加成")
     private Integer cultivateScoreAddition;

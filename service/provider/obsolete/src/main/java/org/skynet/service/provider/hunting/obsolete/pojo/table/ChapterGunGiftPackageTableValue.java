@@ -38,13 +38,13 @@ public class ChapterGunGiftPackageTableValue implements Serializable {
     @ApiModelProperty("奖励钻石")
     private Integer rewardDiamondCount;
     @ApiModelProperty("奖励子弹id")
-    private List<Integer> rewardBulletIdArray;
+    private List<Integer> rewardBulletId;
     @ApiModelProperty("奖励子弹数量")
-    private List<Integer> rewardBulletCountArray;
+    private List<Integer> rewardBulletCount;
     @ApiModelProperty("奖励枪械id")
-    private List<Integer> rewardGunIdArray;
+    private List<Integer> rewardGunId;
     @ApiModelProperty("奖励枪械数量")
-    private List<Integer> rewardGunCountArray;
+    private List<Integer> rewardGunCount;
     @ApiModelProperty("红色Epic枪卡数量（UI显示用）")
     private Integer epicGunCardCount;
     @ApiModelProperty("橙色Rare枪卡数量（UI显示用）")

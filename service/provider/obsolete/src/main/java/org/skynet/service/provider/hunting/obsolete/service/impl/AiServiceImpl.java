@@ -748,7 +748,7 @@ public class AiServiceImpl implements AiService {
     @Override
     public PlayerWeaponInfo generateAiWeaponInfoByMatchAiRoundRule(MatchAIRoundRuleTableValue matchAiRoundRuleTableValue, String gameVersion) {
 
-        List<Integer> weaponCombinationIdArray = matchAiRoundRuleTableValue.getAiWeaponCombinationIdArray();
+        List<Integer> weaponCombinationIdArray = matchAiRoundRuleTableValue.getAiWeaponCombinationId();
         Integer randomId = (Integer) NumberUtils.randomElementInArray(weaponCombinationIdArray);
 
         if (randomId == null) {
@@ -775,12 +775,12 @@ public class AiServiceImpl implements AiService {
         MatchAIRoundRuleTableValue matchAiRuleTableValue = matchAiRuleTable.get(String.valueOf(aiQuery.getMatchAiRoundRuleTableId()));
 
         int animalSequenceIndex = aiQuery.getRound() - 1;
-        if (animalSequenceIndex >= chapterTableValue.getMatchRouteAnimalSequenceArray().size()) {
+        if (animalSequenceIndex >= chapterTableValue.getMatchRouteAnimalSequence().size()) {
 
             return new MatchAiRoundRecordFilterParameters(null, null, null, null, null, null, "Round exceed");
         }
 
-        int animalId = chapterTableValue.getMatchRouteAnimalSequenceArray().get(animalSequenceIndex);
+        int animalId = chapterTableValue.getMatchRouteAnimalSequence().get(animalSequenceIndex);
 
         //ruleIndex的index
         int ruleIndexIndex = aiQuery.getRound() - 1;
@@ -788,9 +788,9 @@ public class AiServiceImpl implements AiService {
             throw new BusinessException("过滤AI规则 filter：" + aiQuery + "round - 1 < 0");
         }
 
-        ruleIndexIndex %= matchAiRuleTableValue.getRuleIndexArray().size();
+        ruleIndexIndex %= matchAiRuleTableValue.getRuleIndex().size();
 
-        int ruleIndex = matchAiRuleTableValue.getRuleIndexArray().get(ruleIndexIndex);
+        int ruleIndex = matchAiRuleTableValue.getRuleIndex().get(ruleIndexIndex);
 
         //是否是玩家先开枪
         Boolean isPlayerFirst = matchAiRuleTableValue.getIsPlayerFirst();

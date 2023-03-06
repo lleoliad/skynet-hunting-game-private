@@ -32,8 +32,8 @@ public class ChestGunTableValue implements Serializable {
     private Integer drawCountRequires;
 
     @ApiModelProperty(value = "枪id")
-    private List<Integer> rewardGunIdsArray;
+    private List<Integer> rewardGunIds;
 
     @ApiModelProperty(value = "备用枪id")
-    private List<Integer> fallbackRewardGunIdsArray;
+    private List<Integer> fallbackRewardGunIds;
 }

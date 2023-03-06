@@ -19,17 +19,17 @@ public class LuckyWheelV2PropertyTableValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("转盘功能第几天启用（从注册算起）")
-    private Integer FunctionEnableDayFromSignUp;
+    private Integer functionEnableDayFromSignUp;
     @ApiModelProperty("初始免费使用次数")
-    private Integer DefaultFreeSpinCount;
+    private Integer defaultFreeSpinCount;
     @ApiModelProperty("免费使用恢复1个需要的时间（秒）")
-    private Long FreeSpinIncreaseOnceSeconds;
+    private Long freeSpinIncreaseOnceSeconds;
     @ApiModelProperty("转盘奖励类型6对应的子弹id")
-    private Integer RewardType6BulletId;
+    private Integer rewardType6BulletId;
     @ApiModelProperty("转盘奖励类型7对应的子弹id")
-    private Integer RewardType7BulletId;
+    private Integer rewardType7BulletId;
     @ApiModelProperty("转盘奖励类型8对应的子弹id")
-    private Integer RewardType8BulletId;
+    private Integer rewardType8BulletId;
 
 
 }
