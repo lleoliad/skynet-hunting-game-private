@@ -271,7 +271,7 @@ public class GameEnvironment {
     @SneakyThrows
     public <T> void loadTable(Table table, Class<T> tClass) {
         if (null == tClass) {
-            log.error("load:error {}", table.name());
+            log.error("load error: {}", table.name());
             return;
         }
 
@@ -281,7 +281,7 @@ public class GameEnvironment {
             field.setAccessible(true);
             Map<Object, T> data = (Map<Object, T>) field.get(null);
             data.putAll(configMap);
-            log.error("\tconfig:{}, info:{}", table.name(), data);
+            // log.error("\tconfig:{}, info:{}", table.name(), data);
             return;
         }
 
@@ -295,8 +295,8 @@ public class GameEnvironment {
                 continue;
             }
 
-            Iterator<T> iterator = entry.getValue().values().iterator();
-            log.info("{}", iterator.next());
+            // Iterator<T> iterator = entry.getValue().values().iterator();
+            // log.info("{}", iterator.next());
 
             Field field = GameEnvironment.class.getDeclaredField(StrUtil.lowerFirst(table.getName()) + "Map");
             field.setAccessible(true);
