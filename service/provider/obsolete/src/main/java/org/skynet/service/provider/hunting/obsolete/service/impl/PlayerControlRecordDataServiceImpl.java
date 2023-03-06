@@ -17,6 +17,7 @@ import org.skynet.service.provider.hunting.obsolete.controller.module.util.Threa
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.enums.PlayerControlRecordSource;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTableValue;

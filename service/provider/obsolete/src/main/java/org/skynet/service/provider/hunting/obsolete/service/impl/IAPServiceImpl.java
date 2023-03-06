@@ -12,10 +12,12 @@ import org.skynet.service.provider.hunting.obsolete.config.IAPProductPrefix;
 import org.skynet.service.provider.hunting.obsolete.config.VipConfig;
 import org.skynet.service.provider.hunting.obsolete.config.VipV2Config;
 import org.skynet.service.provider.hunting.obsolete.config.VipV3Config;
-import org.skynet.service.provider.hunting.obsolete.dao.entity.TopUpOrder;
 import org.skynet.service.provider.hunting.obsolete.enums.OrderState;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
+import com.cn.huntingrivalserver.pojo.table.*;
+import com.cn.huntingrivalserver.service.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
@@ -456,12 +458,13 @@ public class IAPServiceImpl implements IAPService {
                 }
             }
 
-            int gameVersionNum = 0;
-            for (String s : gameVersion.split("\\.")) {
-                gameVersionNum += Integer.parseInt(s);
-            }
-
-            if (gameVersionNum >= 14) {
+            // int gameVersionNum = 0;
+            // for (String s : gameVersion.split("\\.")) {
+            //     gameVersionNum += Integer.parseInt(s);
+            // }
+            //
+            // if (gameVersionNum >= 14) {
+            if (gameVersion.compareTo("1.0.13") >= 0) {
                 //5-12章的章节礼包
                 Set<String> chapterGunGiftPackageIdSet = chapterGunGiftPackageTable.keySet();
 

@@ -8,10 +8,11 @@ import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.config.IAPProductPrefix;
 import org.skynet.service.provider.hunting.obsolete.enums.ForceTutorialStepNames;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
+import com.cn.huntingrivalserver.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.PromotionEventPackageDataService;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
-import com.google.api.client.util.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
@@ -209,15 +210,16 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         int packageLevel = userDataService.getPlayerHighestUnlockedChapterID(userData);
 
         //版本号数字之和，用来判断当前版本是否小于某一个版本  1.0.12
-        int gameVersionNum = 0;
-        for (String s : gameVersion.split("\\.")) {
-            gameVersionNum += Integer.parseInt(s);
-        }
+        // int gameVersionNum = 0;
+        // for (String s : gameVersion.split("\\.")) {
+        //     gameVersionNum += Integer.parseInt(s);
+        // }
 
         List<PromotionEventPackageData> oldPromotionPackage = userData.getPromotionEventPackagesData();
 
         // @TOTO 版本号判断错误
-        if (gameVersionNum <= 13) {
+        // if (gameVersionNum <= 13) {
+        if (gameVersion.compareTo("1.0.12") <= 0) {
             Map<String, PromotionEventPackageGroupTableValue> promotionEventPackageGroupTable = GameEnvironment.promotionEventPackageGroupTableMap.get(gameVersion);
             for (String key : promotionEventPackageGroupTable.keySet()) {
                 PromotionEventPackageGroupTableValue packageGroupTableValue = promotionEventPackageGroupTable.get(key);
@@ -704,13 +706,14 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
             return;
         }
 
-        //版本号数字之和，用来判断当前版本是否小于某一个版本
-        int gameVersionNum = 0;
-        for (String s : gameVersion.split("\\.")) {
-            gameVersionNum += Integer.parseInt(s);
-        }
+        // //版本号数字之和，用来判断当前版本是否小于某一个版本
+        // int gameVersionNum = 0;
+        // for (String s : gameVersion.split("\\.")) {
+        //     gameVersionNum += Integer.parseInt(s);
+        // }
         //1.0.13
-        if (gameVersionNum < 14) {
+        // if (gameVersionNum < 14) {
+        if (gameVersion.compareTo("1.0.13") < 0) {
             return;
         }
 

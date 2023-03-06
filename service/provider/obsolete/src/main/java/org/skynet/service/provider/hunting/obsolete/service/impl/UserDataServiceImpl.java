@@ -5,14 +5,20 @@ import com.alibaba.fastjson.JSONObject;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
+import com.cn.huntingrivalserver.common.util.*;
+import com.cn.huntingrivalserver.config.*;
 import org.skynet.service.provider.hunting.obsolete.controller.module.rank.entity.ClientRecord;
 import org.skynet.service.provider.hunting.obsolete.controller.module.rank.service.RankService;
+import com.cn.huntingrivalserver.enums.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DeleteGUNDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.UpdateGUNDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.UpdatePropDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
+import com.cn.huntingrivalserver.pojo.table.*;
+import com.cn.huntingrivalserver.service.*;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -197,7 +203,8 @@ public class UserDataServiceImpl implements UserDataService {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>(),
-                false
+                false,
+                0
         );
 
         for (Integer defaultUnlockChapterID : GameConfig.defaultUnlockChapterIDsArray) {
@@ -1753,14 +1760,14 @@ public class UserDataServiceImpl implements UserDataService {
         }
         LoginSessionData createdSessionData = RedisDBOperation.selectUserLoginSessionDataDocPath(request.getUserUid());
         if (null != createdSessionData) {
-            if (createdSessionData.getRequestRandomId() == request.getRequestRandomId()) {
-                if (request.getRetry() == null) {
-                    //我们不知道这个消息是客户端retry的消息，还是另外乱序的消息，直接踢客户端下线要求重新登录
-                    throw new BusinessException("无法处理的重复登陆请求");
-                } else if (request.getRetry() < createdSessionData.getRetry()) {
-                    throw new BusinessException("已经被客户端抛弃的login请求");
-                }
-            }
+            // if (createdSessionData.getRequestRandomId() == request.getRequestRandomId()) {
+            //     if (request.getRetry() == null) {
+            //         //我们不知道这个消息是客户端retry的消息，还是另外乱序的消息，直接踢客户端下线要求重新登录
+            //         throw new BusinessException("无法处理的重复登陆请求");
+            //     } else if (request.getRetry() < createdSessionData.getRetry()) {
+            //         throw new BusinessException("已经被客户端抛弃的login请求");
+            //     }
+            // }
             //否则，这个请求是客户端新的登陆请求。
         }
         //build session

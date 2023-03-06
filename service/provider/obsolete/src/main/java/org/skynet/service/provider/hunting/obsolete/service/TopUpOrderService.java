@@ -3,7 +3,7 @@ package org.skynet.service.provider.hunting.obsolete.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.skynet.service.provider.hunting.obsolete.dao.entity.TopUpOrder;
+import org.skynet.service.provider.hunting.obsolete.pojo.entity.TopUpOrder;
 
 
 /**

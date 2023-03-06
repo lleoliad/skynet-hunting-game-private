@@ -5,6 +5,7 @@ import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessExc
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ActiveChapterBonusDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.ChapterBonusPackageData;
@@ -43,6 +44,7 @@ public class ChapterController {
 
     @PostMapping("chapter-confirmChapterUnlockAnimationComplete")
     @ApiOperation("确认玩家章节解锁动画播放完成")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> confirmChapterUnlockAnimationComplete(@RequestBody BaseDTO request) {
         GameEnvironment.timeMessage.computeIfAbsent("confirmChapterUnlockAnimationComplete", k -> new ArrayList<>());
         try {
@@ -81,6 +83,7 @@ public class ChapterController {
 
     @PostMapping("chapterBonusPackage-activeChapterBonusPackage")
     @ApiOperation(value = "激活章节礼包", notes = "玩家看到章节礼包之后,才开始计时")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> activeChapterBonusPackage(@RequestBody ActiveChapterBonusDTO request) {
 
         try {

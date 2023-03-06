@@ -12,6 +12,7 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.enums.Table;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
+import com.cn.huntingrivalserver.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.GameResourceService;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -305,23 +306,34 @@ public class GameEnvironment {
             //Table:1.0.7_A:
             Table[] tables = Table.values();
             for (Table table : tables) {
-                // /Users/apple/Documents/storage/gitlab/huntingrival/source/datas
-                // String baseDir = "/Users/apple/Documents/storage/gitlab/huntingrival/source/datas";
-                String baseDir = "/data/servers/hunt/moulds";
-                String filename = baseDir + File.separator + versionNum + File.separator + table.getName();
-                if (FileUtil.exist(filename)) {
-                    String content = FileUtil.readString(filename, StandardCharsets.UTF_8);
-                    gameEnvironment.gameResourceService.inputContent(versionNum, content, table.getName());
+                String osName = System.getProperty("os.name");
+                if (osName.equals("Mac OS X")) {
+                    String baseDir = "/Users/apple/Documents/storage/gitlab/huntingrival/source/datas";
+                    String filename = baseDir + File.separator + versionNum + File.separator + table.getName();
+                    if (FileUtil.exist(filename)) {
+                        String content = FileUtil.readString(filename, StandardCharsets.UTF_8);
+                        gameEnvironment.gameResourceService.inputContent(versionNum, content, table.getName());
+                    }
                 } else {
-                    StringBuffer key = new StringBuffer("Table:" + versionNum);
-                    key.append(":");
-                    key.append(table.getName());
-                    log.info("版本策划数据：{}", key);
-                    String zipData = RedisDBOperation.getDataTable(key.toString());
-                    if (!StrUtil.isEmptyIfStr(zipData)) {
-                        gameEnvironment.gameResourceService.inputGameResource(versionNum, zipData, table.getName());
+                    // /Users/apple/Documents/storage/gitlab/huntingrival/source/datas
+                    // String baseDir = "/Users/apple/Documents/storage/gitlab/huntingrival/source/datas";
+                    String baseDir = "/data/servers/hunt/moulds";
+                    String filename = baseDir + File.separator + versionNum + File.separator + table.getName();
+                    if (FileUtil.exist(filename)) {
+                        String content = FileUtil.readString(filename, StandardCharsets.UTF_8);
+                        gameEnvironment.gameResourceService.inputContent(versionNum, content, table.getName());
+                    } else {
+                        StringBuffer key = new StringBuffer("Table:" + versionNum);
+                        key.append(":");
+                        key.append(table.getName());
+                        log.info("版本策划数据：{}", key);
+                        String zipData = RedisDBOperation.getDataTable(key.toString());
+                        if (!StrUtil.isEmptyIfStr(zipData)) {
+                            gameEnvironment.gameResourceService.inputGameResource(versionNum, zipData, table.getName());
+                        }
                     }
                 }
+
 
                 // key.append(table.getName());
                 // log.info("规则表的key{}", key);

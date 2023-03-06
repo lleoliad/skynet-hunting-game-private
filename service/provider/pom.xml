@@ -14,6 +14,7 @@
 
     <modules>
         <module>obsolete</module>
+        <module>login</module>
     </modules>
 
     <dependencies>

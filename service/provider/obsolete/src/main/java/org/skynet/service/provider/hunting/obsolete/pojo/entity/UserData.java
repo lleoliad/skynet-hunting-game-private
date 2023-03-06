@@ -230,4 +230,7 @@ public class UserData implements Serializable {
     @TableField(exist = false)
     private Boolean isCreateBattleInfo;
 
+    @ApiModelProperty(value = "最后一次请求时间")
+    private long lastRequestTime;
+
 }

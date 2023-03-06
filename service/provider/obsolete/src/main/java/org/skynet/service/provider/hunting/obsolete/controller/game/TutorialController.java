@@ -5,6 +5,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ForceStepDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerTutorialData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
@@ -90,6 +91,7 @@ public class TutorialController {
 
     @PostMapping("tutorial-completeForceTutorialStep")
     @ApiOperation("确认某个引导步骤完成")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> completeForceTutorialStep(@RequestBody ForceStepDTO request) {
 
         try {

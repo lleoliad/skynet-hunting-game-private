@@ -8,6 +8,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLoc
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.config.VipV3Config;
 import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.VipDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerVipV3Data;
@@ -47,6 +48,7 @@ public class VipV3Controller {
 
     @PostMapping("/vipV3-claimSVipV3DailyRewards")
     @ApiOperation("获取svip v3每日奖励")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> claimSVipV2DailyRewards(@RequestBody VipDTO request) {
 
         try {
@@ -133,6 +135,7 @@ public class VipV3Controller {
 
     @PostMapping("/vipV3-claimVipV3DailyRewards")
     @ApiOperation("获取vip v3每日奖励")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> claimVipV2DailyRewards(@RequestBody VipDTO request) {
 
         try {

@@ -2,3 +2,11 @@ skynet:
   service-list:
     data-resource-repository:
       url: http://resource-repository-server
+    robot-factory:
+      url: http://robot-factory-server
+    user:
+      url: http://user-server
+    rank-league:
+      url: http://rank-league-server
+    battle:
+      url: http://battle-server

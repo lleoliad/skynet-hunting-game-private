@@ -36,7 +36,8 @@ public class HttpUtil {
             connection.setRequestMethod("POST");
             connection.setUseCaches(false);
             connection.setInstanceFollowRedirects(true);
-            connection.setConnectTimeout(3000);
+            connection.setConnectTimeout(60000);
+            connection.setReadTimeout(60000);
             connection.setRequestProperty("Content-Type", "application/json");
 
         } catch (IOException e) {
@@ -81,6 +82,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -114,6 +117,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -156,6 +161,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -203,6 +210,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -251,6 +260,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -299,6 +310,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -347,6 +360,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -394,6 +409,8 @@ public class HttpUtil {
 
             URL _url = new URL(url);
             httpURLConnection = HttpUtil.getHttpConnection(_url);
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             //POST请求
@@ -445,6 +462,8 @@ public class HttpUtil {
         StringBuilder lineBuffer = new StringBuilder();
         try {
             HttpURLConnection httpURLConnection = HttpUtil.HttpConnectionByGet(new URL(url));
+            httpURLConnection.setConnectTimeout(60000);
+            httpURLConnection.setReadTimeout(60000);
 
             httpURLConnection.connect();
             BufferedReader reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "utf-8"));

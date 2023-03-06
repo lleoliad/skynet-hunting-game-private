@@ -1,5 +1,5 @@
 skynet:
-  domain-name: mpmf.skynet.org
+  domain-name: skynet.org
   project:
     name: hunting
     code: 1
@@ -11,7 +11,7 @@ skynet:
     watcher-id: -1
     deploy-id: -1
     instance-id: -1
-    name: game-server
+    name: game
     port: 17950
   service-url:
     agent: http://agent
@@ -49,10 +49,16 @@ skynet:
       password: 4KowHp6
       database: 0
       root-key: ${skynet.project.name}-${skynet.service.name}
-    codis:
+    codis-mpmf:
       host: 192.168.2.200
       port: 6380
       password: crs-32m8b7oz:lM47dp7W
+      database: 0
+      root-key: ${skynet.project.name}-${skynet.service.name}
+    codis:
+      host: redis.${skynet.domain-name}
+      port: 6379
+      password: 4KowHp6
       database: 0
       timeout: 10000
       root-key: ${skynet.project.name}-${skynet.service.name}
@@ -63,7 +69,7 @@ skynet:
         max-wait-millis: 10000 # 当资源池耗尽后，调用者的最大等待时间（单位为毫秒）
         jmx-enabled: true # 是否开启jmx监控, 可用于监控
         test-on-create: false # 向资源池创建连接时是否做连接有效性检测（ping），无效连接会被移除
-        test-on-borrow: false # 向资源池借用连接时是否做连接有效性检测（ping），无效连接会被移除
+        test-on-borrow: true # 向资源池借用连接时是否做连接有效性检测（ping），无效连接会被移除
         test-on-return: false # 向资源池归还连接时是否做连接有效性检测（ping），无效连接会被移除
         test-while-idle: true
     nacos:

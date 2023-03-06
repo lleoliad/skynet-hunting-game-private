@@ -1,8 +1,8 @@
-package org.skynet.service.provider.hunting.obsolete.dao.mapper;
+package org.skynet.service.provider.hunting.obsolete.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.skynet.service.provider.hunting.obsolete.dao.entity.TopUpOrder;
+import org.skynet.service.provider.hunting.obsolete.pojo.entity.TopUpOrder;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

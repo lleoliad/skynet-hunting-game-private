@@ -7,6 +7,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.DeflaterUtils;
 import org.skynet.service.provider.hunting.obsolete.enums.Table;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
+import com.cn.huntingrivalserver.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.GameResourceService;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.springframework.stereotype.Service;

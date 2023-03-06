@@ -6,10 +6,13 @@ import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessExc
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
+import com.cn.huntingrivalserver.config.*;
 import org.skynet.service.provider.hunting.obsolete.config.*;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.OpenChapterDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.StartUnlockDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
@@ -103,6 +106,7 @@ public class ChestController {
 
     @PostMapping("chest-startUnlockChapterWinChest")
     @ApiOperation("开始解锁章节胜利宝箱")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> startUnlockChapterWinChest(@RequestBody StartUnlockDTO request) {
 
         GameEnvironment.timeMessage.computeIfAbsent("startUnlockChapterWinChest", k -> new ArrayList<>());
@@ -224,6 +228,7 @@ public class ChestController {
 
     @PostMapping("chest-openChapterWinChestNow")
     @ApiOperation("立即解锁章节胜利宝箱")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> openChapterWinChestNow(@RequestBody OpenChapterDTO request) {
         GameEnvironment.timeMessage.computeIfAbsent("openChapterWinChestNow", k -> new ArrayList<>());
         try {
@@ -327,6 +332,7 @@ public class ChestController {
 
     @PostMapping("chest-openFreeChest")
     @ApiOperation("打开免费箱子")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> openFreeChest(@RequestBody BaseDTO request) {
 
         try {
@@ -389,6 +395,7 @@ public class ChestController {
 
     @PostMapping("chest-getLatestOpenedChestOpenResult")
     @ApiOperation("获取最近一次开箱的开箱结果")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> getLatestOpenedChestOpenResult(@RequestBody BaseDTO request) {
         GameEnvironment.timeMessage.computeIfAbsent("getLatestOpenedChestOpenResult", k -> new ArrayList<>());
         try {
@@ -433,6 +440,7 @@ public class ChestController {
 
     @PostMapping("chest-accelerateChapterWinChestUnlock")
     @ApiOperation("章节胜利宝箱加速")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> accelerateChapterWinChestUnlock(@RequestBody OpenChapterDTO request) {
 
         try {

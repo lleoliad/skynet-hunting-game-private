@@ -1,6 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
 
@@ -45,6 +46,8 @@ public interface IAPService {
 
     /**
      * 验证google play订单
+     *
+     * @param params @return
      */
     ReceiptValidateResult googlePlayReceiptValidate(IapReceiptValidateDTO request);
 

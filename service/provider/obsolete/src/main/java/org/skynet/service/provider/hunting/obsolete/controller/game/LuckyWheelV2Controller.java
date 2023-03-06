@@ -6,6 +6,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.LuckyWheelV2SpinRewardBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.LuckyWheelDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.LuckyWheelV2Data;
@@ -45,6 +46,7 @@ public class LuckyWheelV2Controller {
 
     @PostMapping("luckyWheelV2-luckyWheelV2RefreshContent")
     @ApiOperation("刷新转盘v2表盘内容")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> luckyWheelV2RefreshContent(@RequestBody LuckyWheelDTO request) {
 
         try {
@@ -88,6 +90,7 @@ public class LuckyWheelV2Controller {
 
     @PostMapping("luckyWheelV2-luckyWheelV2Spin")
     @ApiOperation("获取转盘V2奖励")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> luckyWheelV2Spin(@RequestBody LuckyWheelDTO request) {
 
         try {

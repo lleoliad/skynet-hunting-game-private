@@ -88,7 +88,6 @@ public class CommonUtils {
         }
     }
 
-
     public static void requestProcess(BaseDTO request, Boolean verifyToken, Boolean IsSupportRecordModeClientServer) {
 
         if (verifyToken == null)
@@ -102,7 +101,6 @@ public class CommonUtils {
 
             String userUid = JwtUtils.getUserUid(request.getUserToken());
             if (backupToken == null || !backupToken.equals(request.getUserToken()) || !userUid.equals(request.getUserUid())) {
-
                 throw new BusinessException("玩家" + request.getUserUid() + "的token验证不通过");
             }
 
@@ -114,9 +112,13 @@ public class CommonUtils {
             }
 
             if (GameEnvironment.userDataMap.containsKey(request.getUserUid())) {
-                throw new BusinessException("请求未完成，等待请求结束中");
+                // if (unixTimeNow - userData.getLastRequestTime() < 10) {
+                //     log.info("玩家在10秒内有重复请求，抛出错误信息");
+                //     throw new BusinessException("请求未完成，等待请求结束中");
+                // }
             }
 
+            userData.setLastRequestTime(unixTimeNow);
         }
 
         if (request.getClientBuildInAppInfo().getRecordOnlyMode() == null) {

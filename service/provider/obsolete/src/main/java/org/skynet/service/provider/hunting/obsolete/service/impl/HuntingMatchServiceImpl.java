@@ -10,11 +10,13 @@ import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.enums.BulletQuality;
 import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordChooseMode;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CheckNewUnlockChapterBO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.BulletTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.MatchAIRoundRuleTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTableValue;
+import com.cn.huntingrivalserver.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.service.*;
@@ -113,15 +115,12 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
      */
     @Override
     public void winOrLoseTrophyInHuntingMatch(String uuid, ChapterTableValue chapterTableValue, boolean isWin, String gameVersion) {
-
         UserData userData = GameEnvironment.userDataMap.get(uuid);
         Map<Integer, Integer> chapterWinTrophyCountMap = userData.getChapterWinTrophyCountMap();
         if (isWin) {
-
             int alreadyRewardTrophyInChapter = chapterWinTrophyCountMap.getOrDefault(chapterTableValue.getId(), 0);
             //每一章能获得的奖杯数量有上限
-            int rewardTrophyCountInChapter = Math.min(chapterTableValue.getWinTrophyIncreaseCount() + alreadyRewardTrophyInChapter,
-                    chapterTableValue.getMaxAvailableTrophyCount());
+            int rewardTrophyCountInChapter = Math.min(chapterTableValue.getWinTrophyIncreaseCount() + alreadyRewardTrophyInChapter, chapterTableValue.getMaxAvailableTrophyCount());
             int trophyChangeInChapter = rewardTrophyCountInChapter - alreadyRewardTrophyInChapter;
 
             userData.setTrophy(userData.getTrophy() + trophyChangeInChapter);
@@ -132,7 +131,6 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
             //奖杯成就
             achievementService.updateTrophyAchievementData(userData, trophyChangeInChapter, chapterTableValue.getId(), gameVersion);
         } else {
-
             int winTrophyCountInChapter = chapterWinTrophyCountMap.getOrDefault(chapterTableValue.getId(), 0);
             int winTrophyCountInChapterNow = winTrophyCountInChapter - chapterTableValue.getLoseTrophyDecreaseCount();
             winTrophyCountInChapterNow = Math.max(0, winTrophyCountInChapterNow);
@@ -143,7 +141,6 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
 
             userData.getChapterWinTrophyCountMap().put(chapterTableValue.getId(), winTrophyCountInChapterNow);
         }
-
     }
 
     @Override
@@ -294,7 +291,8 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
                 useTotalRandomAiProfile = true;
             }
         }
-        if (useTotalRandomAiProfile) {
+        String osName = System.getProperty("os.name");
+        if (useTotalRandomAiProfile || osName.equals("Mac OS X")) {
             opponentPlayerInfo.setName(userDataService.createGuestName(userData.getName()));
             opponentPlayerInfo.setIcon_base64(null);
             opponentPlayerInfo.setUseDefaultIcon(true);

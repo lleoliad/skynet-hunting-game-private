@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.dao.entity;
+package org.skynet.service.provider.hunting.obsolete.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

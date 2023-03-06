@@ -12,6 +12,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLoc
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.controller.module.dto.BattleStartDto;
 import org.skynet.service.provider.hunting.obsolete.controller.module.dto.SearchAiDto;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.RecordDataAndBase64;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.AIControlRecordDataQueryDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
@@ -250,12 +251,14 @@ public class AIController {
 
     @PostMapping("ai-aiControlRecordDataQuery")
     @ApiOperation("根据条件,找到合适的AI操作录制文件并返回")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> aiControlRecordDataQuery(@RequestBody AIControlRecordDataQueryDTO request) {
 
         GameEnvironment.timeMessage.computeIfAbsent("aiControlRecordDataQuery", k -> new ArrayList<>());
 
         String aiUrl = systemPropertiesConfig.getAiUrl();
         String fightUrl = systemPropertiesConfig.getFightUrl();
+        String userUid = request.getUserUid();
 
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
@@ -265,7 +268,6 @@ public class AIController {
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
 
             //载入当前玩家信息
-            String userUid = request.getUserUid();
             userDataService.checkUserDataExist(userUid);
             UserData userData = GameEnvironment.userDataMap.get(userUid);
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
@@ -280,7 +282,7 @@ public class AIController {
             //>=1.0.10版本，后续该处理可以去掉，因为所有方法都处理了重发逻辑
 
 
-            RecordDataAndBase64 recordDataAndBase64 = null;
+            // RecordDataAndBase64 recordDataAndBase64 = null;
             BattleStartDto battleStartDto = new BattleStartDto();
             battleStartDto.setUid(request.getUserUid());
             battleStartDto.setVersion(request.getGameVersion());
@@ -299,7 +301,7 @@ public class AIController {
                     Object recordData = jsonObject.get("recordDataBase64");
                     if (recordData != null) {
                         findControlRecordEncodeData = recordData.toString();
-                        log.warn("查询出的ai录像原始数据，recordDataAndBase64为{}", JSONUtil.toJsonStr(recordDataAndBase64));
+                        // log.warn("查询出的ai录像原始数据，recordDataAndBase64为{}", JSONUtil.toJsonStr(recordDataAndBase64));
                     }
 
                     //如果战斗服返回的数据为空，再去本地数据库查找
@@ -321,21 +323,23 @@ public class AIController {
 
 
                         SearchAiDto searchAiDto = new SearchAiDto(request.getGameVersion(),
-                                Integer.valueOf(jsonObject.get("AnimalId").toString()),
-                                Long.valueOf(jsonObject.get("AnimalRouteUid").toString()),
-                                Integer.valueOf(jsonObject.get("GunId").toString()),
-                                Integer.valueOf(jsonObject.get("GunLevel").toString()),
-                                Integer.valueOf(jsonObject.get("BulletId").toString()),
-                                Integer.valueOf(jsonObject.get("WindId").toString()),
-                                Integer.valueOf(jsonObject.get("AveragePrecisionLevel").toString()));
+                                Integer.valueOf(jsonObject.get("animalId").toString()),
+                                Long.valueOf(jsonObject.get("animalRouteUid").toString()),
+                                Integer.valueOf(jsonObject.get("gunId").toString()),
+                                Integer.valueOf(jsonObject.get("gunLevel").toString()),
+                                Integer.valueOf(jsonObject.get("bulletId").toString()),
+                                Integer.valueOf(jsonObject.get("windId").toString()),
+                                Integer.valueOf(jsonObject.get("averagePrecisionLevel").toString()));
 
                         Map<String, Object> aiInfo = HttpUtil.getAiInfo(aiUrl + "/huntingrival/ai-searchAiRecordData", searchAiDto);
                         if (aiInfo != null) {
                             try {
-                                recordDataAndBase64 = JSONUtil.toBean(aiInfo.get("data").toString(), RecordDataAndBase64.class);
+                                RecordDataAndBase64 recordDataAndBase64 = JSONUtil.toBean(aiInfo.get("data").toString(), RecordDataAndBase64.class);
+                                findControlRecordEncodeData = recordDataAndBase64.getBase64();
                                 log.info("找到的战斗信息：{}", recordDataAndBase64);
                             } catch (Exception e) {
-                                recordDataAndBase64 = null;
+                                e.printStackTrace();
+                                // recordDataAndBase64 = null;
                                 log.error("战报格式转换错误，先将战报设置为空");
                             }
                         }
@@ -352,12 +356,12 @@ public class AIController {
             }
 
 
-            if (recordDataAndBase64 != null) {
-                findControlRecordData = recordDataAndBase64.getRecordData();
-                findControlRecordEncodeData = recordDataAndBase64.getBase64();
-            } else {
-                log.warn("查询出的ai录像原始数据，recordDataAndBase64为空");
-            }
+            // if (recordDataAndBase64 != null) {
+            //     findControlRecordData = recordDataAndBase64.getRecordData();
+            //     findControlRecordEncodeData = recordDataAndBase64.getBase64();
+            // } else {
+            //     log.warn("查询出的ai录像原始数据，recordDataAndBase64为空");
+            // }
 
 
 //            InHuntingMatchAiFetchedControlRecordInfo aiFetchedDataInfo = new InHuntingMatchAiFetchedControlRecordInfo();
@@ -390,7 +394,7 @@ public class AIController {
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             userDataService.userDataSettlement(userData, sendToClientData, false, request.getGameVersion());
-            if (findControlRecordData != null) {
+            if (findControlRecordEncodeData != null) {
                 map.put("recordDataBase64", findControlRecordEncodeData);
             }
             //todo 需要确定是否短线
@@ -403,18 +407,24 @@ public class AIController {
             return map;
 
         } catch (Exception e) {
-
-            CommonUtils.responseException(request, e, request.getUserUid());
+            e.printStackTrace();
+            // CommonUtils.responseException(request, e, request.getUserUid());
         } finally {
+            GameEnvironment.userDataMap.remove(userUid);
             ThreadLocalUtil.remove();
         }
 
-        return null;
+        Map<String, Object> map = CommonUtils.responsePrepare(null);
+        map.put("isOpponentDisconnect", false);
+        // map.put("recordDataBase64", null);
+        log.info("回合开始出现异常状态返回空数据，保证前端不要弹断线重连");
+        return map;
     }
 
 
     @PostMapping("ai-searchAiRecordData")
     @ApiOperation("根据条件,找到合适的AI操作录制文件并返回")
+    @RepeatSubmit(interval = 120000)
     public ResponseResult<RecordDataAndBase64> findAIForGame(@RequestBody SearchAiDto searchAiDto) {
 
         try {

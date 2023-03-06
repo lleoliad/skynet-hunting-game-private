@@ -33,6 +33,9 @@ public class ConfirmHuntingMatchCompleteDTO extends BaseDTO {
     @ApiModelProperty(value = "直接赢")
     private Boolean directlyWin;
 
+    @ApiModelProperty(value = "客户直接进行战斗结算，不处理战报")
+    private Boolean playerDirectChangeResult;
+
     @ApiModelProperty(value = "直接输")
     private Boolean directlyLose;
 

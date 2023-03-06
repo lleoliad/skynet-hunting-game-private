@@ -28,5 +28,8 @@ public class BattleMatchDto extends BaseDTO {
     @ApiModelProperty(value = "是否是AI录制模式")
     private Boolean isRecordMode;
 
+    @ApiModelProperty(value = "奖杯数目")
+    private Integer trophyCount;
+
 
 }

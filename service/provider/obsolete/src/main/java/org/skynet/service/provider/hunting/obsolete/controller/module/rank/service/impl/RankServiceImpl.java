@@ -12,6 +12,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerRankData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,11 @@ public class RankServiceImpl implements RankService {
 
     public void getRewardInfo(UserData userData, String gameVersion) {
         String rankUrl = systemPropertiesConfig.getRankUrl();
+        log.info("段位赛地址{},", rankUrl);
+        if (StringUtils.isEmpty(rankUrl)) {
+            return;
+        }
+
         RankLoginDto rankLoginDto = new RankLoginDto(userData.getUuid(), gameVersion, userData.getName(), null, 0L);
         //从redis中获取玩家头像，如果没有直接为空
         String key = Path.getUserProfileImageCollectionPath();

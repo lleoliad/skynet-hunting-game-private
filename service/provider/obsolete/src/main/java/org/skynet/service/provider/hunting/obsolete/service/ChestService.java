@@ -2,6 +2,7 @@ package org.skynet.service.provider.hunting.obsolete.service;
 
 import org.skynet.service.provider.hunting.obsolete.enums.BulletLibraryType;
 import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 
 import java.util.List;

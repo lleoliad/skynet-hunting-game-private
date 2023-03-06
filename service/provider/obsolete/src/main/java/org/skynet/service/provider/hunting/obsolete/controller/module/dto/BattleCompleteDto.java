@@ -28,5 +28,11 @@ public class BattleCompleteDto extends BaseDTO {
     @ApiModelProperty(value = "所有回合战报数据")
     private List<String> roundReportData;
 
+    @ApiModelProperty(value = "直接赢")
+    private Boolean directlyWin;
+
+    @ApiModelProperty(value = "客户直接进行战斗结算，不处理战报")
+    private Boolean playerDirectChangeResult;
+
 
 }

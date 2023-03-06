@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
+import com.cn.huntingrivalserver.common.util.*;
 import org.skynet.service.provider.hunting.obsolete.common.util.*;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
@@ -13,12 +14,16 @@ import org.skynet.service.provider.hunting.obsolete.controller.module.dto.Battle
 import org.skynet.service.provider.hunting.obsolete.controller.module.dto.BattleMatchDto;
 import org.skynet.service.provider.hunting.obsolete.controller.module.dto.BattleStartDto;
 import org.skynet.service.provider.hunting.obsolete.controller.module.dto.UserInfoDto;
+import com.cn.huntingrivalserver.controller.module.entity.*;
 import org.skynet.service.provider.hunting.obsolete.controller.module.entity.*;
 import org.skynet.service.provider.hunting.obsolete.controller.module.util.ThreadLocalForFight;
+import com.cn.huntingrivalserver.enums.*;
 import org.skynet.service.provider.hunting.obsolete.enums.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CheckNewUnlockChapterBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.RecordDataAndBase64;
+import com.cn.huntingrivalserver.pojo.dto.*;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
@@ -26,6 +31,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue
 import org.skynet.service.provider.hunting.obsolete.pojo.table.LuckyWheelV2PropertyTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.MatchAIRoundRuleTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTableValue;
+import com.cn.huntingrivalserver.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -148,7 +154,7 @@ public class FightModuleController {
             int gunId = userData.getEquippedGunId();
             int gunLevel = userData.getGunLevelMap().get(gunId);
             int bulletId = userData.getEquippedBulletId();
-            BattleMatchDto matchDto = new BattleMatchDto(request.getChapterId(), cultivateWinRateAddition, new PlayerWeaponInfo(gunId, gunLevel, bulletId), userData.getServerOnly().getRecordModeData() != null);
+            BattleMatchDto matchDto = new BattleMatchDto(request.getChapterId(), cultivateWinRateAddition, new PlayerWeaponInfo(gunId, gunLevel, bulletId), userData.getServerOnly().getRecordModeData() != null, userData.getTrophy());
             Map<String, Object> fightInfo = HttpUtil.getFightInfo("battle/complete/battle/matching", matchDto);
 
             //玩家的武器

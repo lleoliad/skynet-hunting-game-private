@@ -4,7 +4,6 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
-import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
@@ -14,13 +13,16 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.config.VipV2Config;
 import org.skynet.service.provider.hunting.obsolete.controller.module.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.controller.module.dto.UserInfoDto;
+import com.cn.huntingrivalserver.controller.module.entity.*;
 import org.skynet.service.provider.hunting.obsolete.controller.module.entity.*;
 import org.skynet.service.provider.hunting.obsolete.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ChangeNameDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.LoginDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.LuckyWheelV2PropertyTableValue;
@@ -229,7 +231,6 @@ public class UserController {
     @PostMapping("/login")
     @ApiOperation("玩家登录")
     public Map<String, Object> login(@RequestBody LoginDTO loginDTO) {
-
         String loginUserUid = null;
         try {
             String fightUrl = systemPropertiesConfig.getFightUrl();
@@ -269,11 +270,11 @@ public class UserController {
                 log.warn("从redis中加载用户");
                 // 从redis中加载用户
                 //判断该玩家是否在线,在线则抛出异常，不执行登录操作
-                synchronized (GameEnvironment.userDataMap) {
-                    if (GameEnvironment.userDataMap.containsKey(loginDTO.getUserUid())) {
-                        throw new BusinessException("该玩家已经在线");
-                    }
-                }
+                // synchronized (GameEnvironment.userDataMap) {
+                //     if (GameEnvironment.userDataMap.containsKey(loginDTO.getUserUid())) {
+                //         throw new BusinessException("该玩家已经在线");
+                //     }
+                // }
                 userDataService.checkUserDataExist(loginDTO.getUserUid());
                 loginUserData = GameEnvironment.userDataMap.get(loginDTO.getUserUid());
 
@@ -501,6 +502,7 @@ public class UserController {
 
     @PostMapping("changePlayerName")
     @ApiOperation("修改玩家名称")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> changePlayerName(@RequestBody ChangeNameDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("changePlayerName", k -> new ArrayList<>());

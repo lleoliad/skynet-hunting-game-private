@@ -6,6 +6,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.enums.AchievementType;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.AchievementDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.AchievementData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.History;
@@ -46,6 +47,7 @@ public class AchievementController {
 
     @PostMapping("achievement-completeAchievement")
     @ApiOperation("完成某个任务")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> completeAchievement(@RequestBody AchievementDTO request) {
         GameEnvironment.timeMessage.computeIfAbsent("achievement", k -> new ArrayList<>());
         try {

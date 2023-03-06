@@ -12,9 +12,11 @@ import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLoc
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.controller.module.rank.dto.PreviewPlayerDto;
 import org.skynet.service.provider.hunting.obsolete.controller.module.rank.service.RankService;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DownloadPlayersIconDto;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.RankOtherPlayerDetailDto;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
@@ -58,6 +60,7 @@ public class RankController {
 
     @PostMapping("/rank-getAllPlayersData")
     @ApiOperation("获取段位中所有玩家的信息")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> getAllPlayersData() {
 
         try {
@@ -78,6 +81,7 @@ public class RankController {
 
     @PostMapping("/rank-downloadPlayersIcon")
     @ApiOperation("获取其他玩家头像数据")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> downloadPlayersIcon(@RequestBody DownloadPlayersIconDto request) {
 
         try {
@@ -96,6 +100,7 @@ public class RankController {
 
     @PostMapping("/rank-getPlayerDetailData")
     @ApiOperation("获取其他玩家详细信息")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> getPlayerDetailData(@RequestBody RankOtherPlayerDetailDto request) {
 
         try {
@@ -190,6 +195,7 @@ public class RankController {
 
     @PostMapping("/rank-getEvaluationResult")
     @ApiOperation("获取上周段位结算数据")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> getEvaluationResult(@RequestBody BaseDTO baseDTO) {
 
         try {
@@ -231,6 +237,7 @@ public class RankController {
 
     @PostMapping("/rank-openRankRewardChest")
     @ApiOperation("打开段位宝箱")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> openPromotedRewardChest(@RequestBody BaseDTO request) {
 
         try {
@@ -311,6 +318,7 @@ public class RankController {
 
     @PostMapping("/rank-confirmLastWeekEvaluationRankListShow")
     @ApiOperation("确认上周结算排行界面展示")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> confirmLastWeekEvaluationRankListShow(@RequestBody BaseDTO baseDTO) {
 
         try {
@@ -337,6 +345,7 @@ public class RankController {
 
     @PostMapping("/rank-confirmLastWeekEvaluationRankChangeShow")
     @ApiOperation("确认上周结算段位变化界面展示")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> confirmLastWeekEvaluationRankChangeShow(@RequestBody BaseDTO baseDTO) {
 
         try {

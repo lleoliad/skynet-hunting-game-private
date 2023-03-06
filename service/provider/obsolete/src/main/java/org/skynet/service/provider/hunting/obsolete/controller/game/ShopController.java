@@ -8,6 +8,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseBulletDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseChestDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseCoinPackageDTO;
@@ -94,6 +95,7 @@ public class ShopController {
 
     @PostMapping("shop-purchaseChest")
     @ApiOperation("购买宝箱")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> purchaseChest(@RequestBody PurchaseChestDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("purchaseChest", k -> new ArrayList<>());
@@ -167,6 +169,7 @@ public class ShopController {
 
     @PostMapping("shop-purchaseCoinBonusPackage")
     @ApiOperation("购买金币礼包")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> purchaseCoinBonusPackage(@RequestBody PurchaseCoinPackageDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("purchaseCoinBonusPackage", k -> new ArrayList<>());
@@ -204,9 +207,11 @@ public class ShopController {
                     throw new BusinessException("玩家今日已经没有剩余的激励广告次数了");
                 }
 
-                if (tableValue != coinBonusPackageTable.get(1)) {
+                if (tableValue != coinBonusPackageTable.get("1")) {
                     throw new BusinessException("通过广告购买的金币礼包" + JSONObject.toJSONString(tableValue) + "不是第一个礼包");
                 }
+
+                userData.getAdvertisementData().setRemainedRewardAdCountToday(userData.getAdvertisementData().getRemainedRewardAdCountToday() - 1);
             }
             //通过钻石购买
             else {
@@ -227,6 +232,7 @@ public class ShopController {
             sendToClientData.setCoin(userData.getCoin());
             sendToClientData.setDiamond(userData.getDiamond());
             sendToClientData.setHistory(userData.getHistory());
+            sendToClientData.setAdvertisementData(userData.getAdvertisementData());
             userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
@@ -245,6 +251,7 @@ public class ShopController {
 
     @PostMapping("weapon-purchaseBullet")
     @ApiOperation("购买子弹")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> purchaseBullet(@RequestBody PurchaseBulletDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("purchaseBullet", k -> new ArrayList<>());

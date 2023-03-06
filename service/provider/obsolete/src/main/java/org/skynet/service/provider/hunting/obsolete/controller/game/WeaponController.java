@@ -6,6 +6,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLoc
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.enums.BulletQuality;
 import org.skynet.service.provider.hunting.obsolete.enums.GunQuality;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.EquipBulletDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.GunDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
@@ -46,6 +47,7 @@ public class WeaponController {
 
     @PostMapping("/weapon-equipGun")
     @ApiOperation("装备某把枪")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> equipGun(@RequestBody GunDTO dto) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("equipGun", k -> new ArrayList<>());
@@ -92,6 +94,7 @@ public class WeaponController {
 
     @PostMapping("weapon-upgradeGun")
     @ApiOperation("枪械升级")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> upgradeGun(@RequestBody GunDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("upgradeGun", k -> new ArrayList<>());
@@ -184,6 +187,7 @@ public class WeaponController {
 
     @PostMapping("weapon-equipBullet")
     @ApiOperation("装备子弹")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> equipBullet(@RequestBody EquipBulletDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("equipBullet", k -> new ArrayList<>());

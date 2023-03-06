@@ -2,7 +2,7 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
-import org.skynet.service.provider.hunting.obsolete.dao.mapper.UserDataVOMapper;
+import org.skynet.service.provider.hunting.obsolete.mapper.UserDataVOMapper;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.vo.UserDataVO;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataVOService;

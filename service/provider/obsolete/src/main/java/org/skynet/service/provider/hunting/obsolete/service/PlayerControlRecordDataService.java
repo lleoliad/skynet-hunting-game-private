@@ -1,6 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 

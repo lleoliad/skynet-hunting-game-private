@@ -19,17 +19,21 @@ import org.skynet.service.provider.hunting.obsolete.controller.module.entity.Def
 import org.skynet.service.provider.hunting.obsolete.enums.ForceTutorialStepNames;
 import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordChooseMode;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CheckNewUnlockChapterBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ConfirmHuntingMatchCompleteDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ConfirmHuntingMatchStartDTO;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.MatchAIRoundRuleTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTableValue;
+import com.cn.huntingrivalserver.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -563,6 +567,7 @@ public class HuntingMatchController {
 
     @PostMapping("/huntingMatch-confirmHuntingMatchStart")
     @ApiOperation("确认进入章节比赛")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> confirmHuntingMatchStart(@RequestBody ConfirmHuntingMatchStartDTO request) {
         try {
             String fightUrl = systemPropertiesConfig.getFightUrl();
@@ -630,7 +635,7 @@ public class HuntingMatchController {
             int gunId = userData.getEquippedGunId();
             int gunLevel = userData.getGunLevelMap().get(gunId);
             int bulletId = userData.getEquippedBulletId();
-            BattleMatchDto matchDto = new BattleMatchDto(playerSelectChapterId, cultivateWinRateAddition, new PlayerWeaponInfo(gunId, gunLevel, bulletId), userData.getServerOnly().getRecordModeData() != null);
+            BattleMatchDto matchDto = new BattleMatchDto(playerSelectChapterId, cultivateWinRateAddition, new PlayerWeaponInfo(gunId, gunLevel, bulletId), userData.getServerOnly().getRecordModeData() != null, userData.getTrophy());
             matchDto.setVersion(request.getGameVersion());
             matchDto.setUid(request.getUserUid());
 //            http://192.168.2.199:9301
@@ -731,8 +736,8 @@ public class HuntingMatchController {
                 userDataSendToClient.setEquippedBulletId(userData.getEquippedBulletId());
             }
 
-            Integer opponentTrophyCount;
-            opponentTrophyCount = (Integer) data.get("safePlayerTrophyCount");
+            // Integer opponentTrophyCount;
+            // opponentTrophyCount = (Integer) data.get("safePlayerTrophyCount");
             //生成匹配ai信息
             //正常模式
             if (recordModeData == null) {
@@ -743,7 +748,7 @@ public class HuntingMatchController {
             //录制模式
             else {
                 log.info("生成对手信息，来自章节" + playerSelectChapterId);
-                opponentPlayerInfo = huntingMatchService.generateOpponentPlayerInfo(userData, request.getChapterId(), null, request.getGameVersion());
+                opponentPlayerInfo = huntingMatchService.generateOpponentPlayerInfo(userData, request.getChapterId(), defender.getTrophyCount(), request.getGameVersion());
             }
 
             userDataSendToClient.setHistory(userData.getHistory());
@@ -834,7 +839,9 @@ public class HuntingMatchController {
 
     @PostMapping("/huntingMatch-confirmHuntingMatchComplete")
     @ApiOperation("确认章节比赛结束")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> confirmHuntingMatchComplete(@RequestBody ConfirmHuntingMatchCompleteDTO request) {
+        String userUid = request.getUserUid();
         try {
             GameEnvironment.timeMessage.computeIfAbsent("confirmHuntingMatchComplete", k -> new ArrayList<>());
             ThreadLocalUtil.set(request.getServerTimeOffset());
@@ -875,7 +882,9 @@ public class HuntingMatchController {
             battleCompleteDto.setPlayerFinalScore(request.getPlayerFinalScore());
             battleCompleteDto.setAiFinalScore(request.getAiFinalScore());
             battleCompleteDto.setRoundCount(roundCount);
-            if (systemPropertiesConfig.getProduction() && !request.getPlatform().equals(PlatformName.UnityEditor.getPlatform())) {
+            battleCompleteDto.setDirectlyWin(request.getDirectlyWin());
+            battleCompleteDto.setPlayerDirectChangeResult(request.getPlayerDirectChangeResult());
+            if (systemPropertiesConfig.getProduction() || !request.getPlatform().equals(PlatformName.UnityEditor.getPlatform())) {
                 battleCompleteDto.setRoundReportData(request.getAllEncodedControlRecordsData());
 //            http://192.168.2.199:9301
                 if (!(request.getDirectlyWin() != null || request.getDirectlyLose() != null)) {
@@ -887,6 +896,7 @@ public class HuntingMatchController {
                         data = JSONObject.parseObject(fightInfo.get("data").toString());
                     }
 //                if (data  == null){
+
 //                    throw new BusinessException("从战斗服获取到的数据为空");
 //                }
                 }
@@ -942,13 +952,8 @@ public class HuntingMatchController {
 
             if (!playerDirectChangeResult) {
 
-                if (Math.abs(localPlayerFinalScore - request.getPlayerFinalScore()) > 1 ||
-                        Math.abs(aiFinalScore - request.getAiFinalScore()) > 1) {
-
-                    String errorInfo = "比赛" + request.getMatchUUID() + ",玩家上报分数和录像计算分数结果不一致,录像计算中,玩家:" + localPlayerFinalScore +
-                            ",ai:" + aiFinalScore + ",玩家上报中,玩家" + request.getPlayerFinalScore() + ",ai:" + request.getAiFinalScore();
-
-
+                if (Math.abs(localPlayerFinalScore - request.getPlayerFinalScore()) > 1 || Math.abs(aiFinalScore - request.getAiFinalScore()) > 1) {
+                    String errorInfo = "比赛" + request.getMatchUUID() + ",玩家上报分数和录像计算分数结果不一致,录像计算中,玩家:" + localPlayerFinalScore + ",ai:" + aiFinalScore + ",玩家上报中,玩家" + request.getPlayerFinalScore() + ",ai:" + request.getAiFinalScore();
                     //不是正式服务器抛出错误，尽早检查错误
                     if (!systemPropertiesConfig.getProduction()) {
                         throw new BusinessException(errorInfo);
@@ -981,9 +986,6 @@ public class HuntingMatchController {
 //            huntingMatchService.saveHuntingHistoryMatch(matchHistoryRef, request.getMatchUUID(),historyData);
 
 //            log.info("记录比赛历史数据"+request.getMatchUUID());
-
-            //删除正在比赛的数据
-            huntingMatchService.removeHuntingMatchNowData(matchPath, request.getUserUid(), request.getMatchUUID());
 
             UserDataSendToClient sendToClientUserData = GameEnvironment.prepareSendToClientUserData();
 
@@ -1171,6 +1173,10 @@ public class HuntingMatchController {
 
 
             userDataService.userDataSettlement(userData, sendToClientUserData, true, request.getGameVersion());
+
+            //删除正在比赛的数据
+            huntingMatchService.removeHuntingMatchNowData(matchPath, request.getUserUid(), request.getMatchUUID());
+
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 
             map.put("userData", sendToClientUserData);
@@ -1187,19 +1193,24 @@ public class HuntingMatchController {
             if (lastCoin < userData.getCoin()) {
                 Long addCount = userData.getCoin().longValue() - lastCoin;
                 String rankUrl = systemPropertiesConfig.getRankUrl();
-                Map<String, Object> fightInfo = HttpUtil.rankAddCoin(rankUrl + "/add/coins", new HashMap<String, Object>() {{
-                    put("userId", request.getUserUid());
-                    put("coin", addCount);
-                }});
+                if (!StringUtils.isBlank(rankUrl)) {
+                    Map<String, Object> fightInfo = HttpUtil.rankAddCoin(rankUrl + "/add/coins", new HashMap<String, Object>() {{
+                        put("userId", request.getUserUid());
+                        put("coin", addCount);
+                    }});
+                }
             }
 
             return map;
         } catch (Exception e) {
-
             CommonUtils.responseException(request, e, request.getUserUid());
         } finally {
+            GameEnvironment.userDataMap.remove(userUid);
             ThreadLocalUtil.remove();
         }
+        // Map<String, Object> map = CommonUtils.responsePrepare(null);
+        // log.info("战斗完成出现异常状态返回空数据，保证前端不要弹断线重连");
+        // return map;
         return null;
     }
 

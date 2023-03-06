@@ -5,6 +5,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.config.VipConfig;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.VipDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerVipData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
@@ -36,6 +37,7 @@ public class VipController {
 
     @PostMapping("/vip-claimVipDailyRewards")
     @ApiOperation("获得vip每日奖励")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> claimVipDailyRewards(@RequestBody VipDTO request) {
 
         try {

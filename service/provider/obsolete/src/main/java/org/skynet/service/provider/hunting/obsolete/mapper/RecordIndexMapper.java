@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.dao.mapper;
+package org.skynet.service.provider.hunting.obsolete.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

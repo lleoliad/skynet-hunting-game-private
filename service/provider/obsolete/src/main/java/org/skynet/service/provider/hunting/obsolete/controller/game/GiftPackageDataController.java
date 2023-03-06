@@ -5,6 +5,7 @@ import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.GiftPackageDataDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
@@ -41,6 +42,7 @@ public class GiftPackageDataController {
 
     @PostMapping("giftPackage-refreshGiftPackageData")
     @ApiOperation("刷新用户礼包")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> refreshGiftPackageData(@RequestBody BaseDTO request) {
 
         try {
@@ -100,6 +102,7 @@ public class GiftPackageDataController {
 
     @PostMapping("giftPackage-refreshPromotionEventPackage")
     @ApiOperation("刷新活动礼包")
+    @RepeatSubmit(interval = 120000)
     public Map<String, Object> refreshPromotionEventPackage(@RequestBody GiftPackageDataDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("refreshPromotionEventPackage", k -> new ArrayList<>());

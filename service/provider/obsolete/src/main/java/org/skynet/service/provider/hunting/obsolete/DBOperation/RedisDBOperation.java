@@ -9,6 +9,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.DeflaterUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.CloudUserDataDto;
+import com.cn.huntingrivalserver.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataVOService;
@@ -18,10 +19,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Component;
 
@@ -648,6 +646,17 @@ public class RedisDBOperation {
         String key = "Token:" + userUid;
 
         redisDBOperation.redisTemplate.opsForValue().set(key, token, tokenExpiration, TimeUnit.DAYS);
+    }
+
+    public static void setCacheObject(final String key, final String value, final Integer timeout, final TimeUnit timeUnit) {
+        redisDBOperation.redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+    }
+    public static String getCacheObject(final String key) {
+        return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+    }
+
+    public static boolean deleteKey(final String key) {
+        return redisDBOperation.redisTemplate.delete(key);
     }
 
     public static void deleteUserToken(String userUid) {
