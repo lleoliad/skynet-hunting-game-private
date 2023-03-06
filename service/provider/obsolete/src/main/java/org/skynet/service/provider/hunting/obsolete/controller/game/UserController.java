@@ -11,13 +11,13 @@ import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLoc
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.config.VipV2Config;
-import org.skynet.service.provider.hunting.obsolete.controller.module.dto.BaseDTO;
-import org.skynet.service.provider.hunting.obsolete.controller.module.dto.UserInfoDto;
-import org.skynet.service.provider.hunting.obsolete.controller.module.entity.*;
+import org.skynet.service.provider.hunting.obsolete.module.dto.BaseDTO;
+import org.skynet.service.provider.hunting.obsolete.module.dto.UserInfoDto;
 import org.skynet.service.provider.hunting.obsolete.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
+import org.skynet.service.provider.hunting.obsolete.module.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ChangeNameDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.LoginDTO;

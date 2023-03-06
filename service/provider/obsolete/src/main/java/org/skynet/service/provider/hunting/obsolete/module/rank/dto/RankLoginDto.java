@@ -1,5 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.rank.dto;
-
+package org.skynet.service.provider.hunting.obsolete.module.rank.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -9,8 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PreviewPlayerDto {
-
+public class RankLoginDto {
 
     @ApiModelProperty(value = "用户ID")
     private String userId;
@@ -18,8 +16,14 @@ public class PreviewPlayerDto {
     @ApiModelProperty(value = "版本号")
     private String version;
 
-    @ApiModelProperty(value = "联赛分组ID")
-    private String groupId;
+    @ApiModelProperty(value = "玩家昵称")
+    private String nickname;
+
+    @ApiModelProperty(value = "头像")
+    private String headPic;
+
+    @ApiModelProperty(value = "金币")
+    private Long coin;
 
 
 }

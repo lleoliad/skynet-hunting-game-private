@@ -1,7 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.pojo.entity;
 
 
-import org.skynet.service.provider.hunting.obsolete.controller.module.rank.entity.ClientRecord;
+import org.skynet.service.provider.hunting.obsolete.module.rank.entity.ClientRecord;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

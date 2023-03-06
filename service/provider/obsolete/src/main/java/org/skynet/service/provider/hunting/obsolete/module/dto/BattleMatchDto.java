@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.dto;
+package org.skynet.service.provider.hunting.obsolete.module.dto;
 
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerWeaponInfo;
 import io.swagger.annotations.ApiModel;

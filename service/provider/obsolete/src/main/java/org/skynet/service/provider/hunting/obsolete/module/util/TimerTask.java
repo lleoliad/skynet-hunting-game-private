@@ -1,10 +1,10 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.util;
+package org.skynet.service.provider.hunting.obsolete.module.util;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
-import org.skynet.service.provider.hunting.obsolete.controller.module.dto.BaseDTO;
+import org.skynet.service.provider.hunting.obsolete.module.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

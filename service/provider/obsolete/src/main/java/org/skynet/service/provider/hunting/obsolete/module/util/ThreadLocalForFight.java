@@ -1,6 +1,6 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.util;
+package org.skynet.service.provider.hunting.obsolete.module.util;
 
-import org.skynet.service.provider.hunting.obsolete.controller.module.dto.BattleCompleteDto;
+import org.skynet.service.provider.hunting.obsolete.module.dto.BattleCompleteDto;
 import lombok.extern.slf4j.Slf4j;
 
 

@@ -1,6 +1,6 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.dto;
+package org.skynet.service.provider.hunting.obsolete.module.dto;
 
-import org.skynet.service.provider.hunting.obsolete.controller.module.entity.UserInfo;
+import org.skynet.service.provider.hunting.obsolete.module.entity.UserInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.rank.service;
+package org.skynet.service.provider.hunting.obsolete.module.rank.service;
 
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
 

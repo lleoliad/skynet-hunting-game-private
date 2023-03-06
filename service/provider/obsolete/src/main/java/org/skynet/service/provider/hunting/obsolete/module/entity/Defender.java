@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.entity;
+package org.skynet.service.provider.hunting.obsolete.module.entity;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

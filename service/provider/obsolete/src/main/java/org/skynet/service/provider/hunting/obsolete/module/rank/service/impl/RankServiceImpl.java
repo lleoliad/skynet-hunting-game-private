@@ -1,13 +1,13 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.rank.service.impl;
+package org.skynet.service.provider.hunting.obsolete.module.rank.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
-import org.skynet.service.provider.hunting.obsolete.controller.module.rank.dto.RankLoginDto;
-import org.skynet.service.provider.hunting.obsolete.controller.module.rank.entity.ClientRecord;
-import org.skynet.service.provider.hunting.obsolete.controller.module.rank.service.RankService;
+import org.skynet.service.provider.hunting.obsolete.module.rank.dto.RankLoginDto;
+import org.skynet.service.provider.hunting.obsolete.module.rank.entity.ClientRecord;
+import org.skynet.service.provider.hunting.obsolete.module.rank.service.RankService;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerRankData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;

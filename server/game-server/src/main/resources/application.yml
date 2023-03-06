@@ -10,3 +10,33 @@ skynet:
       url: http://rank-league
     battle:
       url: http://battle
+
+
+server:
+  config:
+    clientGameVersion: [1.0.7,1.0.9,1.0.10,1.0.11,1.0.12,1.0.13,1.0.14,1.1.0]
+    production: true
+    groups: [A]
+    supportRecordModeClient: true
+    googleWebClientId: "728644399697-mlfuc0ss7f56d4a6tgm98f1lq3i1o7kd.apps.googleusercontent.com"
+    facebookAppId: 1081749179209791
+    facebookAppSecret: 866df893ab602b34a92552d0a4155ed7
+    cloudUrl: "https://us-central1-wildhunthuntingclash.cloudfunctions.net"
+    fightUrl: "http://localhost:17960"
+    aiUrl: "http://47.88.90.222:9090"
+    rankUrl: "http://localhost:17920/skynet/service/provider/hunting/rank/league/player"
+
+google:
+  config:
+    type: service_account
+    projectId: pc-api-7271145507751356136-749
+    privateKeyId: 1117d72d8d6c67f9f76189189c2ebd9e1e31f270
+    privateKey: -----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDXoyO/LlZgfvN8\nA97CL0dkBZ/IXAPFRABJZSdCmzEUDMJN7SP5juQ9qAG7lKuPfUrwlqk3p3UuXSMI\nMVYdA7BSzUpE3hlfLEAbwh1drgrQHyX7dQzAIQQS7RhAt+rPo5RgT4oOUY89LqVh\njjXOZyPSqFdJ6z24oosqd3X8dB5Q5TVdMpIPJxhMWice4S5ymm8RUeyXSoOuG9qx\nDX/ydQgoO9sCFXZblqkC3U3/k9eBJlMjI88+HSn4Xse4X/ZHxBhmRwSAVE5dWS1g\n80nXX2EnBho8j6/G7AMxVvabfB00xj4vgVX25I6WYYegtlqbfE3yR/o6BHKkVMlq\nWdroE8iVAgMBAAECggEALInbYQpA2IL4JwIEoU6THAdmWoOY2saCGaa9Lm5v+2Bs\nRJyprMq0/UAlhXk+Wy+JijpQHrjlhOtDSFaqXulLYrrYr3NBQc1Zu3IDTz1aqeR5\nG6AwP0HCfec/NmTWaMc0ZxUeonj5kS1Ahu8Q0X4vobvX9aJTN/7IqD+O3NMeDN59\nsWR759AAb57hCOYR2D21AmvLS9QV1nSfmoQAArP3578hRgQ/jA8V2J5irInSXh/w\nkn3C5LcUUhclM/m8E9sHHPKD+A5SqHJquP4SZfxyKLWruqce95kA29jF5fzCDbXM\nomdEHfsZjBtUiQgeERcZzrk4tbECNqT5ELPtLMPH8QKBgQDsBC6ARVP4wQy9SLs9\nfm67LRFc2aXMnLM1SZqzn+NdmFK5AFOmQGFy3XZlrpYxJciyBEF/2WnbP89ob8+q\nIZg5BXP2LH9UAbPHaBpFE+qRD4wp+y2AO4OuaqUvdYPmJC2fTclwYXgexM/oM9Us\ngS7Ty6SV0KYDzhOWB34kyj85cQKBgQDp5To6dBLrM88Gbci6Wmno2k2p3GWY6DMq\ng8zxSsECx1dzsfwvJMUrCAWytN26VESSXZ+kY86tb0VxlCW57/UmmORTCe6LDgFk\nt1NdEqUAyaHc/ya0Y5feJJOlbEg46Mxbm3Ttqy/5WUyUxpAhTMy6zQIWN1K3+hXD\n0xopZsyPZQKBgQDiIX+MVuCFzjGuiikcWi8uF5gzJjW9PcZWoBchU2g9HNzldHKx\nL64uqBHwir5MiK8qIPnAzUanUxQeNEL79wQqXhclHq1AiAEAZbYFyXdNVWAuOQL3\ngg5A5t0uA6JEtxUfNSB0FG9Ky7eH+2GcKon7U3p2MFtf+eq6LKOoDD9XgQKBgEY1\nIH1bSjJ/oqzzV0VYzmGu5ZEPLw/u4yzn0yS6o6UJ4R5BVslv6B86kTtLPyMnGE42\n/CyEKQ22UMn/BjQB6zxiuGaUnJ3w3ko1HTja19ycqZGEpUGQg42SvR7ymds7RdxZ\nlYeh0wyt2WbvE2RrgSixUOcKRDIlR1M4kqnKyaxhAoGAVD9a+1sNbaioERQcCt3X\nNOwApb4s5IbkcnF61aMGzYT7yKL39Y+5BvV2xSWNWMWsmhhzVPjhFYszlzOidyLE\n2996Kx13rMHYXaYq/GKRGWpoV4F1MP8epQoKIK10hj0tmSaNxxk7j48OCpmF/yc5\nFhMo/vlRCT+YPzmS8NDKB78=\n-----END PRIVATE KEY-----\n
+    clientEmail: hunting-sniper@pc-api-7271145507751356136-749.iam.gserviceaccount.com
+    clientId: 114163466106107972287
+    authUri: https://accounts.google.com/o/oauth2/auth
+    tokenUri: https://oauth2.googleapis.com/token
+    authProviderX509CertUrl: https://www.googleapis.com/oauth2/v1/certs
+    clientX509CertUrl: https://www.googleapis.com/robot/v1/metadata/x509/hunting-sniper%40pc-api-7271145507751356136-749.iam.gserviceaccount.com
+
+

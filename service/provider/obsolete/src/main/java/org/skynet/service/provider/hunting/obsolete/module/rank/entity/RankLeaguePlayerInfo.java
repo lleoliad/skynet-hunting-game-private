@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.rank.entity;
+package org.skynet.service.provider.hunting.obsolete.module.rank.entity;
 
 
 import io.swagger.annotations.ApiModel;

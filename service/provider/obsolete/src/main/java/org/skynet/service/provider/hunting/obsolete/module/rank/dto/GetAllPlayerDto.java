@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.controller.module.rank.dto;
+package org.skynet.service.provider.hunting.obsolete.module.rank.dto;
 
 
 import lombok.AllArgsConstructor;
