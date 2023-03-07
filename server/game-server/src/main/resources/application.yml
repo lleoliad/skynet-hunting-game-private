@@ -6,10 +6,12 @@ skynet:
       url: http://robot-factory
     user:
       url: http://user
-    rank-league:
-      url: http://rank-league
     battle:
       url: http://battle
+    rank-league:
+      url: http://rank-league
+    championship:
+      url: http://championship
 
 
 server:

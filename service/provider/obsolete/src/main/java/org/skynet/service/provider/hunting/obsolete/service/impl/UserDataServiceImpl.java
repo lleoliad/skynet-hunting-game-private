@@ -445,7 +445,7 @@ public class UserDataServiceImpl implements UserDataService {
                     UserData newUserData = createDefaultUserData(userId, newUUID, gameVersion);
 
                     //向数据库里插入用户数据
-                    userDataVOService.insertUser(newUserData);
+                    // userDataVOService.insertUser(newUserData);// TODO 取消游戏服务器用户数据的创建
 
                     log.info("userData:{}", newUserData);
 

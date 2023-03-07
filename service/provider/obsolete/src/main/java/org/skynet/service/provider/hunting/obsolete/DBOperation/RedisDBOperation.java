@@ -559,7 +559,7 @@ public class RedisDBOperation {
                 userData.setUserId(redisDBOperation.getIncr("userAutoIncrementId"));
             }
             UserDataVOService voService = ApplicationContextUtil.getBean(UserDataVOService.class);
-            voService.updateUserData(userData);
+            // voService.updateUserData(userData);// TODO 取消用户数据的更新
         });
 
     }
