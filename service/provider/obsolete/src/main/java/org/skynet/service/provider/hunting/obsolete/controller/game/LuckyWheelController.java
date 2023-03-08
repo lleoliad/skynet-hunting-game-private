@@ -48,7 +48,7 @@ public class LuckyWheelController {
 
     @PostMapping("luckyWheel-luckyWheelSpin")
     @ApiOperation("转动一次幸运转盘")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> luckyWheelSpin(@RequestBody LuckyWheelDTO request) {
 
         try {

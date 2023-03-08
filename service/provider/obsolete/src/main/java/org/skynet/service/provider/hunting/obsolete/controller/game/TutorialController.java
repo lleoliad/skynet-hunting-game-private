@@ -91,7 +91,7 @@ public class TutorialController {
 
     @PostMapping("tutorial-completeForceTutorialStep")
     @ApiOperation("确认某个引导步骤完成")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> completeForceTutorialStep(@RequestBody ForceStepDTO request) {
 
         try {

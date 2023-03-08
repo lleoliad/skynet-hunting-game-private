@@ -4,6 +4,11 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.services.androidpublisher.AndroidPublisherScopes;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -16,15 +21,9 @@ import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRec
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerUploadWholeMatchControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.service.PlayerControlRecordDataService;
 import org.skynet.service.provider.hunting.obsolete.service.RecordIndexService;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.services.androidpublisher.AndroidPublisherScopes;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import org.skynet.starter.codis.service.CodisService;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.redis.core.RedisConnectionUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Api(tags = "玩家控制记录")
@@ -43,6 +45,12 @@ public class PlayerControlRecordController {
 
     @Resource
     private PlayerControlRecordDataService playerControlRecordDataService;
+
+    // @Resource
+    // private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private CodisService codisService;
 
 //    @ApiOperation("创建已有所有录像的分布数据库")
 //    @GetMapping("/createDatabase")
@@ -167,10 +175,6 @@ public class PlayerControlRecordController {
 
     }
 
-
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
     public static int total;
 
     @Resource
@@ -184,7 +188,6 @@ public class PlayerControlRecordController {
 
     @PostMapping("/download/singleData")
     public Map<String, Object> resolveWholeData(@RequestBody DownloadWholeDataDTO request) throws IOException {
-
         try {
 
             DownloadDataDTO serverResponse = null;
@@ -268,12 +271,12 @@ public class PlayerControlRecordController {
         } catch (Exception e) {
             log.warn("错误信息{}:", e.toString());
             e.printStackTrace();
-            RedisConnectionUtils.unbindConnection(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
+            // RedisConnectionUtils.unbindConnection(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
             log.warn("抛出异常后打印request:{}", JSONObject.toJSONString(request));
             resolveWholeData(request);
 //            throw new BusinessException(e.toString());
         } finally {
-            RedisConnectionUtils.unbindConnection(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
+            // RedisConnectionUtils.unbindConnection(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
         }
         return CommonUtils.responsePrepare(null);
     }

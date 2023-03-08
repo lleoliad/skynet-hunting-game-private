@@ -55,7 +55,7 @@ public class IAPController {
 
     @PostMapping("iap-preparePurchase")
     @ApiOperation(value = "准备购买", notes = "记录玩家正在发起一次购买,玩家完成或者失败之后,清除该记录")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> preparePurchase(@RequestBody PreparePurchaseDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("preparePurchase", k -> new ArrayList<>());
@@ -135,7 +135,7 @@ public class IAPController {
 
     @PostMapping("iap-iapReceiptValidate")
     @ApiOperation(value = "验证内购订单,并发送商品")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> iapReceiptValidate(@RequestBody IapReceiptValidateDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("iapReceiptValidate", k -> new ArrayList<>());
@@ -288,7 +288,7 @@ public class IAPController {
 
     @PostMapping("iap-removeFailurePendingPurchase")
     @ApiOperation("内购如果失败的话,清除pending purchase记录")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> removeFailurePendingPurchase(@RequestBody RemoveFailureDTO dto) {
 
         try {
@@ -349,7 +349,7 @@ public class IAPController {
 
     @PostMapping("iap-syncPendingPurchaseProducts")
     @ApiOperation(value = "同步未购买订单", notes = "以客户端iap返回的未完成订单为准,反正订单都要验证,可以信任客户端")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> syncPendingPurchaseProducts(@RequestBody SyncPendingDTO request) {
 
         try {

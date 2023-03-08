@@ -23,6 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
+import org.skynet.starter.codis.service.CodisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,8 +51,11 @@ public class RankController {
     @Resource
     private RankService rankService;
 
+    // @Resource
+    // private RedisTemplate<String, Object> redisTemplate;
+
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private CodisService codisService;
 
     @Resource
     private ChestService chestService;
@@ -59,7 +63,7 @@ public class RankController {
 
     @PostMapping("/rank-getAllPlayersData")
     @ApiOperation("获取段位中所有玩家的信息")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> getAllPlayersData() {
 
         try {
@@ -80,7 +84,7 @@ public class RankController {
 
     @PostMapping("/rank-downloadPlayersIcon")
     @ApiOperation("获取其他玩家头像数据")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> downloadPlayersIcon(@RequestBody DownloadPlayersIconDto request) {
 
         try {
@@ -99,7 +103,7 @@ public class RankController {
 
     @PostMapping("/rank-getPlayerDetailData")
     @ApiOperation("获取其他玩家详细信息")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> getPlayerDetailData(@RequestBody RankOtherPlayerDetailDto request) {
 
         try {
@@ -152,7 +156,8 @@ public class RankController {
                 playerDetailData.setNickName(userData.getName());
                 //获取玩家头像
                 String key = Path.getUserProfileImageCollectionPath();
-                Object imageBase64 = redisTemplate.opsForHash().get(key, userData.getUuid());
+                // Object imageBase64 = redisTemplate.opsForHash().get(key, userData.getUuid());
+                String imageBase64 = codisService.get(key);
                 if (imageBase64 != null) {
                     playerDetailData.setHeadPic(imageBase64.toString());
                 }
@@ -194,7 +199,7 @@ public class RankController {
 
     @PostMapping("/rank-getEvaluationResult")
     @ApiOperation("获取上周段位结算数据")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> getEvaluationResult(@RequestBody BaseDTO baseDTO) {
 
         try {
@@ -236,7 +241,7 @@ public class RankController {
 
     @PostMapping("/rank-openRankRewardChest")
     @ApiOperation("打开段位宝箱")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> openPromotedRewardChest(@RequestBody BaseDTO request) {
 
         try {
@@ -317,7 +322,7 @@ public class RankController {
 
     @PostMapping("/rank-confirmLastWeekEvaluationRankListShow")
     @ApiOperation("确认上周结算排行界面展示")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> confirmLastWeekEvaluationRankListShow(@RequestBody BaseDTO baseDTO) {
 
         try {
@@ -344,7 +349,7 @@ public class RankController {
 
     @PostMapping("/rank-confirmLastWeekEvaluationRankChangeShow")
     @ApiOperation("确认上周结算段位变化界面展示")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> confirmLastWeekEvaluationRankChangeShow(@RequestBody BaseDTO baseDTO) {
 
         try {

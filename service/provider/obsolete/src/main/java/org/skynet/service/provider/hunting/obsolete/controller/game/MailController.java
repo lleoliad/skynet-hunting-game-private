@@ -49,7 +49,7 @@ public class MailController {
 
     @PostMapping("mail-claimPlayerMailItems")
     @ApiOperation("获取邮件附加的物品")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> claimPlayerMailItems(@RequestBody MailDataDTO request) {
 
         try {
@@ -148,7 +148,7 @@ public class MailController {
 
     @PostMapping("mail-deletePlayerMail")
     @ApiOperation("删除玩家邮件")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> deletePlayerMail(@RequestBody MailDataDTO request) {
 
         try {
@@ -169,7 +169,7 @@ public class MailController {
 
     @PostMapping("mail-pullAllInboxMails")
     @ApiOperation("获取玩家邮件")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> pullAllInboxMails(@RequestBody MailDataDTO request) {
 
         try {
@@ -209,7 +209,7 @@ public class MailController {
 
     @PostMapping("mail-pullLatestInboxMails")
     @ApiOperation("拉取最新的邮件")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> pullLatestInboxMails(@RequestBody MailDataDTO request) {
 
         try {

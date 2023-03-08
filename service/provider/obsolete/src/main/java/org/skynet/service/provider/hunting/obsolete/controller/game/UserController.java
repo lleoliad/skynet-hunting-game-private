@@ -515,7 +515,7 @@ public class UserController {
 
     @PostMapping("changePlayerName")
     @ApiOperation("修改玩家名称")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> changePlayerName(@RequestBody ChangeNameDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("changePlayerName", k -> new ArrayList<>());

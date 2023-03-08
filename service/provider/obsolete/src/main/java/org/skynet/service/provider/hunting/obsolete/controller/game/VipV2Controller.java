@@ -48,7 +48,7 @@ public class VipV2Controller {
 
     @PostMapping("/vipV2-claimSVipV2DailyRewards")
     @ApiOperation("获取svip v2每日奖励")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> claimSVipV2DailyRewards(@RequestBody VipDTO request) {
 
         try {
@@ -139,7 +139,7 @@ public class VipV2Controller {
 
     @PostMapping("/vipV2-claimVipV2DailyRewards")
     @ApiOperation("获取vip v2每日奖励")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> claimVipV2DailyRewards(@RequestBody VipDTO request) {
 
         try {

@@ -37,7 +37,7 @@ public class VipController {
 
     @PostMapping("/vip-claimVipDailyRewards")
     @ApiOperation("获得vip每日奖励")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> claimVipDailyRewards(@RequestBody VipDTO request) {
 
         try {

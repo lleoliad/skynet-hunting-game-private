@@ -47,7 +47,7 @@ public class AchievementController {
 
     @PostMapping("achievement-completeAchievement")
     @ApiOperation("完成某个任务")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> completeAchievement(@RequestBody AchievementDTO request) {
         GameEnvironment.timeMessage.computeIfAbsent("achievement", k -> new ArrayList<>());
         try {

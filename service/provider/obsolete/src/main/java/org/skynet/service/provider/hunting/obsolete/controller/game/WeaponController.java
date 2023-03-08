@@ -47,7 +47,7 @@ public class WeaponController {
 
     @PostMapping("/weapon-equipGun")
     @ApiOperation("装备某把枪")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> equipGun(@RequestBody GunDTO dto) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("equipGun", k -> new ArrayList<>());
@@ -94,7 +94,7 @@ public class WeaponController {
 
     @PostMapping("weapon-upgradeGun")
     @ApiOperation("枪械升级")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> upgradeGun(@RequestBody GunDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("upgradeGun", k -> new ArrayList<>());
@@ -187,7 +187,7 @@ public class WeaponController {
 
     @PostMapping("weapon-equipBullet")
     @ApiOperation("装备子弹")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> equipBullet(@RequestBody EquipBulletDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("equipBullet", k -> new ArrayList<>());

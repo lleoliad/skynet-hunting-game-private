@@ -14,6 +14,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.skynet.starter.codis.service.CodisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +27,11 @@ import java.util.Map;
 @Transactional
 public class RankServiceImpl implements RankService {
 
+    // @Resource
+    // private RedisTemplate<String, Object> redisTemplate;
+
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private CodisService codisService;
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
@@ -46,7 +50,8 @@ public class RankServiceImpl implements RankService {
         RankLoginDto rankLoginDto = new RankLoginDto(userData.getUuid(), gameVersion, userData.getName(), null, 0L);
         //从redis中获取玩家头像，如果没有直接为空
         String key = Path.getUserProfileImageCollectionPath();
-        Object imageBase64 = redisTemplate.opsForHash().get(key, userData.getUuid());
+        // Object imageBase64 = redisTemplate.opsForHash().get(key, userData.getUuid());
+        String imageBase64 = codisService.get(key);
         if (imageBase64 != null) {
             rankLoginDto.setHeadPic(imageBase64.toString());
         }

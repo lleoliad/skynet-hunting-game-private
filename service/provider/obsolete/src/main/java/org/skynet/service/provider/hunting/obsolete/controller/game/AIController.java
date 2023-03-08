@@ -245,13 +245,9 @@ public class AIController {
 //    }
 
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
-
     @PostMapping("ai-aiControlRecordDataQuery")
     @ApiOperation("根据条件,找到合适的AI操作录制文件并返回")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> aiControlRecordDataQuery(@RequestBody AIControlRecordDataQueryDTO request) {
 
         GameEnvironment.timeMessage.computeIfAbsent("aiControlRecordDataQuery", k -> new ArrayList<>());
@@ -424,7 +420,7 @@ public class AIController {
 
     @PostMapping("ai-searchAiRecordData")
     @ApiOperation("根据条件,找到合适的AI操作录制文件并返回")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public ResponseResult<RecordDataAndBase64> findAIForGame(@RequestBody SearchAiDto searchAiDto) {
 
         try {

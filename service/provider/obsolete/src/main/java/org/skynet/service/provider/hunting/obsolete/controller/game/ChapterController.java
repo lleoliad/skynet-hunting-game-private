@@ -44,7 +44,7 @@ public class ChapterController {
 
     @PostMapping("chapter-confirmChapterUnlockAnimationComplete")
     @ApiOperation("确认玩家章节解锁动画播放完成")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> confirmChapterUnlockAnimationComplete(@RequestBody BaseDTO request) {
         GameEnvironment.timeMessage.computeIfAbsent("confirmChapterUnlockAnimationComplete", k -> new ArrayList<>());
         try {
@@ -83,7 +83,7 @@ public class ChapterController {
 
     @PostMapping("chapterBonusPackage-activeChapterBonusPackage")
     @ApiOperation(value = "激活章节礼包", notes = "玩家看到章节礼包之后,才开始计时")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> activeChapterBonusPackage(@RequestBody ActiveChapterBonusDTO request) {
 
         try {

@@ -42,7 +42,7 @@ public class GiftPackageDataController {
 
     @PostMapping("giftPackage-refreshGiftPackageData")
     @ApiOperation("刷新用户礼包")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> refreshGiftPackageData(@RequestBody BaseDTO request) {
 
         try {
@@ -102,7 +102,7 @@ public class GiftPackageDataController {
 
     @PostMapping("giftPackage-refreshPromotionEventPackage")
     @ApiOperation("刷新活动礼包")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> refreshPromotionEventPackage(@RequestBody GiftPackageDataDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("refreshPromotionEventPackage", k -> new ArrayList<>());

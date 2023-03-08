@@ -53,7 +53,7 @@ public class AuthenticationController {
 
     @PostMapping("auth-getAuthenticationProviderBindGameAccount")
     @ApiOperation("玩家拉取账号信息")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> getAuthenticationProviderBindGameAccount(@RequestBody AuthenticationDTO request) {
 
         try {
@@ -183,7 +183,7 @@ public class AuthenticationController {
 
     @PostMapping("auth-recoverAuthenticationProviderGameAccount")
     @ApiOperation("恢复第三方鉴权")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> recoverAuthenticationProviderGameAccount(@RequestBody AuthenticationDTO request) {
         log.warn("进入方法：auth-recoverAuthenticationProviderGameAccount");
         try {
@@ -339,7 +339,7 @@ public class AuthenticationController {
 
     @PostMapping("auth-authenticationLogin")
     @ApiOperation("玩家通过第三方鉴权登陆")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> authenticationLogin(@RequestBody AuthenticationDTO request) {
 
         try {
@@ -533,7 +533,7 @@ public class AuthenticationController {
 
     @PostMapping("auth-recoverGuestGameAccount")
     @ApiOperation("恢复游客账号")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> recoverGuestGameAccount(@RequestBody BaseDTO request) {
 
         try {
@@ -576,7 +576,7 @@ public class AuthenticationController {
 
     @PostMapping("auth-findBindGuestGameAccount")
     @ApiOperation("查找某个device id是否绑定了游戏账号")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> findBindGuestGameAccount(@RequestBody BaseDTO request) {
 
         try {

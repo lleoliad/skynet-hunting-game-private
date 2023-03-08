@@ -24,6 +24,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.*;
+import org.skynet.starter.codis.service.CodisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +74,17 @@ public class UserDataServiceImpl implements UserDataService {
 
     @Resource
     private RankService rankService;
+
+    @Resource
+    private RedisDBOperation redisDBOperation;
+    // @Resource
+    // private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private CodisService codisService;
+
+    @Resource
+    private UserDataVOService userDataVOService;
 
     @Override
     public Integer userDataSettlement(UserData userData, UserDataSendToClient sendToClientData, Boolean incrementUpdateCount, String gameVersion) throws IllegalAccessException {
@@ -418,14 +430,6 @@ public class UserDataServiceImpl implements UserDataService {
         return userData;
     }
 
-    @Resource
-    private RedisDBOperation redisDBOperation;
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Resource
-    private UserDataVOService userDataVOService;
-
     /**
      * 创建新玩家
      *
@@ -461,7 +465,8 @@ public class UserDataServiceImpl implements UserDataService {
 
             throw new BusinessException("无法创建新用户,因为生成的所有uuid都被占用了");
         } catch (BusinessException e) {
-            redisTemplate.delete(newKey);
+            // redisTemplate.delete(newKey);
+            codisService.del(newKey);
             throw new BusinessException(e.getMessage());
         }
     }

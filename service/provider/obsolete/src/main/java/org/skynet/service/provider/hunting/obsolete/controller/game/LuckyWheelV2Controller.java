@@ -46,7 +46,7 @@ public class LuckyWheelV2Controller {
 
     @PostMapping("luckyWheelV2-luckyWheelV2RefreshContent")
     @ApiOperation("刷新转盘v2表盘内容")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> luckyWheelV2RefreshContent(@RequestBody LuckyWheelDTO request) {
 
         try {
@@ -90,7 +90,7 @@ public class LuckyWheelV2Controller {
 
     @PostMapping("luckyWheelV2-luckyWheelV2Spin")
     @ApiOperation("获取转盘V2奖励")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> luckyWheelV2Spin(@RequestBody LuckyWheelDTO request) {
 
         try {

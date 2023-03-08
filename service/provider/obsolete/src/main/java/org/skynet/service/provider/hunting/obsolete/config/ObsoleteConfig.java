@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "org.skynet.commons.db.mysql",
         "org.skynet.commons.db.mongodb",
         "org.skynet.commons.db.redis.service",
+        "org.skynet.starter.codis",
 })
 @EnableMongoRepositories(basePackages = {
         "org.skynet.service.provider.hunting.obsolete.dao.repository"

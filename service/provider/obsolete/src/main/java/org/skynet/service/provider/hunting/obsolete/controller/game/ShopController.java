@@ -95,7 +95,7 @@ public class ShopController {
 
     @PostMapping("shop-purchaseChest")
     @ApiOperation("购买宝箱")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> purchaseChest(@RequestBody PurchaseChestDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("purchaseChest", k -> new ArrayList<>());
@@ -169,7 +169,7 @@ public class ShopController {
 
     @PostMapping("shop-purchaseCoinBonusPackage")
     @ApiOperation("购买金币礼包")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> purchaseCoinBonusPackage(@RequestBody PurchaseCoinPackageDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("purchaseCoinBonusPackage", k -> new ArrayList<>());
@@ -251,7 +251,7 @@ public class ShopController {
 
     @PostMapping("weapon-purchaseBullet")
     @ApiOperation("购买子弹")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> purchaseBullet(@RequestBody PurchaseBulletDTO request) {
         try {
             GameEnvironment.timeMessage.computeIfAbsent("purchaseBullet", k -> new ArrayList<>());

@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.*;
+import org.skynet.starter.codis.service.CodisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +53,12 @@ public class AdminController {
 
     @Resource
     private AiRecordChooseRuleService aiRecordChooseRuleService;
+
+    // @Resource
+    // private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private CodisService codisService;
 
     @PostMapping("admin-readUserData")
     @ApiOperation("获取某个用户的数据")
@@ -122,9 +129,6 @@ public class AdminController {
         return null;
     }
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
     //根据输入的分数，找到其在对应的库中的最高排名和最低排名
     @PostMapping("getRankRange")
     @ApiOperation("根据输入的分数，找到其在对应的库中的最高排名和最低排名")
@@ -141,7 +145,10 @@ public class AdminController {
             }
             //检验数据库是否存在
             String poolName = rankDto.getPoolName();
-            if (Boolean.FALSE.equals(redisTemplate.hasKey(poolName))) {
+            // if (Boolean.FALSE.equals(redisTemplate.hasKey(poolName))) {
+            //     throw new RuntimeException("要查询的数据库不存在");
+            // }
+            if (Boolean.FALSE.equals(codisService.hasKey(poolName))) {
                 throw new RuntimeException("要查询的数据库不存在");
             }
             List<MatchRecord> poolCollection = playerControlRecordDataService.getPoolCollection(poolName);

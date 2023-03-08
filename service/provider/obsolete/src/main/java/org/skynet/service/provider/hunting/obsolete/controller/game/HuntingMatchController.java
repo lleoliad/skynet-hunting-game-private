@@ -565,7 +565,7 @@ public class HuntingMatchController {
 
     @PostMapping("/huntingMatch-confirmHuntingMatchStart")
     @ApiOperation("确认进入章节比赛")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> confirmHuntingMatchStart(@RequestBody ConfirmHuntingMatchStartDTO request) {
         try {
             String fightUrl = systemPropertiesConfig.getFightUrl();
@@ -837,7 +837,7 @@ public class HuntingMatchController {
 
     @PostMapping("/huntingMatch-confirmHuntingMatchComplete")
     @ApiOperation("确认章节比赛结束")
-    @RepeatSubmit(interval = 120000)
+    @RepeatSubmit(interval = 60000)
     public Map<String, Object> confirmHuntingMatchComplete(@RequestBody ConfirmHuntingMatchCompleteDTO request) {
         String userUid = request.getUserUid();
         try {
