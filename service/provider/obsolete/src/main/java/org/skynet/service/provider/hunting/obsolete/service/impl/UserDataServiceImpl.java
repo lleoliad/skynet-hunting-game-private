@@ -2,9 +2,17 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
+import org.skynet.service.provider.hunting.obsolete.common.util.*;
+import org.skynet.service.provider.hunting.obsolete.config.*;
+import org.skynet.service.provider.hunting.obsolete.enums.*;
 import org.skynet.service.provider.hunting.obsolete.module.rank.entity.ClientRecord;
 import org.skynet.service.provider.hunting.obsolete.module.rank.service.RankService;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
@@ -12,16 +20,8 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DeleteGUNDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.UpdateGUNDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.UpdatePropDTO;
-import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import lombok.extern.slf4j.Slf4j;
-import org.skynet.service.provider.hunting.obsolete.common.util.*;
-import org.skynet.service.provider.hunting.obsolete.config.*;
-import org.skynet.service.provider.hunting.obsolete.enums.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
+import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -213,6 +213,8 @@ public class UserDataServiceImpl implements UserDataService {
 
         userData.getGunLevelMap().put(userData.getEquippedGunId(), 1);
         userData.getGunCountMap().put(userData.getEquippedGunId(), 1);
+
+        userData.getHistory().setTotalEarnedCoin(userData.getCoin());
 
         for (int i = 0; i < ChapterWinChestConfig.ChestSlotAmount; i++) {
 
@@ -943,7 +945,7 @@ public class UserDataServiceImpl implements UserDataService {
 //
 //            }
 
-            GunReward gunReward = new GunReward(gunId, gunCount);
+            GunReward gunReward = new GunReward(gunId, (int) Math.ceil(gunCount * (1 + 0.2)));
             gunIdCountData.add(gunReward);
         }
 
@@ -989,7 +991,7 @@ public class UserDataServiceImpl implements UserDataService {
             int gunId = gunsId.get(i);
             int gunCount = gunsCount.get(i);
             allGunsId.add(gunId);
-            allGunsCount.add(gunCount);
+            allGunsCount.add((int) Math.ceil(gunCount * (1 + 0.2)));
         }
 
         chestOpenResult.setGunRewards(new ArrayList<>());
@@ -1011,7 +1013,7 @@ public class UserDataServiceImpl implements UserDataService {
             Integer gunId = entry.getKey();
             Integer gunCount = entry.getValue();
 
-            Integer countValue = chestOpenResultGunCountMap.getOrDefault(gunId, 0) + gunCount;
+            Integer countValue = chestOpenResultGunCountMap.getOrDefault(gunId, 0) + (int) Math.ceil(gunCount * (1 + 0.2));
             chestOpenResultGunCountMap.put(gunId, countValue);
         }
         chestOpenResult.setGunRewards(CommonUtils.convertGunCountMapToGunCountArray(chestOpenResultGunCountMap));
@@ -1800,8 +1802,9 @@ public class UserDataServiceImpl implements UserDataService {
         }
         History history = userData.getHistory();
         history.setTotalEarnedCoinByMatch(history.getTotalEarnedCoinByMatch() == null ? 0 : history.getTotalEarnedCoinByMatch());
+        history.setTotalEarnedCoin(history.getTotalEarnedCoin() == null ? 0 : history.getTotalEarnedCoin());
+        // history.setTotalEarnedCoinByMatch(Math.max(userData.getCoin(), history.getTotalEarnedCoinByMatch()));
         history.setHighestTrophyCount(history.getHighestTrophyCount() == null ? 0 : history.getHighestTrophyCount());
-        history.setTotalEarnedCoinByMatch(Math.max(userData.getCoin(), history.getTotalEarnedCoinByMatch()));
         history.setCurrentMatchWinStreak(history.getCurrentMatchWinStreak() == null ? 0 : history.getCurrentMatchWinStreak());
         history.setBestMatchWinStreak(history.getBestMatchWinStreak() == null ? 0 : history.getBestMatchWinStreak());
         history.setMatchAverageHitPrecision(history.getMatchAverageHitPrecision() == null ? 0 : history.getMatchAverageHitPrecision());
@@ -1876,6 +1879,7 @@ public class UserDataServiceImpl implements UserDataService {
         for (Map.Entry<Integer, Integer> entry : gunCountMap.entrySet()) {
             Integer gunId = entry.getKey();
             Integer gunCount = entry.getValue();
+            gunCount = (int) Math.ceil(gunCount * (1 + 0.2));
 
             GunTableValue gunTableValue = gunTable.get(gunId.toString());
             GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];

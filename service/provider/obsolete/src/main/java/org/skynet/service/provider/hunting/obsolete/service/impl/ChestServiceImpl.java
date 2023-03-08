@@ -529,6 +529,7 @@ public class ChestServiceImpl implements ChestService {
 
     @Override
     public Map<Integer, Integer> extractGunRewardsFromGunLibraryAsync(UserData userData, GunLibraryType gunLibraryType, int chestLevel, int getGunCount, boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, String gameVersion) {
+        getGunCount = getGunCount + (int)Math.ceil(getGunCount * 0.2);
         //确保数据存在
         userDataService.upgradePlayerChestOpenIndexMapData(userData);
 
@@ -710,6 +711,8 @@ public class ChestServiceImpl implements ChestService {
      */
     @Override
     public Map<Integer, Integer> extractGunRewardsFromGunLibrary(UserData userData, GunLibraryType gunLibraryType, Integer chestLevel, Integer getGunCount, String gameVersion, Boolean enableDrawCountRequires, Map<Integer, Integer> resultMap) {
+        getGunCount = getGunCount + (int)Math.ceil(getGunCount * 0.2);
+
         resultMap = CollectionUtils.isEmpty(resultMap) ? new HashMap<>() : resultMap;
 
         //确保数据存在

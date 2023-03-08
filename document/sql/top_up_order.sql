@@ -1,0 +1,30 @@
+DROP TABLE IF EXISTS `top_up_order`;
+CREATE TABLE `top_up_order`
+(
+    `id`                      int(11) NOT NULL AUTO_INCREMENT,
+    `order_number`            varchar(255)       DEFAULT NULL COMMENT '订单编号',
+    `platform_order_number`   varchar(255)       DEFAULT '' COMMENT '平台订单编号',
+    `user_info`               varchar(255)       DEFAULT NULL COMMENT '下订用户',
+    `order_date`              datetime           DEFAULT NULL COMMENT '下单时间',
+    `product_name`            varchar(255)       DEFAULT NULL COMMENT '充值产品名称',
+    `good_count`              int(11) DEFAULT NULL COMMENT '产品数量',
+    `money`                   int(11) DEFAULT NULL COMMENT '充值金额',
+    `order_state`             tinyint(4) NOT NULL COMMENT '订单状态：0 下单 1 已付费 2 订单过期',
+    `order_omit_state`        tinyint(4) DEFAULT '0' COMMENT '订单遗漏状态： 0 未遗漏 1 遗漏',
+    `https_verify_url`        varchar(255)       DEFAULT '' COMMENT '校验通知地址',
+    `order_type`              tinyint(4) DEFAULT '0' COMMENT '订单类型：0 普通订单',
+    `valid_remain_days`       int(11) DEFAULT '0' COMMENT '有效剩余天数',
+    `order_end_date`          datetime           DEFAULT NULL COMMENT '订单结束时间',
+    `first_topup_state`       tinyint(4) DEFAULT '0' COMMENT '首充状态',
+    `real_money`              varchar(50)        DEFAULT '0' COMMENT '实际支付金额',
+    `pay_mode`                varchar(20)        DEFAULT '' COMMENT '支付方式',
+    `receipt_validate_result` longtext COMMENT '收据',
+    `create_time`             timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`             timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `is_deleted`              int(11) NULL DEFAULT 0 COMMENT '逻辑删除（1是删除）',
+    `version`                 int(11) NULL DEFAULT 1 COMMENT '乐观锁',
+    PRIMARY KEY (`id`),
+    KEY                       `idx_order_state` (`order_state`) USING BTREE,
+    KEY                       `idx_create_time` (`create_time`) USING BTREE,
+    KEY                       `idx_update_time` (`update_time`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Compact COMMENT '支付订单表';
