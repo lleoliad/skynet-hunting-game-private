@@ -1,6 +1,14 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetPlayerRankQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
+import org.skynet.components.hunting.robot.data.RobotPlayerInfoBO;
+import org.skynet.components.hunting.robot.query.RobotsQuery;
+import org.skynet.components.hunting.robot.service.RobotFactoryFeignService;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -10,13 +18,12 @@ import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.enums.BulletQuality;
 import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordChooseMode;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CheckNewUnlockChapterBO;
+import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.BulletTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.MatchAIRoundRuleTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTableValue;
-import lombok.extern.slf4j.Slf4j;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +52,12 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
 
     @Resource
     private AiService aiService;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
+
+    @Resource
+    private RobotFactoryFeignService robotFactoryFeignService;
 
     @Override
     public void saveHuntingMatchNowData(String path, String huntingMatchNowUid, String userUid, HuntingMatchNowData huntingMatchNowData) {
@@ -263,6 +276,25 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
 
         final double aiProfileCount = 1071d;
         OpponentPlayerInfo opponentPlayerInfo = new OpponentPlayerInfo(null, null, null, null);
+
+        Result<Integer> playerRankResult = rankLeagueFeignService.getPlayerRank(GetPlayerRankQuery.builder().userId(userData.getUuid()).build());
+        if (playerRankResult.isSuccess()) {
+            Result<RobotPlayerInfoBO> robotPlayerInfoBOResult = robotFactoryFeignService.randomGet(RobotsQuery.builder().rank(playerRankResult.getData()).build());
+            if (robotPlayerInfoBOResult.isSuccess()) {
+                RobotPlayerInfoBO robotPlayerInfoBO = robotPlayerInfoBOResult.getData();
+                opponentPlayerInfo.setName(robotPlayerInfoBO.getNickname());
+                opponentPlayerInfo.setIcon_base64(robotPlayerInfoBO.getHeadPic());
+                opponentPlayerInfo.setUseDefaultIcon(false);
+                return opponentPlayerInfo;
+            }
+        }
+
+        if (StringUtils.isEmpty(opponentPlayerInfo.getName())) {
+            opponentPlayerInfo.setName(userDataService.createGuestName(userData.getName()));
+            opponentPlayerInfo.setIcon_base64(null);
+            opponentPlayerInfo.setUseDefaultIcon(true);
+            return opponentPlayerInfo;
+        }
 
         Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(gameVersion);
         //对手奖杯根据玩家变化

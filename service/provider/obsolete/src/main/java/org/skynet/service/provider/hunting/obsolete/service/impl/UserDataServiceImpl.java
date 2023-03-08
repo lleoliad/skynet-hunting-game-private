@@ -719,7 +719,7 @@ public class UserDataServiceImpl implements UserDataService {
 
         luckyWheelService.refreshLuckyWheelV1FreeSpinCount(userData.getUuid(), gameVersion);
         //确认玩家段位信息
-        rankService.getRewardInfo(userData, gameVersion);
+        // rankService.getRewardInfo(userData, gameVersion);
 
         refreshVipV1LuckyWheelCount(userData);
         //清理玩家邮箱

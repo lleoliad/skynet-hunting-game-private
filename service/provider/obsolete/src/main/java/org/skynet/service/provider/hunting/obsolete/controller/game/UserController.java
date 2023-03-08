@@ -3,6 +3,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.PlayerLoginQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
@@ -60,6 +63,9 @@ public class UserController {
 
     @Resource
     private IAPService iapService;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
 //    @PostMapping("/login")
 //    @ApiOperation("玩家登录")
@@ -386,6 +392,15 @@ public class UserController {
             CommonUtils.responseRemoveServer(advertisementData);
             CommonUtils.responseRemoveServer(vipData);
 
+            Result<?> rankLeagueLoginResult = rankLeagueFeignService.playerInitialize(PlayerLoginQuery.builder()
+                    .version(loginDTO.getGameVersion())
+                    .userId(loginDTO.getUserUid())
+                    .nickname(loginUserData.getName())
+                    .headPic(null)
+                    .coin(0L)
+                    .build());
+
+            userDataSendToClient.setPlayerRankData(rankLeagueLoginResult.getData());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             log.warn("下发给服务器的时间：{}", map.get("serverTime"));

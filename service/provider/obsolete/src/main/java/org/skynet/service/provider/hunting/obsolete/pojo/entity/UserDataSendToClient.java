@@ -160,7 +160,8 @@ public class UserDataSendToClient implements Serializable {
 
     @ApiModelProperty(value = "玩家段位系统")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private PlayerRankData playerRankData;
+    // private PlayerRankData playerRankData;
+    private Object playerRankData;
 
     @ApiModelProperty(value = "是否有未领取的段位奖励")
     @JsonInclude(JsonInclude.Include.NON_NULL)

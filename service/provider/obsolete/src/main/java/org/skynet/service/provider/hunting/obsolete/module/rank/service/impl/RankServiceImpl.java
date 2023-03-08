@@ -2,6 +2,7 @@ package org.skynet.service.provider.hunting.obsolete.module.rank.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
@@ -56,6 +57,8 @@ public class RankServiceImpl implements RankService {
                 new ClientRecord(false, false), -1, -1L, -1);
 
         Map<String, Object> rankInfo = HttpUtil.getRankInfo(rankUrl + "/login", rankLoginDto);
+
+
         if (rankInfo != null) {
 
             JSONObject data = JSONObject.parseObject(rankInfo.get("data").toString());

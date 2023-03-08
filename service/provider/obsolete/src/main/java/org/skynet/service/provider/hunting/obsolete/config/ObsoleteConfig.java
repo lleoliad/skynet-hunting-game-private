@@ -31,6 +31,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "org.skynet.service.provider.hunting.obsolete.dao.repository"
 })
 @EnableFeignClients(basePackages = {
+        "org.skynet.components.hunting.rank.league.service",
+        "org.skynet.components.hunting.robot.service",
         "org.skynet.service.provider.hunting.obsolete.service"
 })
 @RefreshScope
