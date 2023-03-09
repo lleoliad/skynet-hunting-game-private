@@ -7,9 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="skynet-hunting-game-components-game" />
         <module name="game-server" />
         <module name="skynet-hunting-service-provider-login" />
+        <module name="skynet-hunting-game-components-user" />
         <module name="skynet-hunting-service-provider-obsolete" />
+        <module name="skynet-hunting-service-provider-game" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

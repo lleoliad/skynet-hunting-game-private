@@ -2,6 +2,12 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.ChapterWinChestData;
+import org.skynet.commons.hunting.user.domain.ChestData;
+import org.skynet.commons.hunting.user.domain.ChestOpenIndexMap;
+import org.skynet.commons.hunting.user.domain.FreeChestData;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -13,13 +19,12 @@ import org.skynet.service.provider.hunting.obsolete.enums.BulletLibraryType;
 import org.skynet.service.provider.hunting.obsolete.enums.ChestType;
 import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CoinAndDiamondBO;
+import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
+import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
 import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
 import org.skynet.service.provider.hunting.obsolete.service.WeaponService;
-import lombok.extern.slf4j.Slf4j;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
-import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -114,9 +119,17 @@ public class ChestServiceImpl implements ChestService {
         //免费箱子都是木头箱子
         ChestType freeChestType = ChestType.FREE;
         Integer freeChestLevel = userDataService.playerHighestUnlockedChapterID(userData);
-        FreeChestData freeChestData = new FreeChestData(NanoIdUtils.randomNanoId(30), freeChestType.getType(), freeChestLevel, TimeUtils.getUnixTimeSecond(), availableTime);
+        // FreeChestData freeChestData = new FreeChestData(NanoIdUtils.randomNanoId(30), freeChestType.getType(), freeChestLevel, TimeUtils.getUnixTimeSecond(), availableTime);
+        //
+        // return freeChestData;
 
-        return freeChestData;
+        return FreeChestData.builder()
+                .uid(NanoIdUtils.randomNanoId(30))
+                .chestType(freeChestType.getType())
+                .level(freeChestLevel)
+                .createTime(TimeUtils.getUnixTimeSecond())
+                .availableUnixTime(availableTime)
+                .build();
     }
 
 //    /**
@@ -260,7 +273,15 @@ public class ChestServiceImpl implements ChestService {
         ChestType winChestType = ChestType.values()[chestIndex - 1];
         int chestUnlockSeconds = ChapterWinChestConfig.getChestUnlockSeconds(winChestType);
 
-        return new ChapterWinChestData(NanoIdUtils.randomNanoId(30), winChestType.getType(), chapterTableValue.getId(), TimeUtils.getUnixTimeSecond(), -1L, (long) chestUnlockSeconds);
+        // return new ChapterWinChestData(NanoIdUtils.randomNanoId(30), winChestType.getType(), chapterTableValue.getId(), TimeUtils.getUnixTimeSecond(), -1L, (long) chestUnlockSeconds);
+        return ChapterWinChestData.builder()
+                .uid(NanoIdUtils.randomNanoId(30))
+                .chestType(winChestType.getType())
+                .level(chapterTableValue.getId())
+                .createTime(TimeUtils.getUnixTimeSecond())
+                .availableUnixTime(-1L)
+                .unlockSecondsRequires((long) chestUnlockSeconds)
+                .build();
     }
 
     @Override
@@ -529,7 +550,7 @@ public class ChestServiceImpl implements ChestService {
 
     @Override
     public Map<Integer, Integer> extractGunRewardsFromGunLibraryAsync(UserData userData, GunLibraryType gunLibraryType, int chestLevel, int getGunCount, boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, String gameVersion) {
-        getGunCount = getGunCount + (int)Math.ceil(getGunCount * 0.2);
+        getGunCount = getGunCount + (int) Math.ceil(getGunCount * 0.2);
         //确保数据存在
         userDataService.upgradePlayerChestOpenIndexMapData(userData);
 
@@ -711,7 +732,7 @@ public class ChestServiceImpl implements ChestService {
      */
     @Override
     public Map<Integer, Integer> extractGunRewardsFromGunLibrary(UserData userData, GunLibraryType gunLibraryType, Integer chestLevel, Integer getGunCount, String gameVersion, Boolean enableDrawCountRequires, Map<Integer, Integer> resultMap) {
-        getGunCount = getGunCount + (int)Math.ceil(getGunCount * 0.2);
+        getGunCount = getGunCount + (int) Math.ceil(getGunCount * 0.2);
 
         resultMap = CollectionUtils.isEmpty(resultMap) ? new HashMap<>() : resultMap;
 

@@ -7,14 +7,18 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.*;
+import org.skynet.commons.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.*;
 import org.skynet.service.provider.hunting.obsolete.config.*;
-import org.skynet.service.provider.hunting.obsolete.enums.*;
-import org.skynet.service.provider.hunting.obsolete.module.rank.entity.ClientRecord;
-import org.skynet.service.provider.hunting.obsolete.module.rank.service.RankService;
+import org.skynet.service.provider.hunting.obsolete.enums.ABTestGroupConfigs;
+import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
+import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
+import org.skynet.service.provider.hunting.obsolete.enums.GunQuality;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DeleteGUNDTO;
@@ -25,7 +29,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnviron
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.skynet.starter.codis.service.CodisService;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -72,8 +75,8 @@ public class UserDataServiceImpl implements UserDataService {
     @Resource
     private LuckyWheelService luckyWheelService;
 
-    @Resource
-    private RankService rankService;
+    // @Resource
+    // private RankService rankService;
 
     @Resource
     private RedisDBOperation redisDBOperation;
@@ -122,96 +125,128 @@ public class UserDataServiceImpl implements UserDataService {
         //玩家引导数据
         PlayerTutorialData tutorialData = new PlayerTutorialData(new HashMap<>());
         //玩家历史数据
-        History history = new History(
-                0L,
-                0L,
-                0L,
-                0,
-                0,
-                0,
-                0,
-                0D,
-                0,
-                0,
-                0,
-                0,
-                0D,
-                0,
-                0,
-                0D);
+        // History history = new History(
+        //         0L,
+        //         0L,
+        //         0L,
+        //         0,
+        //         0,
+        //         0,
+        //         0,
+        //         0D,
+        //         0,
+        //         0,
+        //         0,
+        //         0,
+        //         0D,
+        //         0,
+        //         0,
+        //         0D);
+
+        History history = History.builder().build();
 
         //宝箱内容表格index
-        ChestOpenIndexMap chestOpenIndexMap = new ChestOpenIndexMap(new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), 0);
+        // ChestOpenIndexMap chestOpenIndexMap = new ChestOpenIndexMap(new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(), 0);
 
-        ServerOnly serverOnly = new ServerOnly(
-                ABTestGroup.A,
-                NanoIdUtils.randomNanoId(24),
-                null,
-                "",
-                chestOpenIndexMap,
-                1,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                0L,
-                0,
-                null,
-                -1,
-                -1);
+        ChestOpenIndexMap chestOpenIndexMap = ChestOpenIndexMap.builder().build();
+
+        // ServerOnly serverOnly = new ServerOnly(
+        //         ABTestGroup.A,
+        //         NanoIdUtils.randomNanoId(24),
+        //         null,
+        //         "",
+        //         chestOpenIndexMap,
+        //         1,
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         0L,
+        //         0,
+        //         null,
+        //         -1,
+        //         -1);
+
+        ServerOnly serverOnly = ServerOnly.builder()
+                .abTestGroup(ABTestGroup.A)
+                .privateKey(NanoIdUtils.randomNanoId(24))
+                .chestOpenIndexMap(chestOpenIndexMap)
+                .build();
 
         FreeChestData[] freeChestDataList = new FreeChestData[2];
         freeChestDataList[0] = null;
         freeChestDataList[1] = null;
         LinkedAuthProviderData linkedAuthProviderData = new LinkedAuthProviderData("", "");
 
-        UserData userData = new UserData(
-                null,
-                userId,
-                0,
-                TimeUtils.getUnixTimeSecond(),
-                createGuestName(""),
-                uuid,
-                GameConfig.defaultCoinAmount,
-                GameConfig.defaultDiamondAmount,
-                0,
-                tutorialData,
-                new LinkedHashMap<>(),
-                new ArrayList<>(),
-                new LinkedHashMap<>(),
-                new LinkedHashMap<>(),
-                new LinkedHashMap<>(),
-                GameConfig.defaultGunID,
-                new LinkedHashMap<>(),
-                new LinkedHashMap<>(),
-                GameConfig.defaultBulletID,
-                new LinkedHashMap<>(),
-                new ArrayList<>(),
-                freeChestDataList,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new HashMap<>(),
-                -1,
-                linkedAuthProviderData,
-                serverOnly,
-                history,
-                new ArrayList<>(),
-                createDefaultLuckyWheelData(gameVersion),
-                createDefaultLuckyWheelV2Data(gameVersion),
-                createDefaultPlayerAdvertisementData(),
-                createDefaultPlayerVipData(),
-                createDefaultPlayerVipV2Data(),
-                createDefaultPlayerVipV3Data(),
-                createDefaultPlayerRankData(),
-                false,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                false,
-                0
-        );
+        // UserData userData = new UserData(
+        //         null,
+        //         userId,
+        //         0,
+        //         TimeUtils.getUnixTimeSecond(),
+        //         createGuestName(""),
+        //         uuid,
+        //         GameConfig.defaultCoinAmount,
+        //         GameConfig.defaultDiamondAmount,
+        //         0,
+        //         tutorialData,
+        //         new LinkedHashMap<>(),
+        //         new ArrayList<>(),
+        //         new LinkedHashMap<>(),
+        //         new LinkedHashMap<>(),
+        //         new LinkedHashMap<>(),
+        //         GameConfig.defaultGunID,
+        //         new LinkedHashMap<>(),
+        //         new LinkedHashMap<>(),
+        //         GameConfig.defaultBulletID,
+        //         new LinkedHashMap<>(),
+        //         new ArrayList<>(),
+        //         freeChestDataList,
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         new HashMap<>(),
+        //         -1,
+        //         linkedAuthProviderData,
+        //         serverOnly,
+        //         history,
+        //         new ArrayList<>(),
+        //         createDefaultLuckyWheelData(gameVersion),
+        //         createDefaultLuckyWheelV2Data(gameVersion),
+        //         createDefaultPlayerAdvertisementData(),
+        //         createDefaultPlayerVipData(),
+        //         createDefaultPlayerVipV2Data(),
+        //         createDefaultPlayerVipV3Data(),
+        //         // createDefaultPlayerRankData(),
+        //         false,
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         new ArrayList<>(),
+        //         false,
+        //         0
+        // );
+
+        UserData userData = UserData.builder()
+                .uid(userId)
+                .signUpTime(TimeUtils.getUnixTimeSecond())
+                .name(createGuestName(""))
+                .uuid(uuid)
+                .coin(GameConfig.defaultCoinAmount)
+                .diamond(GameConfig.defaultDiamondAmount)
+                .tutorialData(tutorialData)
+                .equippedGunId(GameConfig.defaultGunID)
+                .equippedBulletId(GameConfig.defaultBulletID)
+                .freeChestsData(freeChestDataList)
+                .linkedAuthProviderData(linkedAuthProviderData)
+                .serverOnly(serverOnly)
+                .history(history)
+                .luckyWheelData(createDefaultLuckyWheelData(gameVersion))
+                .luckyWheelV2Data(createDefaultLuckyWheelV2Data(gameVersion))
+                .advertisementData(createDefaultPlayerAdvertisementData())
+                .vipData(createDefaultPlayerVipData())
+                .vipV2Data(createDefaultPlayerVipV2Data())
+                .vipV3Data(createDefaultPlayerVipV3Data())
+                .build();
 
         for (Integer defaultUnlockChapterID : GameConfig.defaultUnlockChapterIDsArray) {
 
@@ -237,13 +272,13 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
 
-    public PlayerRankData createDefaultPlayerRankData() {
-        return new PlayerRankData(null,
-                null,
-                -1,
-                -1, -1, -1,
-                new ClientRecord(false, false), -1, -1L, -1);
-    }
+    // public PlayerRankData createDefaultPlayerRankData() {
+    //     return new PlayerRankData(null,
+    //             null,
+    //             -1,
+    //             -1, -1, -1,
+    //             new ClientRecord(false, false), -1, -1L, -1);
+    // }
 
     @Override
     public PlayerVipData createDefaultPlayerVipData() {
@@ -254,6 +289,7 @@ public class UserDataServiceImpl implements UserDataService {
                 TimeUtils.getStandardTimeDay(),
                 -1L,
                 -1L);
+        // return PlayerVipData.builder().server_only_lastClearLuckyWheelVipSpinCountStandardTimeDay(TimeUtils.getStandardTimeDay()).build();
     }
 
     @Override
@@ -369,7 +405,7 @@ public class UserDataServiceImpl implements UserDataService {
         //vip
         userData.setVipData(userData.getVipData() == null ? createDefaultPlayerVipData() : userData.getVipData());
 
-        ChestOpenIndexMap map = new ChestOpenIndexMap(new HashMap<>(), new HashMap<>(), new HashMap<>(), 0);
+        ChestOpenIndexMap map = ChestOpenIndexMap.builder().build();//new ChestOpenIndexMap(new HashMap<>(), new HashMap<>(), new HashMap<>(), 0);
 
         //vipV2
         userData.setVipV2Data(userData.getVipV2Data() == null ? createDefaultPlayerVipV2Data() : userData.getVipV2Data());
@@ -389,21 +425,25 @@ public class UserDataServiceImpl implements UserDataService {
         if (userData.getServerOnly() == null) {
 
 
-            ServerOnly serverOnly = new ServerOnly(null,
-                    null,
-                    null,
-                    null,
-                    map,
-                    null,
-                    null,
-                    new ArrayList<>(),
-                    null,
-                    null,
-                    0L,
-                    0,
-                    null,
-                    -1,
-                    -1);
+            // ServerOnly serverOnly = new ServerOnly(null,
+            //         null,
+            //         null,
+            //         null,
+            //         map,
+            //         null,
+            //         null,
+            //         new ArrayList<>(),
+            //         null,
+            //         null,
+            //         0L,
+            //         0,
+            //         null,
+            //         -1,
+            //         -1);
+
+            ServerOnly serverOnly = ServerOnly.builder()
+                    .chestOpenIndexMap(map)
+                    .build();
 
             userData.setServerOnly(serverOnly);
         } else {
@@ -1803,7 +1843,7 @@ public class UserDataServiceImpl implements UserDataService {
     private void upgradePlayerHistoryData(UserData userData) {
         //初始化history
         if (userData.getHistory() == null) {
-            userData.setHistory(new History());
+            userData.setHistory(History.builder().build());
         }
         History history = userData.getHistory();
         history.setTotalEarnedCoinByMatch(history.getTotalEarnedCoinByMatch() == null ? 0 : history.getTotalEarnedCoinByMatch());

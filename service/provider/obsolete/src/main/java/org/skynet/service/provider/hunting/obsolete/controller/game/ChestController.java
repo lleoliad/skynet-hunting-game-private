@@ -1,6 +1,11 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.ChapterWinChestData;
+import org.skynet.commons.hunting.user.domain.ChestData;
+import org.skynet.commons.hunting.user.domain.FreeChestData;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
@@ -294,7 +299,7 @@ public class ChestController {
             long tempDiamond = userData.getDiamond() - diamondPrice;
             userData.setDiamond(tempDiamond);
 
-            openResult = chestService.openChest(userData, chestData, request.getGameVersion());
+            openResult = chestService.openChest(userData, BeanUtil.copyProperties(chestData, ChestData.class), request.getGameVersion());
             userData.getChapterWinChestsData().set(request.getSlotIndex(), null);
 
             userData.getChapterWinChestsData().removeIf(Objects::isNull);
@@ -359,7 +364,7 @@ public class ChestController {
                 throw new BusinessException("玩家" + userData.getUuid() + "打开免费箱子,但是时间不满足.箱子" + firstChestData.getAvailableUnixTime() + ",now" + unixTimeNow);
             }
 
-            ChestOpenResult openResult = chestService.openChest(userData, firstChestData, request.getGameVersion());
+            ChestOpenResult openResult = chestService.openChest(userData, BeanUtil.copyProperties(firstChestData, ChestData.class), request.getGameVersion());
             log.info("打开免费箱子," + JSONObject.toJSONString(openResult));
 
             freeChestsData[0] = null;

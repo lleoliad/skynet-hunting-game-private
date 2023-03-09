@@ -16,7 +16,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.AuthenticationDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.AccountMapData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.AccountSummaryData;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.vo.DeviceIdUser;

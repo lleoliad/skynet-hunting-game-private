@@ -4,6 +4,15 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.rocketmq.client.producer.SendCallback;
+import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.ChapterWinChestData;
+import org.skynet.commons.hunting.user.domain.PlayerRecordModeData;
+import org.skynet.commons.hunting.user.query.AddCoinsQuery;
+import org.skynet.components.hunting.rank.league.message.AddCoinMessage;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
@@ -33,6 +42,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.skynet.service.provider.hunting.obsolete.service.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -70,6 +80,12 @@ public class HuntingMatchController {
 
     @Resource
     private AchievementService achievementService;
+
+    @Value("${skynet.rocketmq.rank-league.topic.addCoinTopic}")
+    private String rankLeagueAddCoinTopic;
+
+    @Resource
+    private RocketMQTemplate rocketMQTemplate;
 
 //    @PostMapping("/huntingMatch-confirmHuntingMatchComplete")
 //    @ApiOperation("确认章节比赛结束")
@@ -1190,13 +1206,27 @@ public class HuntingMatchController {
 
             if (lastCoin < userData.getCoin()) {
                 Long addCount = userData.getCoin().longValue() - lastCoin;
-                String rankUrl = systemPropertiesConfig.getRankUrl();
-                if (!StringUtils.isBlank(rankUrl)) {
-                    Map<String, Object> fightInfo = HttpUtil.rankAddCoin(rankUrl + "/add/coins", new HashMap<String, Object>() {{
-                        put("userId", request.getUserUid());
-                        put("coin", addCount);
-                    }});
-                }
+                // String rankUrl = systemPropertiesConfig.getRankUrl();
+                // if (!StringUtils.isBlank(rankUrl)) {
+                //     Map<String, Object> fightInfo = HttpUtil.rankAddCoin(rankUrl + "/add/coins", new HashMap<String, Object>() {{
+                //         put("userId", request.getUserUid());
+                //         put("coin", addCount);
+                //     }});
+                // }
+
+                AddCoinMessage addCoinMessage = AddCoinMessage.builder().userId(request.getUserUid()).coin(addCount).build();
+                rocketMQTemplate.asyncSend(rankLeagueAddCoinTopic, addCoinMessage, new SendCallback() {
+                    @Override
+                    public void onSuccess(SendResult sendResult) {
+                        // log.info("async onSucess SendResult={}", sendResult);
+                        // log.info("发送增加段位赛金币成功：{}", addCoinMessage);
+                    }
+
+                    @Override
+                    public void onException(Throwable throwable) {
+                        log.info("发送增加段位赛金币失败：{}", addCoinMessage);
+                    }
+                });
             }
 
             return map;

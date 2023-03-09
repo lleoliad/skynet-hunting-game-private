@@ -17,6 +17,9 @@
     <modules>
         <module>server</module>
         <module>service</module>
+        <module>components</module>
+        <module>components/game</module>
+        <module>components/user</module>
     </modules>
 
 </project>

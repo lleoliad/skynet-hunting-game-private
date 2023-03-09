@@ -239,85 +239,85 @@ public class RankController {
     }
 
 
-    @PostMapping("/rank-openRankRewardChest")
-    @ApiOperation("打开段位宝箱")
-    @RepeatSubmit(interval = 60000)
-    public Map<String, Object> openPromotedRewardChest(@RequestBody BaseDTO request) {
-
-        try {
-            ThreadLocalUtil.set(request.getServerTimeOffset());
-            CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
-
-            UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
-            //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
-            UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
-
-            String rankUrl = systemPropertiesConfig.getRankUrl();
-            ChestData chestData = new ChestData();
-            //获取用户宝箱奖励
-            PreviewPlayerDto previewPlayerDto = new PreviewPlayerDto(userData.getUuid(), request.getGameVersion(), request.getGroupId());
-            Map<String, Object> rankInfo = HttpUtil.getRankInfo(rankUrl + "/getReward", previewPlayerDto);
-
-            // if (rankInfo != null) {
-            //     JSONObject data = JSONObject.parseObject(rankInfo.get("data").toString());
-            //     if (data != null) {
-            //         JSONObject userJsonData = JSONObject.parseObject(data.get("userData").toString());
-            //         if (userJsonData != null) {
-            //             JSONObject rankJsonData = JSONObject.parseObject(userJsonData.get("playerRankData").toString());
-            //             if (rankJsonData.get("lastWeekRewardChestType") != null) {
-            //                 chestData.setChestType(Integer.parseInt(rankJsonData.get("lastWeekRewardChestType").toString()));
-            //             }
-            //             if (rankJsonData.get("lastWeekRewardChestLevel") != null) {
-            //                 chestData.setLevel(Integer.parseInt(rankJsonData.get("lastWeekRewardChestLevel").toString()));
-            //             }
-            //
-            //         }
-            //     }
-            // }
-
-            JSONObject data = JSONObject.parseObject(rankInfo.get("data").toString());
-            JSONObject userJsonData = JSONObject.parseObject(data.get("userData").toString());
-            JSONObject rankJsonData = JSONObject.parseObject(userJsonData.get("playerRankData").toString());
-            if (rankJsonData.get("lastWeekRewardChestType") != null) {
-                chestData.setChestType(Integer.parseInt(rankJsonData.get("lastWeekRewardChestType").toString()));
-            }
-            if (rankJsonData.get("lastWeekRewardChestLevel") != null) {
-                chestData.setLevel(Integer.parseInt(rankJsonData.get("lastWeekRewardChestLevel").toString()));
-            }
-
-            ChestOpenResult chestOpenResult = null;
-            if (chestData.getChestType() != null && chestData.getLevel() != null) {
-                chestOpenResult = chestService.openChest(userData, chestData, request.getGameVersion());
-            }
-
-
-            //todo 开完宝箱之后刷新段位信息
-
-            Map<String, Object> map = CommonUtils.responsePrepare(null);
-            if (chestOpenResult != null) {
-                sendToClientData.setBulletCountMap(userData.getBulletCountMap());
-                sendToClientData.setCoin(userData.getCoin());
-                sendToClientData.setDiamond(userData.getDiamond());
-                sendToClientData.setGunLevelMap(userData.getGunLevelMap());
-                sendToClientData.setGunCountMap(userData.getGunCountMap());
-
-                JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(sendToClientData));
-                jsonObject.put("playerRankData", rankJsonData);
-                map.put("userData", jsonObject);
-                map.put("openResult", chestOpenResult);
-            }
-
-
-            return map;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            ThreadLocalUtil.remove();
-        }
-
-    }
+    // @PostMapping("/rank-openRankRewardChest")
+    // @ApiOperation("打开段位宝箱")
+    // @RepeatSubmit(interval = 60000)
+    // public Map<String, Object> openPromotedRewardChest(@RequestBody BaseDTO request) {
+    //
+    //     try {
+    //         ThreadLocalUtil.set(request.getServerTimeOffset());
+    //         CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
+    //         userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+    //
+    //         UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
+    //         //处理userData
+    //         userDataService.checkUserDataExist(request.getUserUid());
+    //         UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
+    //
+    //         String rankUrl = systemPropertiesConfig.getRankUrl();
+    //         ChestData chestData = new ChestData();
+    //         //获取用户宝箱奖励
+    //         PreviewPlayerDto previewPlayerDto = new PreviewPlayerDto(userData.getUuid(), request.getGameVersion(), request.getGroupId());
+    //         Map<String, Object> rankInfo = HttpUtil.getRankInfo(rankUrl + "/getReward", previewPlayerDto);
+    //
+    //         // if (rankInfo != null) {
+    //         //     JSONObject data = JSONObject.parseObject(rankInfo.get("data").toString());
+    //         //     if (data != null) {
+    //         //         JSONObject userJsonData = JSONObject.parseObject(data.get("userData").toString());
+    //         //         if (userJsonData != null) {
+    //         //             JSONObject rankJsonData = JSONObject.parseObject(userJsonData.get("playerRankData").toString());
+    //         //             if (rankJsonData.get("lastWeekRewardChestType") != null) {
+    //         //                 chestData.setChestType(Integer.parseInt(rankJsonData.get("lastWeekRewardChestType").toString()));
+    //         //             }
+    //         //             if (rankJsonData.get("lastWeekRewardChestLevel") != null) {
+    //         //                 chestData.setLevel(Integer.parseInt(rankJsonData.get("lastWeekRewardChestLevel").toString()));
+    //         //             }
+    //         //
+    //         //         }
+    //         //     }
+    //         // }
+    //
+    //         JSONObject data = JSONObject.parseObject(rankInfo.get("data").toString());
+    //         JSONObject userJsonData = JSONObject.parseObject(data.get("userData").toString());
+    //         JSONObject rankJsonData = JSONObject.parseObject(userJsonData.get("playerRankData").toString());
+    //         if (rankJsonData.get("lastWeekRewardChestType") != null) {
+    //             chestData.setChestType(Integer.parseInt(rankJsonData.get("lastWeekRewardChestType").toString()));
+    //         }
+    //         if (rankJsonData.get("lastWeekRewardChestLevel") != null) {
+    //             chestData.setLevel(Integer.parseInt(rankJsonData.get("lastWeekRewardChestLevel").toString()));
+    //         }
+    //
+    //         ChestOpenResult chestOpenResult = null;
+    //         if (chestData.getChestType() != null && chestData.getLevel() != null) {
+    //             chestOpenResult = chestService.openChest(userData, chestData, request.getGameVersion());
+    //         }
+    //
+    //
+    //         //todo 开完宝箱之后刷新段位信息
+    //
+    //         Map<String, Object> map = CommonUtils.responsePrepare(null);
+    //         if (chestOpenResult != null) {
+    //             sendToClientData.setBulletCountMap(userData.getBulletCountMap());
+    //             sendToClientData.setCoin(userData.getCoin());
+    //             sendToClientData.setDiamond(userData.getDiamond());
+    //             sendToClientData.setGunLevelMap(userData.getGunLevelMap());
+    //             sendToClientData.setGunCountMap(userData.getGunCountMap());
+    //
+    //             JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(sendToClientData));
+    //             jsonObject.put("playerRankData", rankJsonData);
+    //             map.put("userData", jsonObject);
+    //             map.put("openResult", chestOpenResult);
+    //         }
+    //
+    //
+    //         return map;
+    //     } catch (Exception e) {
+    //         throw new RuntimeException(e);
+    //     } finally {
+    //         ThreadLocalUtil.remove();
+    //     }
+    //
+    // }
 
 
     @PostMapping("/rank-confirmLastWeekEvaluationRankListShow")

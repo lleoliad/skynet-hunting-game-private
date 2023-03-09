@@ -1,10 +1,10 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
 import org.skynet.service.provider.hunting.obsolete.enums.AchievementType;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.AchievementData;
+import org.skynet.commons.hunting.user.domain.AchievementData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerFireDetails;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.AchievementTableValue;
 
 import java.util.List;

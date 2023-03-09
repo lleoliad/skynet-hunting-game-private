@@ -9,7 +9,7 @@ import org.skynet.service.provider.hunting.obsolete.enums.GunQuality;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.EquipBulletDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.GunDTO;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.BulletTableValue;

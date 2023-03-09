@@ -20,7 +20,7 @@ public class SystemPropertiesConfig implements InitializingBean {
     private String cloudUrl;
     private String fightUrl;
     private String aiUrl;
-    private String rankUrl;
+    // private String rankUrl;
 
     public static String[] CLIENT_GAME_VERSION;
     public static Boolean PRODUCTION;
@@ -46,6 +46,6 @@ public class SystemPropertiesConfig implements InitializingBean {
         CLOUD_URL = cloudUrl;
         FIGHT_URL = fightUrl;
         AI_URL = aiUrl;
-        RANK_URL = rankUrl;
+        // RANK_URL = rankUrl;
     }
 }

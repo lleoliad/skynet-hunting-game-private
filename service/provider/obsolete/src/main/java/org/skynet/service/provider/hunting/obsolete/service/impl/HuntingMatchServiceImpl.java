@@ -3,6 +3,8 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.*;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.GetPlayerRankQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;

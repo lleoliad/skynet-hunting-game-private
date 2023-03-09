@@ -1,5 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.ChapterWinChestData;
+import org.skynet.commons.hunting.user.domain.ChestData;
+import org.skynet.commons.hunting.user.domain.FreeChestData;
 import org.skynet.service.provider.hunting.obsolete.enums.BulletLibraryType;
 import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;

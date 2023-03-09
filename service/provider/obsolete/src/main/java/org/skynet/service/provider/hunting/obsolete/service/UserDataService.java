@@ -1,5 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DeleteGUNDTO;

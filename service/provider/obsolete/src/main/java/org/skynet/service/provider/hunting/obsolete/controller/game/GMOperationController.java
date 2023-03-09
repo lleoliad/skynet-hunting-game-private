@@ -13,7 +13,7 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.enums.OmitState;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.IAPPurchaseReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.TopUpOrder;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.IAPService;
 import org.skynet.service.provider.hunting.obsolete.service.TopUpOrderService;

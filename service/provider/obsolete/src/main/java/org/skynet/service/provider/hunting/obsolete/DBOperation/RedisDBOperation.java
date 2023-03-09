@@ -2,6 +2,12 @@ package org.skynet.service.provider.hunting.obsolete.DBOperation;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.context.exception.SkynetException;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.query.UserDataLandQuery;
+import org.skynet.commons.hunting.user.query.UserDataUpdateQuery;
+import org.skynet.commons.hunting.user.service.UserFeignService;
+import org.skynet.commons.lang.common.Result;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.ApplicationContextUtil;
@@ -11,7 +17,6 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.CloudUserDataDto;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataVOService;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -44,16 +49,21 @@ public class RedisDBOperation {
     @ApiModelProperty(value = "当前环境变量")
     private static RedisDBOperation redisDBOperation;
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    // @Resource
+    // private RedisTemplate<String, Object> redisTemplate;
 
     @Resource
     private CodisService codisService;
 
+    @Resource
+    private UserFeignService userFeignService;
+
     @PostConstruct
     public void init() {
         redisDBOperation = this;
-        redisDBOperation.redisTemplate = this.redisTemplate;
+        // redisDBOperation.redisTemplate = this.redisTemplate;
+        redisDBOperation.codisService = this.codisService;
+        redisDBOperation.userFeignService = this.userFeignService;
     }
 
 
@@ -72,11 +82,13 @@ public class RedisDBOperation {
      * @param zipData 录像压缩文件
      */
     public static void insertMatchControlRecords(String key, String zipData) {
-        redisDBOperation.redisTemplate.opsForValue().set(key, zipData);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, zipData);
+        throw new RuntimeException("功能取消");
     }
 
     public static String selectMatchControlRecords(String key) {
-        return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        throw new RuntimeException("功能取消");
     }
 
     /*
@@ -95,44 +107,48 @@ public class RedisDBOperation {
     public static void insertMatchRoundControlRecordsPool(String key, PlayerControlRecordDocData recordDocData) {
 
 
-        //先压缩再存
-        String jsonString = JSONObject.toJSONString(recordDocData);
-        String zipString = DeflaterUtils.zipString(jsonString);
-        redisDBOperation.redisTemplate.opsForList().leftPush(key, zipString);
-        if (redisDBOperation.redisTemplate.opsForList().size(key) >= 100) {
-            redisDBOperation.redisTemplate.opsForList().rightPop(key);
-        }
-
-//        redisDBOperation.redisTemplate.opsForList().leftPush(key,recordIndex);
+//         //先压缩再存
+//         String jsonString = JSONObject.toJSONString(recordDocData);
+//         String zipString = DeflaterUtils.zipString(jsonString);
+//         redisDBOperation.redisTemplate.opsForList().leftPush(key, zipString);
+//         if (redisDBOperation.redisTemplate.opsForList().size(key) >= 100) {
+//             redisDBOperation.redisTemplate.opsForList().rightPop(key);
+//         }
 //
-//        if (redisDBOperation.redisTemplate.opsForList().size(key)>=100){
-//            redisDBOperation.redisTemplate.opsForList().rightPop(key);
-//        }
+// //        redisDBOperation.redisTemplate.opsForList().leftPush(key,recordIndex);
+// //
+// //        if (redisDBOperation.redisTemplate.opsForList().size(key)>=100){
+// //            redisDBOperation.redisTemplate.opsForList().rightPop(key);
+// //        }
+
+        throw new RuntimeException("功能取消");
     }
 
 
     public static List<Object> selectMatchRoundControlRecords(String path) {
 
-//        return redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
+// //        return redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
+//
+//         //MatchRoundControlRecordsArchived_5:animalId101:animalRouteUid792117168:gunId1:gunLevel1:bulletId1:windId0:averageShowPrecision10
+//         List<Object> resultList = new ArrayList<>();
+//         String substring = path.substring(0, path.length() - 1);
+//         try {
+//             String number = substring.substring(substring.length() - 1);
+//             Integer.parseInt(number);
+//             substring = substring.substring(0, substring.length() - 1);
+//         } catch (Exception e) {
+//
+//         }
+//         for (int i = 1; i <= 11; i++) {
+//             path = substring + i;
+//             List<Object> range = redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
+//             if (range != null) {
+//                 resultList.addAll(range);
+//             }
+//         }
+//         return resultList;
 
-        //MatchRoundControlRecordsArchived_5:animalId101:animalRouteUid792117168:gunId1:gunLevel1:bulletId1:windId0:averageShowPrecision10
-        List<Object> resultList = new ArrayList<>();
-        String substring = path.substring(0, path.length() - 1);
-        try {
-            String number = substring.substring(substring.length() - 1);
-            Integer.parseInt(number);
-            substring = substring.substring(0, substring.length() - 1);
-        } catch (Exception e) {
-
-        }
-        for (int i = 1; i <= 11; i++) {
-            path = substring + i;
-            List<Object> range = redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
-            if (range != null) {
-                resultList.addAll(range);
-            }
-        }
-        return resultList;
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -146,40 +162,43 @@ public class RedisDBOperation {
         //先压缩再存
         String jsonString = JSONObject.toJSONString(recordDocData);
         String zipString = DeflaterUtils.zipString(jsonString);
-        redisDBOperation.redisTemplate.opsForList().leftPush(key, zipString);
-        if (redisDBOperation.redisTemplate.opsForList().size(key) >= 100) {
-            redisDBOperation.redisTemplate.opsForList().rightPop(key);
-        }
+        // redisDBOperation.redisTemplate.opsForList().leftPush(key, zipString);
+        // if (redisDBOperation.redisTemplate.opsForList().size(key) >= 100) {
+        //     redisDBOperation.redisTemplate.opsForList().rightPop(key);
+        // }
+        throw new RuntimeException("功能取消");
     }
 
     public static List<Object> selectSingleRoundControlRecords(String path) {
 
 //        return redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
 
-        List<Object> resultList = new ArrayList<>();
-        String substring = path.substring(0, path.length() - 1);
-        try {
-            String number = substring.substring(substring.length() - 1);
-            Integer.parseInt(number);
-            substring = substring.substring(0, substring.length() - 1);
-        } catch (Exception e) {
+        // List<Object> resultList = new ArrayList<>();
+        // String substring = path.substring(0, path.length() - 1);
+        // try {
+        //     String number = substring.substring(substring.length() - 1);
+        //     Integer.parseInt(number);
+        //     substring = substring.substring(0, substring.length() - 1);
+        // } catch (Exception e) {
+        //
+        // }
+        // for (int i = 1; i <= 11; i++) {
+        //     path = substring + i;
+        //     List<Object> range = redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
+        //     if (range != null) {
+        //         resultList.addAll(range);
+        //     }
+        // }
+        // return resultList;
 
-        }
-        for (int i = 1; i <= 11; i++) {
-            path = substring + i;
-            List<Object> range = redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
-            if (range != null) {
-                resultList.addAll(range);
-            }
-        }
-        return resultList;
+        throw new RuntimeException("功能取消");
     }
 
 
     public static List<Object> selectSingleRoundControlRecordsForAveragePrecisionLevel(String path) {
 
-        return redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
-
+        // return redisDBOperation.redisTemplate.opsForList().range(path, 0, -1);
+        throw new RuntimeException("功能取消");
     }
 
 
@@ -198,21 +217,22 @@ public class RedisDBOperation {
      */
     public static void insertDataToMatchControlRecordsPoolTrophySegmentCollection(String key, MatchRecord record) {
 
-        redisDBOperation.redisTemplate.boundListOps(key).leftPush(record);
-
-        List<MatchRecord> list = new ArrayList<>();
-        //匹配池长度大于1000就删除旧的
-        while (selectMatchControlRecordsPoolTrophySegmentCollectionLength(key) > 1000) {
-            MatchRecord outRecord = (MatchRecord) redisDBOperation.redisTemplate.boundListOps(key).rightPop();
-            list.add(outRecord);
-        }
-
-        //删除相关玩家的池子录像数量
-        for (MatchRecord data : list) {
-            //PlayerControlRecords:"userUid":MatchControlRecordsPool:3:101:700-800
-            String playerDataKey = "PlayerControlRecords:" + data.getPlayerUid() + ":" + key;
-            deletePlayerRecordsInMatchControlRecordsPoolTrophySegment(playerDataKey, data);
-        }
+        // redisDBOperation.redisTemplate.boundListOps(key).leftPush(record);
+        //
+        // List<MatchRecord> list = new ArrayList<>();
+        // //匹配池长度大于1000就删除旧的
+        // while (selectMatchControlRecordsPoolTrophySegmentCollectionLength(key) > 1000) {
+        //     MatchRecord outRecord = (MatchRecord) redisDBOperation.redisTemplate.boundListOps(key).rightPop();
+        //     list.add(outRecord);
+        // }
+        //
+        // //删除相关玩家的池子录像数量
+        // for (MatchRecord data : list) {
+        //     //PlayerControlRecords:"userUid":MatchControlRecordsPool:3:101:700-800
+        //     String playerDataKey = "PlayerControlRecords:" + data.getPlayerUid() + ":" + key;
+        //     deletePlayerRecordsInMatchControlRecordsPoolTrophySegment(playerDataKey, data);
+        // }
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -225,14 +245,15 @@ public class RedisDBOperation {
      */
     public static void deleteDataToMatchControlRecordsPoolTrophySegmentCollection(String path, MatchRecord record) {
 
-        if (!checkKeyExist(path) || redisDBOperation.redisTemplate.boundListOps(path).size() == 0) {
-            throw new BusinessException("该玩家在池子里没有数据" + path);
-        }
-        if (record == null) {
-            redisDBOperation.redisTemplate.boundListOps(path).rightPop();
-        } else
-            redisDBOperation.redisTemplate.boundListOps(path).remove(-1, record);
+        // if (!checkKeyExist(path) || redisDBOperation.redisTemplate.boundListOps(path).size() == 0) {
+        //     throw new BusinessException("该玩家在池子里没有数据" + path);
+        // }
+        // if (record == null) {
+        //     redisDBOperation.redisTemplate.boundListOps(path).rightPop();
+        // } else
+        //     redisDBOperation.redisTemplate.boundListOps(path).remove(-1, record);
 
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -243,12 +264,14 @@ public class RedisDBOperation {
      */
     public static Long selectMatchControlRecordsPoolTrophySegmentCollectionLength(String path) {
 
-        if (!checkKeyExist(path)) {
-//            throw new BusinessException(path+"匹配池不存在");
-            log.warn(path + "匹配池不存在");
-        }
+//         if (!checkKeyExist(path)) {
+// //            throw new BusinessException(path+"匹配池不存在");
+//             log.warn(path + "匹配池不存在");
+//         }
+//
+//         return redisDBOperation.redisTemplate.boundListOps(path).size();
 
-        return redisDBOperation.redisTemplate.boundListOps(path).size();
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -259,12 +282,14 @@ public class RedisDBOperation {
      */
     public static List<Object> selectMatchControlRecordsPoolTrophySegmentCollectionContent(String path) {
 
-        if (!checkKeyExist(path)) {
-//            throw new BusinessException(path+"匹配池不存在");
-            log.warn("匹配池不存在" + path);
-        }
+//         if (!checkKeyExist(path)) {
+// //            throw new BusinessException(path+"匹配池不存在");
+//             log.warn("匹配池不存在" + path);
+//         }
+//
+//         return redisDBOperation.redisTemplate.boundListOps(path).range(0, -1);
 
-        return redisDBOperation.redisTemplate.boundListOps(path).range(0, -1);
+        throw new RuntimeException("功能取消");
     }
 
     /*
@@ -281,17 +306,21 @@ public class RedisDBOperation {
      */
     public static void insertPoolTrophySegmentMetaData(String path, MatchControlRecordsPoolMetaData data) {
 
-        redisDBOperation.redisTemplate.opsForValue().set(path, data, 12, TimeUnit.HOURS);
+        // redisDBOperation.redisTemplate.opsForValue().set(path, data, 12, TimeUnit.HOURS);
+
+        throw new RuntimeException("功能取消");
     }
 
     public static MatchControlRecordsPoolMetaData selectMatchControlRecordsPoolMetaData(String path) {
 
-        if (!checkKeyExist(path)) {
-            log.warn(path + "匹配池信息不存在");
-            return null;
-        }
+        // if (!checkKeyExist(path)) {
+        //     log.warn(path + "匹配池信息不存在");
+        //     return null;
+        // }
+        //
+        // return (MatchControlRecordsPoolMetaData) redisDBOperation.redisTemplate.opsForValue().get(path);
 
-        return (MatchControlRecordsPoolMetaData) redisDBOperation.redisTemplate.opsForValue().get(path);
+        throw new RuntimeException("功能取消");
     }
 
 
@@ -313,7 +342,8 @@ public class RedisDBOperation {
      */
     public static void insertPlayerRecordsInMatchControlRecordsPoolTrophySegment(String path, MatchRecord record) {
 
-        redisDBOperation.redisTemplate.boundListOps(path).leftPush(record);
+        // redisDBOperation.redisTemplate.boundListOps(path).leftPush(record);
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -326,13 +356,15 @@ public class RedisDBOperation {
      */
     public static void deletePlayerRecordsInMatchControlRecordsPoolTrophySegment(String path, MatchRecord record) {
 
-        if (!checkKeyExist(path) || redisDBOperation.redisTemplate.boundListOps(path).size() == 0) {
-            throw new BusinessException("该玩家在池子里没有数据" + path);
-        }
-        if (record == null) {
-            redisDBOperation.redisTemplate.boundListOps(path).rightPop();
-        } else
-            redisDBOperation.redisTemplate.boundListOps(path).remove(-1, record);
+        // if (!checkKeyExist(path) || redisDBOperation.redisTemplate.boundListOps(path).size() == 0) {
+        //     throw new BusinessException("该玩家在池子里没有数据" + path);
+        // }
+        // if (record == null) {
+        //     redisDBOperation.redisTemplate.boundListOps(path).rightPop();
+        // } else
+        //     redisDBOperation.redisTemplate.boundListOps(path).remove(-1, record);
+
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -343,7 +375,9 @@ public class RedisDBOperation {
      */
     public static MatchRecord selectPlayerRecordsInMatchControlRecordsPoolTrophySegment(String path) {
 
-        return (MatchRecord) redisDBOperation.redisTemplate.boundListOps(path).rightPop();
+        // return (MatchRecord) redisDBOperation.redisTemplate.boundListOps(path).rightPop();
+
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -354,11 +388,13 @@ public class RedisDBOperation {
      */
     public static Long selectMatchRecordInPlayerRecordsLength(String path) {
 
-        if (!checkKeyExist(path)) {
-            log.info("该玩家在池子里没有数据" + path);
-            return 0L;
-        }
-        return redisDBOperation.redisTemplate.boundListOps(path).size();
+        // if (!checkKeyExist(path)) {
+        //     log.info("该玩家在池子里没有数据" + path);
+        //     return 0L;
+        // }
+        // return redisDBOperation.redisTemplate.boundListOps(path).size();
+
+        throw new RuntimeException("功能取消");
     }
 
     /*
@@ -376,12 +412,14 @@ public class RedisDBOperation {
      */
     public static List<Object> selectPlayerChapterLatestMatchScoreCollection(String path) {
 
-        String key = "PlayerControlRecords" + ":" + path;
-        if (!checkKeyExist(key)) {
-            log.info("玩家在对应章节没有分数记录");
-            return null;
-        }
-        return redisDBOperation.redisTemplate.boundListOps(key).range(0, -1);
+        // String key = "PlayerControlRecords" + ":" + path;
+        // if (!checkKeyExist(key)) {
+        //     log.info("玩家在对应章节没有分数记录");
+        //     return null;
+        // }
+        // return redisDBOperation.redisTemplate.boundListOps(key).range(0, -1);
+
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -392,11 +430,13 @@ public class RedisDBOperation {
      */
     public static void insertPlayerChapterLatestMatchScoreCollection(String path, Integer score) {
 
-        String key = "PlayerControlRecords" + ":" + path;
-        redisDBOperation.redisTemplate.boundListOps(key).leftPush(score);
-        if (redisDBOperation.redisTemplate.boundListOps(key).size() > 5) {
-            redisDBOperation.redisTemplate.boundListOps(key).rightPop();
-        }
+        // String key = "PlayerControlRecords" + ":" + path;
+        // redisDBOperation.redisTemplate.boundListOps(key).leftPush(score);
+        // if (redisDBOperation.redisTemplate.boundListOps(key).size() > 5) {
+        //     redisDBOperation.redisTemplate.boundListOps(key).rightPop();
+        // }
+
+        throw new RuntimeException("功能取消");
 
     }
 
@@ -409,7 +449,8 @@ public class RedisDBOperation {
      */
     public static List<Object> selectPlayerChapterLatestMatchPlayerUidCollection(String path) {
 
-        return redisDBOperation.redisTemplate.boundListOps(path).range(0, -1);
+        // return redisDBOperation.redisTemplate.boundListOps(path).range(0, -1);
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -421,11 +462,13 @@ public class RedisDBOperation {
     public static void insertPlayerChapterLatestMatchPlayerUidCollection(String path, String matchUid) {
 
 
-        redisDBOperation.redisTemplate.boundListOps(path).leftPush(matchUid);
-        //只保留50个
-        while (redisDBOperation.redisTemplate.boundListOps(path).size() >= 50) {
-            redisDBOperation.redisTemplate.boundListOps(path).rightPop();
-        }
+        // redisDBOperation.redisTemplate.boundListOps(path).leftPush(matchUid);
+        // //只保留50个
+        // while (redisDBOperation.redisTemplate.boundListOps(path).size() >= 50) {
+        //     redisDBOperation.redisTemplate.boundListOps(path).rightPop();
+        // }
+
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -437,13 +480,15 @@ public class RedisDBOperation {
     public static void insertPlayerHuntingMatchNowData(String userUid, String huntingMatchUUid) {
 
         String key = "PlayerControlRecords:HuntingMatchNowUUid" + ":" + userUid;
-        redisDBOperation.redisTemplate.opsForList().leftPush(key, huntingMatchUUid);
+        // redisDBOperation.redisTemplate.opsForList().leftPush(key, huntingMatchUUid);
+        throw new RuntimeException("功能取消");
     }
 
     public static void setPlayerHuntingMatchNowData(String userUid, String huntingMatchUUid) {
         String key = "PlayerControlRecords:HuntingMatchNowUUid" + ":" + userUid;
-        redisDBOperation.redisTemplate.opsForList().leftPop(key);
-        redisDBOperation.redisTemplate.opsForList().leftPush(key, huntingMatchUUid);
+        // redisDBOperation.redisTemplate.opsForList().leftPop(key);
+        // redisDBOperation.redisTemplate.opsForList().leftPush(key, huntingMatchUUid);
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -455,7 +500,9 @@ public class RedisDBOperation {
     public static void deletePlayerHuntingMatchNowData(String userUid, String huntingMatchUUid) {
 
         String key = "PlayerControlRecords:HuntingMatchNowUUid" + ":" + userUid;
-        redisDBOperation.redisTemplate.opsForList().remove(key, 0, huntingMatchUUid);
+        // redisDBOperation.redisTemplate.opsForList().remove(key, 0, huntingMatchUUid);
+        throw new RuntimeException("功能取消");
+
     }
 
     /**
@@ -467,7 +514,8 @@ public class RedisDBOperation {
     public static List<Object> selectPlayerHuntingMatchNowData(String userUid) {
 
         String key = "PlayerControlRecords:HuntingMatchNowUUid" + ":" + userUid;
-        return redisDBOperation.redisTemplate.opsForList().range(key, 0, -1);
+        // return redisDBOperation.redisTemplate.opsForList().range(key, 0, -1);
+        throw new RuntimeException("功能取消");
     }
 
     /*
@@ -484,9 +532,9 @@ public class RedisDBOperation {
      * @param huntingMatchNowData
      */
     public static void insertHuntingMatchNowData(String key, HuntingMatchNowData huntingMatchNowData) {
+        // redisDBOperation.redisTemplate.opsForValue().set(key, JSONObject.toJSONString(huntingMatchNowData), 30, TimeUnit.DAYS);
 
-
-        redisDBOperation.redisTemplate.opsForValue().set(key, JSONObject.toJSONString(huntingMatchNowData), 30, TimeUnit.DAYS);
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -497,8 +545,9 @@ public class RedisDBOperation {
      */
     public static HuntingMatchNowData selectHuntingMatchNowData(String key) {
 
-        String temp = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
-        return JSONObject.parseObject(temp, HuntingMatchNowData.class);
+        // String temp = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // return JSONObject.parseObject(temp, HuntingMatchNowData.class);
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -508,10 +557,12 @@ public class RedisDBOperation {
      */
     public static void deleteHuntingMatchNowData(String key) {
 
-        if (!checkKeyExist(key)) {
-            log.error("HuntingMatchNowData" + key + "不存在");
-        }
-        redisDBOperation.redisTemplate.delete(key);
+        // if (!checkKeyExist(key)) {
+        //     log.error("HuntingMatchNowData" + key + "不存在");
+        // }
+        // redisDBOperation.redisTemplate.delete(key);
+
+        throw new RuntimeException("功能取消");
     }
 
     /*
@@ -529,15 +580,18 @@ public class RedisDBOperation {
      */
     public static void insertHuntingMatchHistoryData(String key, String zipString) {
 
-        redisDBOperation.redisTemplate.opsForValue().set(key, zipString);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, zipString);
+
+        throw new RuntimeException("功能取消");
 
     }
 
     public static HuntingMatchHistoryData selectHuntingMatchHistoryData(String key) throws IOException {
 
-        String zip = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
-        String unzipString = DeflaterUtils.unzipString(zip);
-        return JSONObject.parseObject(unzipString, HuntingMatchHistoryData.class);
+        // String zip = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // String unzipString = DeflaterUtils.unzipString(zip);
+        // return JSONObject.parseObject(unzipString, HuntingMatchHistoryData.class);
+        throw new RuntimeException("功能取消");
     }
 
     /*
@@ -553,33 +607,35 @@ public class RedisDBOperation {
      * @param userData
      */
     public static void insertUserData(UserData userData) {
-        String key = "User:" + userData.getUuid();
+        // String key = "User:" + userData.getUuid();
+        //
+        // redisDBOperation.redisTemplate.opsForValue().set(key, JSONObject.toJSONString(userData));
+        //
+        // //todo 优化落库操作，定时刷新在线
+        // threadPool.execute(() -> {
+        //     if (userData.getUserId() == null) {
+        //         userData.setUserId(redisDBOperation.getIncr("userAutoIncrementId"));
+        //     }
+        //     UserDataVOService voService = ApplicationContextUtil.getBean(UserDataVOService.class);
+        //     // voService.updateUserData(userData);// TODO 取消用户数据的更新
+        // });
 
-        redisDBOperation.redisTemplate.opsForValue().set(key, JSONObject.toJSONString(userData));
-
-        //todo 优化落库操作，定时刷新在线
-        threadPool.execute(() -> {
-            if (userData.getUserId() == null) {
-                userData.setUserId(redisDBOperation.getIncr("userAutoIncrementId"));
-            }
-            UserDataVOService voService = ApplicationContextUtil.getBean(UserDataVOService.class);
-            // voService.updateUserData(userData);// TODO 取消用户数据的更新
-        });
-
+        redisDBOperation.userFeignService.update(UserDataUpdateQuery.builder().userId(userData.getUuid()).userData(userData).build());
     }
 
     public static Boolean deleteUserData(String userUid) {
 
-        String key = "User:" + userUid;
-
-        Boolean delete = redisDBOperation.redisTemplate.delete(key);
-        if (delete) {
-            threadPool.execute(() -> {
-                UserDataVOService voService = ApplicationContextUtil.getBean(UserDataVOService.class);
-                voService.deleteUserData(userUid);
-            });
-        }
-        return delete;
+        // String key = "User:" + userUid;
+        //
+        // Boolean delete = redisDBOperation.redisTemplate.delete(key);
+        // if (delete) {
+        //     threadPool.execute(() -> {
+        //         UserDataVOService voService = ApplicationContextUtil.getBean(UserDataVOService.class);
+        //         voService.deleteUserData(userUid);
+        //     });
+        // }
+        // return delete;
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -590,9 +646,12 @@ public class RedisDBOperation {
      */
     public static UserData selectUserData(String key) {
 
-        String temp = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // String temp = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        Result<UserData> loadResult = redisDBOperation.userFeignService.load(UserDataLandQuery.builder().userId(key.substring("User:".length())).build());
+        SkynetException.asserter(loadResult.getSuccess(), -1);
 
-        if (temp == null) {
+        // if (temp == null) {
+        if (Objects.isNull(loadResult.getData())) {
             SystemPropertiesConfig systemPropertiesConfig = ApplicationContextUtil.getBean(SystemPropertiesConfig.class);
             log.warn("redis中没有该用户信息，从谷歌数据库查询");
 //            throw new BusinessException("数据库中没有该玩家信息"+key,-1);
@@ -611,10 +670,10 @@ public class RedisDBOperation {
                 log.warn("谷歌数据库中没有该用户信息，抛出异常");
                 throw new BusinessException("数据库中没有该玩家信息" + key, -1);
             }
-            if (userData.getUserId() == null) {
-                Long userId = redisDBOperation.getIncr("userAutoIncrementId");
-                userData.setUserId(userId);
-            }
+            // if (userData.getUserId() == null) {
+            //     Long userId = redisDBOperation.getIncr("userAutoIncrementId");
+            //     userData.setUserId(userId);
+            // }
 
             if (null != userData.getLinkedAuthProviderData()) {
                 if (!StringUtils.isBlank(userData.getLinkedAuthProviderData().getFacebookUserId())) {
@@ -631,9 +690,11 @@ public class RedisDBOperation {
             }
 
             insertUserData(userData);
-            temp = JSONObject.toJSONString(userData);
+            // temp = JSONObject.toJSONString(userData);
+            return userData;
         }
-        return JSONObject.parseObject(temp, UserData.class);
+        // return JSONObject.parseObject(temp, UserData.class);
+        return loadResult.getData();
     }
 
 
@@ -648,29 +709,35 @@ public class RedisDBOperation {
 
         String key = "Token:" + userUid;
 
-        redisDBOperation.redisTemplate.opsForValue().set(key, token, tokenExpiration, TimeUnit.DAYS);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, token, tokenExpiration, TimeUnit.DAYS);
+        redisDBOperation.codisService.set(key, token, tokenExpiration, TimeUnit.DAYS);
     }
 
     public static void setCacheObject(final String key, final String value, final Integer timeout, final TimeUnit timeUnit) {
-        redisDBOperation.redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        redisDBOperation.codisService.set(key, value, timeout, TimeUnit.DAYS);
     }
     public static String getCacheObject(final String key) {
-        return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        return redisDBOperation.codisService.get(key);
     }
 
     public static boolean deleteKey(final String key) {
-        return redisDBOperation.redisTemplate.delete(key);
+        // return redisDBOperation.redisTemplate.delete(key);
+        return redisDBOperation.codisService.del(key) > 0;
     }
 
     public static void deleteUserToken(String userUid) {
 
         String key = "Token:" + userUid;
-        redisDBOperation.redisTemplate.delete(key);
+        // redisDBOperation.redisTemplate.delete(key);
+        redisDBOperation.codisService.del(key);
     }
 
     public static String selectUserToken(String userUid) {
         String key = "Token:" + userUid;
-        return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        return redisDBOperation.codisService.get(key);
     }
 
 
@@ -681,34 +748,40 @@ public class RedisDBOperation {
      */
     public static String getDataTable(String key) {
 
-        return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        return redisDBOperation.codisService.get(key);
     }
 
     public static void insertDataTable(String key, String zipDataTable) {
 
-        redisDBOperation.redisTemplate.opsForValue().set(key, zipDataTable);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, zipDataTable);
+        redisDBOperation.codisService.set(key, zipDataTable);
     }
 
     //ai先手比赛规则
     public static void insertLocalPlayerFirstAiRecordChooseRules(String key, String zipDataTable) {
 
-        redisDBOperation.redisTemplate.opsForValue().set(key, zipDataTable);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, zipDataTable);
+        throw new RuntimeException("功能取消");
     }
 
     public static String selectLocalPlayerFirstAiRecordChooseRules(String key) {
 
-        return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        throw new RuntimeException("功能取消");
     }
 
     //玩家先手比赛规则
     public static void insertAiFirstAiRecordChooseRules(String key, String zipDataTable) {
 
-        redisDBOperation.redisTemplate.opsForValue().set(key, zipDataTable);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, zipDataTable);
+        throw new RuntimeException("功能取消");
     }
 
     public static String selectAiFirstAiRecordChooseRules(String key) {
 
-        return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        throw new RuntimeException("功能取消");
     }
 
     /*
@@ -726,26 +799,32 @@ public class RedisDBOperation {
     public static PendingPurchaseOrder selectPendingCustomOrder(String orderId) {
 
         String path = Path.getPendingCustomOrderCollectionPath();
-        return (PendingPurchaseOrder) redisDBOperation.redisTemplate.opsForValue().get(path + ":" + orderId);
+        // return (PendingPurchaseOrder) redisDBOperation.redisTemplate.opsForValue().get(path + ":" + orderId);
+        String content = redisDBOperation.codisService.get(path + ":" + orderId);
+        PendingPurchaseOrder pendingPurchaseOrder = JSONObject.parseObject(content, PendingPurchaseOrder.class);
+        return pendingPurchaseOrder;
     }
 
 
     public static void insertPendingCustomOrders(String orderId, PendingPurchaseOrder pendingOrder) {
 
         String path = Path.getPendingCustomOrderCollectionPath();
-        redisDBOperation.redisTemplate.opsForValue().set(path + ":" + orderId, pendingOrder, 30, TimeUnit.DAYS);
+        // redisDBOperation.redisTemplate.opsForValue().set(path + ":" + orderId, pendingOrder, 30, TimeUnit.DAYS);
+        redisDBOperation.codisService.set(path + ":" + orderId, JSONObject.toJSONString(pendingOrder), 30, TimeUnit.DAYS);
     }
 
     public static void insertArchiveCustomOrders(String orderId, PendingPurchaseOrder pendingOrder) {
 
         String path = Path.getArchiveCustomOrderCollectionPath();
-        redisDBOperation.redisTemplate.opsForValue().set(path + ":" + orderId, pendingOrder, 30, TimeUnit.DAYS);
+        // redisDBOperation.redisTemplate.opsForValue().set(path + ":" + orderId, pendingOrder, 30, TimeUnit.DAYS);
+        redisDBOperation.codisService.set(path + ":" + orderId, JSONObject.toJSONString(pendingOrder), 30, TimeUnit.DAYS);
     }
 
     public static void deletePendingCustomOrder(String orderId) {
 
         String finalPath = Path.getPendingCustomOrderCollectionPath() + ":" + orderId;
-        redisDBOperation.redisTemplate.delete(finalPath);
+        // redisDBOperation.redisTemplate.delete(finalPath);
+        redisDBOperation.codisService.del(finalPath);
     }
 
     /**
@@ -787,7 +866,8 @@ public class RedisDBOperation {
 
 //        gameEnvironment.redisTemplate.opsForValue().set(path,archiveResult,60, TimeUnit.DAYS);
         String jsonString = JSONObject.toJSONString(archiveResult);
-        redisDBOperation.redisTemplate.opsForList().leftPush(path, jsonString);
+        // redisDBOperation.redisTemplate.opsForList().leftPush(path, jsonString);
+        redisDBOperation.codisService.leftPushAll(path, jsonString);
     }
 
 
@@ -799,7 +879,9 @@ public class RedisDBOperation {
      */
     public static ArchiveChestOpenResult selectLatestOpenedChestOpenResult(String uid) {
 
-        String jsonString = (String) redisDBOperation.redisTemplate.boundListOps(uid).index(0);
+        // String jsonString = (String) redisDBOperation.redisTemplate.boundListOps(uid).index(0);
+
+        String jsonString = redisDBOperation.codisService.lrange(uid, 0, 1).get(0);
 
         return JSONObject.parseObject(jsonString, ArchiveChestOpenResult.class);
     }
@@ -812,14 +894,17 @@ public class RedisDBOperation {
      */
     public static OpponentProfile selectOpponentProfile(String aiProfileId) {
 
-        if (!redisDBOperation.redisTemplate.hasKey(aiProfileId))
-            log.error("redis中不存在OpponentProfile key" + aiProfileId);
-        return (OpponentProfile) redisDBOperation.redisTemplate.opsForValue().get(aiProfileId);
+        // if (!redisDBOperation.redisTemplate.hasKey(aiProfileId))
+        //     log.error("redis中不存在OpponentProfile key" + aiProfileId);
+        // return (OpponentProfile) redisDBOperation.redisTemplate.opsForValue().get(aiProfileId);
+
+        throw new RuntimeException("功能取消");
     }
 
     public static void insertOpponentProfile(String key, OpponentProfile opponentProfile) {
 
-        redisDBOperation.redisTemplate.opsForValue().set(key, opponentProfile);
+        // redisDBOperation.redisTemplate.opsForValue().set(key, opponentProfile);
+        throw new RuntimeException("功能取消");
     }
 
 
@@ -834,14 +919,16 @@ public class RedisDBOperation {
 
         if (!checkKeyExist(key)) {
 //            throw new BusinessException("关联了多个游客账号");
-            redisDBOperation.redisTemplate.opsForHash().put(key, deviceId, JSONObject.toJSONString(accountMapData));
+//             redisDBOperation.redisTemplate.opsForHash().put(key, deviceId, JSONObject.toJSONString(accountMapData));
+            redisDBOperation.codisService.hset(key, deviceId, JSONObject.toJSONString(accountMapData));
         }
     }
 
     public static AccountMapData selectGuestAccount(String deviceId, String userUid) {
 
         String key = Path.getGuestAccountMapDataCollectionPath() + ":" + userUid;
-        String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, deviceId);
+        // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, deviceId);
+        String jsonString = redisDBOperation.codisService.hget(key, deviceId);
 
         if (jsonString != null)
             return JSONObject.parseObject(jsonString, AccountMapData.class);
@@ -852,7 +939,8 @@ public class RedisDBOperation {
     public static void deleteGuestAccount(String deviceId, String userUid) {
 
         String key = Path.getGuestAccountMapDataCollectionPath() + ":" + userUid;
-        redisDBOperation.redisTemplate.delete(key);
+        // redisDBOperation.redisTemplate.delete(key);
+        redisDBOperation.codisService.del(key);
     }
 
     /*
@@ -865,13 +953,15 @@ public class RedisDBOperation {
         String key = Path.getGoogleAccountMapDataCollectionPath();
         String jsonString = JSONObject.toJSONString(accountMapData);
 
-        redisDBOperation.redisTemplate.opsForHash().put(key, providerUserId, jsonString);
+        // redisDBOperation.redisTemplate.opsForHash().put(key, providerUserId, jsonString);
+        redisDBOperation.codisService.hset(key, providerUserId, jsonString);
     }
 
     public static AccountMapData selectGoogleAccountMapData(String providerUserId) {
 
         String key = Path.getGoogleAccountMapDataCollectionPath();
-        Object object = redisDBOperation.redisTemplate.opsForHash().get(key, providerUserId);
+        // Object object = redisDBOperation.redisTemplate.opsForHash().get(key, providerUserId);
+        Object object = redisDBOperation.codisService.hget(key, providerUserId);
         if (object == null)
             return null;
         return JSONObject.parseObject((String) object, AccountMapData.class);
@@ -887,13 +977,15 @@ public class RedisDBOperation {
         String key = Path.getFacebookAccountMapDataCollectionPath();
         String jsonString = JSONObject.toJSONString(accountMapData);
 
-        redisDBOperation.redisTemplate.opsForHash().put(key, providerUserId, jsonString);
+        // redisDBOperation.redisTemplate.opsForHash().put(key, providerUserId, jsonString);
+        redisDBOperation.codisService.hset(key, providerUserId, jsonString);
     }
 
     public static AccountMapData selectFacebookAccountMapData(String providerUserId) {
 
         String key = Path.getFacebookAccountMapDataCollectionPath();
-        String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, providerUserId);
+        // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, providerUserId);
+        String jsonString = redisDBOperation.codisService.hget(key, providerUserId);
         if (jsonString == null)
             return null;
         return JSONObject.parseObject(jsonString, AccountMapData.class);
@@ -907,7 +999,8 @@ public class RedisDBOperation {
     public static void insertUserProfileImageCollection(String imageBase64, String userUid) {
 
         String key = Path.getUserProfileImageCollectionPath();
-        redisDBOperation.redisTemplate.opsForHash().put(key, userUid, imageBase64);
+        // redisDBOperation.redisTemplate.opsForHash().put(key, userUid, imageBase64);
+        redisDBOperation.codisService.hset(key, userUid, imageBase64);
     }
 
     /**
@@ -916,31 +1009,35 @@ public class RedisDBOperation {
     public static void insertUserArchiveServerResponse(String userUid, ServerResponseArchiveData archiveData) {
 
         String key = Path.getUserServerResponseArchiveCollectionPath(userUid);
-        redisDBOperation.redisTemplate.opsForHash().put(key, archiveData.getRequestId().toString(), archiveData);
+        // redisDBOperation.redisTemplate.opsForHash().put(key, archiveData.getRequestId().toString(), archiveData);
+        throw new RuntimeException("功能取消");
     }
 
     public static ServerResponseArchiveData selectNewUserArchiveServerResponse(String userUid) {
 
-        String key = Path.getUserServerResponseArchiveCollectionPath(userUid);
-        Set keySet = redisDBOperation.redisTemplate.opsForHash().keys(key);
-        List keyList = Lists.newArrayList(keySet);
-        Collections.reverse(keyList);
-        if (keyList.size() == 0) {
-            return null;
-        }
+        // String key = Path.getUserServerResponseArchiveCollectionPath(userUid);
+        // Set keySet = redisDBOperation.redisTemplate.opsForHash().keys(key);
+        // List keyList = Lists.newArrayList(keySet);
+        // Collections.reverse(keyList);
+        // if (keyList.size() == 0) {
+        //     return null;
+        // }
+        //
+        // String requestId = keyList.get(0).toString();
+        //
+        // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, requestId);
+        // if (jsonString == null)
+        //     return null;
+        // return JSONObject.parseObject(jsonString, ServerResponseArchiveData.class);
 
-        String requestId = keyList.get(0).toString();
-
-        String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, requestId);
-        if (jsonString == null)
-            return null;
-        return JSONObject.parseObject(jsonString, ServerResponseArchiveData.class);
+        throw new RuntimeException("功能取消");
     }
 
     public static LoginSessionData selectUserLoginSessionDataDocPath(String userUid) {
 
         String key = Path.getUserLoginSessionDataDocPath(userUid);
-        String jsonString = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        // String jsonString = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
+        String jsonString = redisDBOperation.codisService.get(key);
         if (jsonString == null)
             return null;
         return JSONObject.parseObject(jsonString, LoginSessionData.class);
@@ -949,7 +1046,8 @@ public class RedisDBOperation {
     public static void insertUserLoginSessionDataDocPath(String userUid, LoginSessionData loginSessionData) {
 
         String key = Path.getUserLoginSessionDataDocPath(userUid);
-        redisDBOperation.redisTemplate.opsForValue().set(key, JSON.toJSONString(loginSessionData));
+        // redisDBOperation.redisTemplate.opsForValue().set(key, JSON.toJSONString(loginSessionData));
+        redisDBOperation.codisService.set(key, JSON.toJSONString(loginSessionData));
     }
 
 
@@ -963,12 +1061,14 @@ public class RedisDBOperation {
         //邮件索引
         String mailPath = Path.getInboxMailCollectionPath();
         String jsonString = JSONObject.toJSONString(mailData);
-        redisDBOperation.redisTemplate.opsForHash().put(mailPath, mailData.getUid(), jsonString);
+        // redisDBOperation.redisTemplate.opsForHash().put(mailPath, mailData.getUid(), jsonString);
+        redisDBOperation.codisService.hset(mailPath, mailData.getUid(), jsonString);
 
         //用户索引
         String path = Path.getUserInboxMailCollectionPath();
         String key = path + ":" + userUid;
-        redisDBOperation.redisTemplate.opsForList().leftPush(key, mailData.getUid());
+        // redisDBOperation.redisTemplate.opsForList().leftPush(key, mailData.getUid());
+        redisDBOperation.codisService.leftPushAll(key, mailData.getUid());
     }
 
 
@@ -982,14 +1082,16 @@ public class RedisDBOperation {
 
         String path = Path.getUserInboxMailCollectionPath();
         String key = path + ":" + userUid;
-        String mailKey = (String) redisDBOperation.redisTemplate.opsForList().rightPop(key);
+        // String mailKey = (String) redisDBOperation.redisTemplate.opsForList().rightPop(key);
+        String mailKey = redisDBOperation.codisService.rpop(key);
 
         //邮件索引
         String mailPath = Path.getInboxMailCollectionPath();
-        String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(mailPath, mailKey);
-        redisDBOperation.redisTemplate.opsForHash().delete(mailPath, mailKey);
+        // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(mailPath, mailKey);
+        String jsonString = redisDBOperation.codisService.hget(mailPath, mailKey);
+        // redisDBOperation.redisTemplate.opsForHash().delete(mailPath, mailKey);
+        redisDBOperation.codisService.hdel(mailPath, mailKey);
         MailData mailData = JSONObject.parseObject(jsonString, MailData.class);
-
         return mailData;
     }
 
@@ -998,11 +1100,13 @@ public class RedisDBOperation {
         //用户邮件索引删除
         String path = Path.getUserInboxMailCollectionPath();
         String key = path + ":" + userUid;
-        redisDBOperation.redisTemplate.opsForList().remove(key, 1, mailUid);
+        // redisDBOperation.redisTemplate.opsForList().remove(key, 1, mailUid);
+        redisDBOperation.codisService.lrem(key, 1, mailUid);
 
         //邮件索引删除
         String mailPath = Path.getInboxMailCollectionPath();
-        redisDBOperation.redisTemplate.opsForHash().delete(mailPath, mailUid);
+        // redisDBOperation.redisTemplate.opsForHash().delete(mailPath, mailUid);
+        redisDBOperation.codisService.hdel(mailPath, mailUid);
     }
 
 
@@ -1010,7 +1114,8 @@ public class RedisDBOperation {
 
         String path = Path.getInboxMailCollectionPath();
 
-        String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(path, mailUid);
+        // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(path, mailUid);
+        String jsonString = redisDBOperation.codisService.hget(path, mailUid);
         if (jsonString == null) {
             throw new BusinessException("邮件" + mailUid + "不存在");
         }
@@ -1026,7 +1131,8 @@ public class RedisDBOperation {
             log.info("该玩家没有邮件" + userUid);
             return 0L;
         }
-        return redisDBOperation.redisTemplate.opsForList().size(key);
+        // return redisDBOperation.redisTemplate.opsForList().size(key);
+        return redisDBOperation.codisService.llen(key);
     }
 
     /**
@@ -1040,11 +1146,13 @@ public class RedisDBOperation {
         String path = Path.getUserInboxMailCollectionPath();
         String mailPath = Path.getInboxMailCollectionPath();
         String key = path + ":" + userUid;
-        List<Object> list = redisDBOperation.redisTemplate.opsForList().range(key, 0, -1);
+        // List<Object> list = redisDBOperation.redisTemplate.opsForList().range(key, 0, -1);
+        List<String> list = redisDBOperation.codisService.lrange(key, 0, -1);
         List<MailData> mailDataList = new ArrayList<>();
         if (list != null) {
             for (Object obj : list) {
-                Object o = redisDBOperation.redisTemplate.opsForHash().get(mailPath, obj.toString());
+                // Object o = redisDBOperation.redisTemplate.opsForHash().get(mailPath, obj.toString());
+                Object o = redisDBOperation.codisService.hget(mailPath, obj.toString());
                 if (o != null) {
                     MailData mailData = JSONObject.parseObject(o.toString(), MailData.class);
                     mailDataList.add(mailData);
@@ -1068,7 +1176,8 @@ public class RedisDBOperation {
 
         String jsonString = JSONObject.toJSONString(archivedMailData);
         String zipString = DeflaterUtils.zipString(jsonString);
-        redisDBOperation.redisTemplate.opsForHash().put(path, mailUid, zipString);
+        // redisDBOperation.redisTemplate.opsForHash().put(path, mailUid, zipString);
+        redisDBOperation.codisService.hset(path, mailUid, zipString);
     }
     /*
         ----------
@@ -1083,8 +1192,8 @@ public class RedisDBOperation {
      * @return
      */
     public static boolean checkKeyExist(String key) {
-
-        return redisDBOperation.redisTemplate.hasKey(key);
+        // return redisDBOperation.redisTemplate.hasKey(key);
+        return redisDBOperation.codisService.hasKey(key);
     }
 
     /**
@@ -1093,9 +1202,10 @@ public class RedisDBOperation {
      * @param list
      * @return
      */
-    public static List<Object> MultipleGet(List<String> list) {
+    public static List<String> MultipleGet(List<String> list) {
 
-        return redisDBOperation.redisTemplate.opsForValue().multiGet(list);
+        // return redisDBOperation.redisTemplate.opsForValue().multiGet(list);
+        return redisDBOperation.codisService.multiGet(list);
     }
 
     /**
@@ -1105,12 +1215,14 @@ public class RedisDBOperation {
      */
     public static void MultipleDelete(Set<String> list) {
 
-        redisDBOperation.redisTemplate.delete(list);
+        // redisDBOperation.redisTemplate.delete(list);
+        redisDBOperation.codisService.del(list);
 
     }
 
     public static void Delete(String key) {
-        redisDBOperation.redisTemplate.delete(key);
+        // redisDBOperation.redisTemplate.delete(key);
+        redisDBOperation.codisService.del(key);
     }
 
     /**
@@ -1122,18 +1234,19 @@ public class RedisDBOperation {
      */
     public static Set<String> scan(String matchKey) {
 
-        Set<String> keys = redisDBOperation.redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keysTmp = new HashSet<>();
-            Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(matchKey).count(1000).build());
-            while (cursor.hasNext()) {
-                keysTmp.add(new String(cursor.next()));
-            }
-            //关闭scan
-            cursor.close();
-            return keysTmp;
-        });
-
-        return keys;
+        // Set<String> keys = redisDBOperation.redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+        //     Set<String> keysTmp = new HashSet<>();
+        //     Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(matchKey).count(1000).build());
+        //     while (cursor.hasNext()) {
+        //         keysTmp.add(new String(cursor.next()));
+        //     }
+        //     //关闭scan
+        //     cursor.close();
+        //     return keysTmp;
+        // });
+        //
+        // return keys;
+        throw new RuntimeException("功能取消");
     }
 
 
@@ -1147,17 +1260,18 @@ public class RedisDBOperation {
      * @return
      */
     public Long incr(String key, long liveTime) {
-        if (null == connectionFactory) {
-            connectionFactory = redisDBOperation.redisTemplate.getConnectionFactory();
-        }
-        assert connectionFactory != null;
-        RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, connectionFactory);
-        long increment = entityIdCounter.getAndIncrement();
-        if (increment == 0 && liveTime > 0) {
-            //初始设置过期时间
-            entityIdCounter.expire(liveTime, TimeUnit.SECONDS);
-        }
-        return increment;
+        // if (null == connectionFactory) {
+        //     connectionFactory = redisDBOperation.redisTemplate.getConnectionFactory();
+        // }
+        // assert connectionFactory != null;
+        // RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, connectionFactory);
+        // long increment = entityIdCounter.getAndIncrement();
+        // if (increment == 0 && liveTime > 0) {
+        //     //初始设置过期时间
+        //     entityIdCounter.expire(liveTime, TimeUnit.SECONDS);
+        // }
+        // return increment;
+        throw new RuntimeException("功能取消");
     }
 
     /**
@@ -1169,24 +1283,29 @@ public class RedisDBOperation {
      * @description 若自增key已存在，并且初始值必须要大于生成的值，以免造成序列冲突
      */
     public void setIncr(String key, Long value) {
-        if (value < 0) {
-            value = 1L;
-        }
-        if (null == connectionFactory) {
-            connectionFactory = redisDBOperation.redisTemplate.getConnectionFactory();
-        }
-        assert connectionFactory != null;
-        RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, connectionFactory);
-        entityIdCounter.set(value);
+        // if (value < 0) {
+        //     value = 1L;
+        // }
+        // if (null == connectionFactory) {
+        //     connectionFactory = redisDBOperation.redisTemplate.getConnectionFactory();
+        // }
+        // assert connectionFactory != null;
+        // RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, connectionFactory);
+        // entityIdCounter.set(value);
+
+        throw new RuntimeException("功能取消");
     }
 
     public Long getIncr(String key) {
-        if (null == connectionFactory) {
-            connectionFactory = redisDBOperation.redisTemplate.getConnectionFactory();
-        }
-        assert connectionFactory != null;
-        RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, connectionFactory);
-        return entityIdCounter.getAndIncrement();
+        // if (null == connectionFactory) {
+        //     connectionFactory = redisDBOperation.redisTemplate.getConnectionFactory();
+        // }
+        // assert connectionFactory != null;
+        // RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, connectionFactory);
+        // return entityIdCounter.getAndIncrement();
+
+        Long result = codisService.incrKey(key);
+        return result;
     }
 
 

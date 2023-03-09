@@ -17,7 +17,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.bo.RecordDataAndBase64;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.AIControlRecordDataQueryDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordDocData;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.AiService;

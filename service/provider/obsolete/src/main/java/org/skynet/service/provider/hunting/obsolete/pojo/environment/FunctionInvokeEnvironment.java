@@ -3,7 +3,7 @@ package org.skynet.service.provider.hunting.obsolete.pojo.environment;
 import org.skynet.service.provider.hunting.obsolete.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import lombok.AllArgsConstructor;
 import lombok.Data;

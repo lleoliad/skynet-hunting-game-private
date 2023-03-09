@@ -7,9 +7,9 @@ import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLoc
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.LuckyWheelDTO;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.LuckyWheelData;
+import org.skynet.commons.hunting.user.domain.LuckyWheelData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.LuckyWheelSpinReward;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.LuckyWheelPropertyTable;

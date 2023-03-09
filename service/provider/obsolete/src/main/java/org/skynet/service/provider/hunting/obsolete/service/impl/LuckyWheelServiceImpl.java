@@ -1,6 +1,8 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.NanoIdUtils;

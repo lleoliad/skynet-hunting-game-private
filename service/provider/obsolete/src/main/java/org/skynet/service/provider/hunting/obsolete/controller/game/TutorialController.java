@@ -7,8 +7,8 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ForceStepDTO;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerTutorialData;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.domain.PlayerTutorialData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;

@@ -1,8 +1,8 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.ChapterBonusPackageData;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.domain.ChapterBonusPackageData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterBonusPackageTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterGunGiftPackageTableValue;

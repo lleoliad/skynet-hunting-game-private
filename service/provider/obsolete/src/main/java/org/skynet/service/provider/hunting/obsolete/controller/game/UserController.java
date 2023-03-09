@@ -3,6 +3,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.*;
+import org.skynet.commons.hunting.user.enums.ABTestGroup;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.PlayerLoginQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
@@ -16,7 +19,6 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.config.VipV2Config;
 import org.skynet.service.provider.hunting.obsolete.module.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.module.dto.UserInfoDto;
-import org.skynet.service.provider.hunting.obsolete.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
@@ -312,7 +314,7 @@ public class UserController {
 
             LuckyWheelV2PropertyTableValue luckyWheelV2PropertyTable = GameEnvironment.luckyWheelV2PropertyTableMap.get(loginDTO.getGameVersion());
 
-            Integer newRequestId = userDataService.getUserMaxRequestIdNow(loginUserUid);
+            Long newRequestId = loginUserData.getUpdateCount() + 1000L; //userDataService.getUserMaxRequestIdNow(loginUserUid);
 
             if (loginDTO.getPlatform().equals(PlatformName.IOS.getPlatform())) {
 
@@ -378,7 +380,7 @@ public class UserController {
             userDataSendToClient.setLuckyWheelV2Data(loginUserData.getLuckyWheelV2Data());
             userDataSendToClient.setChapterWinChestsData(loginUserData.getChapterWinChestsData());
             userDataSendToClient.setPromotionGiftPackagesV2Data(loginUserData.getPromotionGiftPackagesV2Data());
-            userDataSendToClient.setPlayerRankData(loginUserData.getPlayerRankData());
+            // userDataSendToClient.setPlayerRankData(loginUserData.getPlayerRankData());
 //            userDataSendToClient.getHistory().setServer_only_matchTotalShots(null);
 //            userDataSendToClient.getHistory().setServer_only_matchAllShotsPrecisionAccumulation(null);
 //            userDataSendToClient.getAdvertisementData().setServer_only_lastRefreshRewardAdCountUnixDay(null);

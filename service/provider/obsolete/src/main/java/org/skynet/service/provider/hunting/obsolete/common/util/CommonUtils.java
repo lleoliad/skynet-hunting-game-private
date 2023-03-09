@@ -11,7 +11,7 @@ import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.GunReward;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserData;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

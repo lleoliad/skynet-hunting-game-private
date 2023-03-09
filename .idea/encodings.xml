@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/components/game/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/components/game/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/components/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/components/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/components/user/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/components/user/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/game-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/game-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/service/provider/game/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/service/provider/game/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/service/provider/login/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/service/provider/login/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/service/provider/obsolete/src/main/java" charset="UTF-8" />

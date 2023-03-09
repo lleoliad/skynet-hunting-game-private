@@ -2,13 +2,14 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.DeflaterUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.NumberUtils;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
-import org.skynet.service.provider.hunting.obsolete.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordChooseMode;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CalculateAIFilterParametersBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.LocalPlayerCalculateAIFilterParametersBO;

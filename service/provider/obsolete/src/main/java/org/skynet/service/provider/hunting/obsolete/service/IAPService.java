@@ -1,5 +1,8 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
+import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.commons.hunting.user.domain.PromotionEventPackageData;
+import org.skynet.commons.hunting.user.domain.UserPendingPurchaseData;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
