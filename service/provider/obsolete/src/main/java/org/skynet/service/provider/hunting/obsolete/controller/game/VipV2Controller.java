@@ -1,6 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
@@ -46,6 +49,9 @@ public class VipV2Controller {
     @Resource
     private ChestService chestService;
 
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
+
     @PostMapping("/vipV2-claimSVipV2DailyRewards")
     @ApiOperation("获取svip v2每日奖励")
     @RepeatSubmit(interval = 60000)
@@ -61,6 +67,11 @@ public class VipV2Controller {
             //处理userData
             obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
+
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
+
+
             PlayerVipV2Data vipV2Data = userData.getVipV2Data();
             boolean[] playerVipV2Status = obsoleteUserDataService.getPlayerVipV2Status(userData);
             Long standardTimeDay = TimeUtils.getStandardTimeDay();
@@ -92,7 +103,7 @@ public class VipV2Controller {
 
             // 橙卡枪
             Integer playerHighestUnlockedChapterID = obsoleteUserDataService.playerHighestUnlockedChapterID(userData);
-            Map<Integer, Integer> gunRewards = chestService.extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, VipV2Config.svipDailyRewardOrangeGunCount, request.getGameVersion(), false, null);
+            Map<Integer, Integer> gunRewards = chestService.extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, VipV2Config.svipDailyRewardOrangeGunCount, request.getGameVersion(), false, null, additionValue);
 
             List<Integer> newUnlockedGunIDs = new ArrayList<>();
             obsoleteUserDataService.addGunToUserData(userData, gunRewards, newUnlockedGunIDs, request.getGameVersion());

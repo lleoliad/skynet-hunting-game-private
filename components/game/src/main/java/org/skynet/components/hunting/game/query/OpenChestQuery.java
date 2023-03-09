@@ -33,4 +33,7 @@ public class OpenChestQuery implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     Long createTime;
+
+    @ApiModelProperty(value = "段位宝箱奖励加成-只向枪械")
+    float rankAdditionValue;
 }

@@ -975,7 +975,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
     }
 
     @Override
-    public void addGunToUserDataByIdAndCountArray(UserData userData, List<Integer> rewardGunIDsArray, List<Integer> rewardGunCountsArray, List<Integer> newUnlockedGunIDs, String gameVersion) {
+    public void addGunToUserDataByIdAndCountArray(UserData userData, List<Integer> rewardGunIDsArray, List<Integer> rewardGunCountsArray, List<Integer> newUnlockedGunIDs, String gameVersion, float additionValue) {
 
         List<GunReward> gunIdCountData = new ArrayList<>();
         for (int i = 0; i < rewardGunIDsArray.size(); i++) {
@@ -991,7 +991,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
 //
 //            }
 
-            GunReward gunReward = new GunReward(gunId, (int) Math.ceil(gunCount * (1 + 0.2)));
+            GunReward gunReward = new GunReward(gunId, (int) Math.ceil(gunCount * (1 + additionValue)));
             gunIdCountData.add(gunReward);
         }
 
@@ -1019,7 +1019,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
     }
 
     @Override
-    public void mergeRewardGunsToChestOpenResult(ChestOpenResult chestOpenResult, List<Integer> gunsId, List<Integer> gunsCount) {
+    public void mergeRewardGunsToChestOpenResult(ChestOpenResult chestOpenResult, List<Integer> gunsId, List<Integer> gunsCount, float additionValue) {
 
         List<Integer> allGunsId = new ArrayList<>();
         List<Integer> allGunsCount = new ArrayList<>();
@@ -1037,7 +1037,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
             int gunId = gunsId.get(i);
             int gunCount = gunsCount.get(i);
             allGunsId.add(gunId);
-            allGunsCount.add((int) Math.ceil(gunCount * (1 + 0.2)));
+            allGunsCount.add((int) Math.ceil(gunCount * (1 + additionValue)));
         }
 
         chestOpenResult.setGunRewards(new ArrayList<>());
@@ -1053,13 +1053,13 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
     }
 
     @Override
-    public void mergeGunCountMapToChestOpenResult(ChestOpenResult chestOpenResult, Map<Integer, Integer> gunCountMap) {
+    public void mergeGunCountMapToChestOpenResult(ChestOpenResult chestOpenResult, Map<Integer, Integer> gunCountMap, float additionValue) {
         Map<Integer, Integer> chestOpenResultGunCountMap = CommonUtils.convertGunCountArrayToGunCountMap(chestOpenResult.getGunRewards());
         for (Map.Entry<Integer, Integer> entry : gunCountMap.entrySet()) {
             Integer gunId = entry.getKey();
             Integer gunCount = entry.getValue();
 
-            Integer countValue = chestOpenResultGunCountMap.getOrDefault(gunId, 0) + (int) Math.ceil(gunCount * (1 + 0.2));
+            Integer countValue = chestOpenResultGunCountMap.getOrDefault(gunId, 0) + (int) Math.ceil(gunCount * (1 + additionValue));
             chestOpenResultGunCountMap.put(gunId, countValue);
         }
         chestOpenResult.setGunRewards(CommonUtils.convertGunCountMapToGunCountArray(chestOpenResultGunCountMap));
@@ -1915,7 +1915,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
         gunLibraryDrawCountMap.put(gunLibrary, original + count);
     }
 
-    public void recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(UserData userData, Map<Integer, Integer> gunCountMap, String gameVersion) {
+    public void recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(UserData userData, Map<Integer, Integer> gunCountMap, String gameVersion, float additionValue) {
         //确保数据存在
         upgradePlayerChestOpenIndexMapData(userData);
         Map<Integer, Integer> gunLibraryDrawCountMap = userData.getServerOnly().getChestOpenIndexMap().getGunLibraryDrawCountMap();
@@ -1925,7 +1925,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
         for (Map.Entry<Integer, Integer> entry : gunCountMap.entrySet()) {
             Integer gunId = entry.getKey();
             Integer gunCount = entry.getValue();
-            gunCount = (int) Math.ceil(gunCount * (1 + 0.2));
+            gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
 
             GunTableValue gunTableValue = gunTable.get(gunId.toString());
             GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];

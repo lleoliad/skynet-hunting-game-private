@@ -478,14 +478,17 @@ public class RedisDBOperation {
 
         String key = "PlayerControlRecords:HuntingMatchNowUUid" + ":" + userUid;
         // redisDBOperation.redisTemplate.opsForList().leftPush(key, huntingMatchUUid);
-        throw new RuntimeException("功能取消");
+        redisDBOperation.codisService.leftPushAll(key, huntingMatchUUid);
+        // throw new RuntimeException("功能取消");
     }
 
     public static void setPlayerHuntingMatchNowData(String userUid, String huntingMatchUUid) {
         String key = "PlayerControlRecords:HuntingMatchNowUUid" + ":" + userUid;
         // redisDBOperation.redisTemplate.opsForList().leftPop(key);
         // redisDBOperation.redisTemplate.opsForList().leftPush(key, huntingMatchUUid);
-        throw new RuntimeException("功能取消");
+        redisDBOperation.codisService.lpop(key);
+        redisDBOperation.codisService.leftPushAll(key, huntingMatchUUid);
+        // throw new RuntimeException("功能取消");
     }
 
     /**
@@ -530,8 +533,8 @@ public class RedisDBOperation {
      */
     public static void insertHuntingMatchNowData(String key, HuntingMatchNowData huntingMatchNowData) {
         // redisDBOperation.redisTemplate.opsForValue().set(key, JSONObject.toJSONString(huntingMatchNowData), 30, TimeUnit.DAYS);
-
-        throw new RuntimeException("功能取消");
+        redisDBOperation.codisService.set(key, JSONObject.toJSONString(huntingMatchNowData), 30 * 24 * 60 * 60 * 1000, TimeUnit.DAYS);
+        // throw new RuntimeException("功能取消");
     }
 
     /**
@@ -543,8 +546,9 @@ public class RedisDBOperation {
     public static HuntingMatchNowData selectHuntingMatchNowData(String key) {
 
         // String temp = (String) redisDBOperation.redisTemplate.opsForValue().get(key);
-        // return JSONObject.parseObject(temp, HuntingMatchNowData.class);
-        throw new RuntimeException("功能取消");
+        String temp = redisDBOperation.codisService.get(key);
+        return JSONObject.parseObject(temp, HuntingMatchNowData.class);
+        // throw new RuntimeException("功能取消");
     }
 
     /**
@@ -559,7 +563,8 @@ public class RedisDBOperation {
         // }
         // redisDBOperation.redisTemplate.delete(key);
 
-        throw new RuntimeException("功能取消");
+        redisDBOperation.codisService.del(key);
+        // throw new RuntimeException("功能取消");
     }
 
     /*
@@ -807,14 +812,14 @@ public class RedisDBOperation {
 
         String path = Path.getPendingCustomOrderCollectionPath();
         // redisDBOperation.redisTemplate.opsForValue().set(path + ":" + orderId, pendingOrder, 30, TimeUnit.DAYS);
-        redisDBOperation.codisService.set(path + ":" + orderId, JSONObject.toJSONString(pendingOrder), 30, TimeUnit.DAYS);
+        redisDBOperation.codisService.set(path + ":" + orderId, JSONObject.toJSONString(pendingOrder), 30 * 24 * 60 * 60 * 1000, TimeUnit.DAYS);
     }
 
     public static void insertArchiveCustomOrders(String orderId, PendingPurchaseOrder pendingOrder) {
 
         String path = Path.getArchiveCustomOrderCollectionPath();
         // redisDBOperation.redisTemplate.opsForValue().set(path + ":" + orderId, pendingOrder, 30, TimeUnit.DAYS);
-        redisDBOperation.codisService.set(path + ":" + orderId, JSONObject.toJSONString(pendingOrder), 30, TimeUnit.DAYS);
+        redisDBOperation.codisService.set(path + ":" + orderId, JSONObject.toJSONString(pendingOrder), 30 * 24 * 60 * 60 * 1000, TimeUnit.DAYS);
     }
 
     public static void deletePendingCustomOrder(String orderId) {

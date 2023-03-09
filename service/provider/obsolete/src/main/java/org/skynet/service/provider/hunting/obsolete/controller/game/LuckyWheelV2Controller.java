@@ -1,6 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import com.alibaba.fastjson.JSON;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
@@ -42,6 +45,9 @@ public class LuckyWheelV2Controller {
 
     @Resource
     private LuckyWheelService luckyWheelService;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
 
     @PostMapping("luckyWheelV2-luckyWheelV2RefreshContent")
@@ -142,7 +148,10 @@ public class LuckyWheelV2Controller {
 
             }
 
-            spinReward = luckyWheelService.spinLuckyWheelV2Reward(request.getUserUid(), request.getGameVersion());
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
+
+            spinReward = luckyWheelService.spinLuckyWheelV2Reward(request.getUserUid(), request.getGameVersion(), additionValue);
 
             userDataSendToClient.setLuckyWheelV2Data(luckyWheelV2Data);
             userDataSendToClient.setCoin(userData.getCoin());

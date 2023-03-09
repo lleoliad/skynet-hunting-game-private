@@ -113,7 +113,7 @@ public interface ChestService {
      * @param gameVersion
      * @return
      */
-    ChestOpenResult openChest(UserData userData, ChestData chestData, String gameVersion);
+    ChestOpenResult openChest(UserData userData, ChestData chestData, String gameVersion, float additionValue);
 
     /**
      * 获取枪奖励
@@ -166,7 +166,7 @@ public interface ChestService {
      * @param enableDrawCountRequires
      * @param resultMap
      */
-    Map<Integer, Integer> extractGunRewardsFromGunLibraryAsync(UserData userData, GunLibraryType gunLibraryType, int chestLevel, int getGunCount, boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, String gameVersion);
+    Map<Integer, Integer> extractGunRewardsFromGunLibraryAsync(UserData userData, GunLibraryType gunLibraryType, int chestLevel, int getGunCount, boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, String gameVersion, float additionValue);
 
-    Map<Integer, Integer> extractGunRewardsFromGunLibrary(UserData userData, GunLibraryType gunLibraryType, Integer chestLevel, Integer getGunCount, String gameVersion, Boolean enableDrawCountRequires, Map<Integer, Integer> resultMap);
+    Map<Integer, Integer> extractGunRewardsFromGunLibrary(UserData userData, GunLibraryType gunLibraryType, Integer chestLevel, Integer getGunCount, String gameVersion, Boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, float additionValue);
 }

@@ -350,7 +350,7 @@ public interface ObsoleteUserDataService {
      * @param newUnlockedGunIDs
      * @param gameVersion
      */
-    void addGunToUserDataByIdAndCountArray(UserData userData, List<Integer> rewardGunIDsArray, List<Integer> rewardGunCountsArray, List<Integer> newUnlockedGunIDs, String gameVersion);
+    void addGunToUserDataByIdAndCountArray(UserData userData, List<Integer> rewardGunIDsArray, List<Integer> rewardGunCountsArray, List<Integer> newUnlockedGunIDs, String gameVersion, float additionValue);
 
     /**
      * 购买后为用户添加子弹
@@ -368,7 +368,7 @@ public interface ObsoleteUserDataService {
      * @param gunsId
      * @param gunsCount
      */
-    void mergeRewardGunsToChestOpenResult(ChestOpenResult chestOpenResult, List<Integer> gunsId, List<Integer> gunsCount);
+    void mergeRewardGunsToChestOpenResult(ChestOpenResult chestOpenResult, List<Integer> gunsId, List<Integer> gunsCount, float additionValue);
 
     /**
      * 合并枪械奖励
@@ -376,7 +376,7 @@ public interface ObsoleteUserDataService {
      * @param chestOpenResult
      * @param gunCountMap
      */
-    void mergeGunCountMapToChestOpenResult(ChestOpenResult chestOpenResult, Map<Integer, Integer> gunCountMap);
+    void mergeGunCountMapToChestOpenResult(ChestOpenResult chestOpenResult, Map<Integer, Integer> gunCountMap, float additionValue);
 
     /**
      * 合并子弹奖励
@@ -509,7 +509,7 @@ public interface ObsoleteUserDataService {
 
     double calculatePlayerCultivateScore(String userUid, String gameVersion);
 
-    void recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(UserData userData, Map<Integer, Integer> gunCountMap, String gameVersion);
+    void recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(UserData userData, Map<Integer, Integer> gunCountMap, String gameVersion, float additionValue);
 
     /**
      * 玩家购买vip商品

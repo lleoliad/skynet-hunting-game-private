@@ -1,6 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
@@ -46,6 +49,9 @@ public class VipV3Controller {
     @Resource
     private ChestService chestService;
 
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
+
     @PostMapping("/vipV3-claimSVipV3DailyRewards")
     @ApiOperation("获取svip v3每日奖励")
     @RepeatSubmit(interval = 60000)
@@ -90,9 +96,12 @@ public class VipV3Controller {
                 }
             });
 
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
+
             // 橙卡枪
             Integer playerHighestUnlockedChapterID = obsoleteUserDataService.playerHighestUnlockedChapterID(userData);
-            Map<Integer, Integer> gunRewards = chestService.extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, VipV3Config.svipDailyRewardOrangeGunCount, request.getGameVersion(), false, null);
+            Map<Integer, Integer> gunRewards = chestService.extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, VipV3Config.svipDailyRewardOrangeGunCount, request.getGameVersion(), false, null, additionValue);
 
             List<Integer> newUnlockedGunIDs = new ArrayList<>();
             obsoleteUserDataService.addGunToUserData(userData, gunRewards, newUnlockedGunIDs, request.getGameVersion());

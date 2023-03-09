@@ -2,6 +2,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 import org.skynet.components.hunting.user.domain.ChestData;
@@ -49,6 +52,9 @@ public class ChestController {
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
 //    @GetMapping("open/progress")
 //    @ApiOperation("打开章节箱子")
@@ -248,6 +254,9 @@ public class ChestController {
             obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
+
             ChestOpenResult openResult = new ChestOpenResult();
 
             List<ChapterWinChestData> chapterWinChestsData = userData.getChapterWinChestsData();
@@ -299,7 +308,7 @@ public class ChestController {
             long tempDiamond = userData.getDiamond() - diamondPrice;
             userData.setDiamond(tempDiamond);
 
-            openResult = chestService.openChest(userData, BeanUtil.copyProperties(chestData, ChestData.class), request.getGameVersion());
+            openResult = chestService.openChest(userData, BeanUtil.copyProperties(chestData, ChestData.class), request.getGameVersion(), additionValue);
             userData.getChapterWinChestsData().set(request.getSlotIndex(), null);
 
             userData.getChapterWinChestsData().removeIf(Objects::isNull);
@@ -352,6 +361,9 @@ public class ChestController {
             obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
+
             FreeChestData[] freeChestsData = userData.getFreeChestsData();
             if (freeChestsData == null || freeChestsData.length == 0 || freeChestsData[0] == null) {
                 throw new BusinessException("玩家" + userData.getUuid() + "没有免费箱子数据");
@@ -364,7 +376,7 @@ public class ChestController {
                 throw new BusinessException("玩家" + userData.getUuid() + "打开免费箱子,但是时间不满足.箱子" + firstChestData.getAvailableUnixTime() + ",now" + unixTimeNow);
             }
 
-            ChestOpenResult openResult = chestService.openChest(userData, BeanUtil.copyProperties(firstChestData, ChestData.class), request.getGameVersion());
+            ChestOpenResult openResult = chestService.openChest(userData, BeanUtil.copyProperties(firstChestData, ChestData.class), request.getGameVersion(), additionValue);
             log.info("打开免费箱子," + JSONObject.toJSONString(openResult));
 
             freeChestsData[0] = null;

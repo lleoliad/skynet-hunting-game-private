@@ -38,7 +38,7 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
         ChestOpenResult chestOpenResult = chestService.openChest(userDataResult.getData(), ChestData.builder()
                 .chestType(openChestQuery.getChestType())
                 .level(openChestQuery.getLevel())
-                .build(), openChestQuery.getVersion());
+                .build(), openChestQuery.getVersion(), openChestQuery.getRankAdditionValue());
 
         userFeignService.update(UserDataUpdateQuery.builder().userId(openChestQuery.getUserId()).userData(userData).build());
         ClientUserData clientUserData = ClientUserData.builder().build();

@@ -13,7 +13,7 @@ public interface LuckyWheelService {
      * @param gameVersion
      * @return
      */
-    LuckyWheelSpinReward spinLuckyWheelOnceReward(String userUid, String gameVersion);
+    LuckyWheelSpinReward spinLuckyWheelOnceReward(String userUid, String gameVersion, float additionValue);
 
     /**
      * 尝试刷新转盘的内容和累计奖励
@@ -67,5 +67,5 @@ public interface LuckyWheelService {
      * @param userUid
      * @param gameVersion
      */
-    LuckyWheelV2SpinRewardBO spinLuckyWheelV2Reward(String userUid, String gameVersion);
+    LuckyWheelV2SpinRewardBO spinLuckyWheelV2Reward(String userUid, String gameVersion, float additionValue);
 }

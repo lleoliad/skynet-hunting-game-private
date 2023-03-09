@@ -360,7 +360,7 @@ public class ChestServiceImpl implements ChestService {
     }
 
     @Override
-    public ChestOpenResult openChest(UserData userData, ChestData chestData, String gameVersion) {
+    public ChestOpenResult openChest(UserData userData, ChestData chestData, String gameVersion, float additionValue) {
 
         Map<String, ChestContentMapTableValue> chestContentMapTable = GameEnvironment.chestContentMapTableMap.get(gameVersion);
         ChestContentMapTableValue chestContentMapTableValue = null;
@@ -398,14 +398,14 @@ public class ChestServiceImpl implements ChestService {
         //gun
         Map<Integer, Integer> gunRewardMap = new HashMap<>();
         if (chestContentMapTableValue.getEpicGunCount() > 0) {
-            gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Epic, chestData.getLevel(), chestContentMapTableValue.getEpicGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap);
+            gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Epic, chestData.getLevel(), chestContentMapTableValue.getEpicGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap, additionValue);
         }
 
         if (chestContentMapTableValue.getRareGunCount() > 0) {
-            gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, chestData.getLevel(), chestContentMapTableValue.getRareGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap);
+            gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, chestData.getLevel(), chestContentMapTableValue.getRareGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap, additionValue);
         }
         if (chestContentMapTableValue.getRandomGunCount() > 0) {
-            gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Random, chestData.getLevel(), chestContentMapTableValue.getRandomGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap);
+            gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Random, chestData.getLevel(), chestContentMapTableValue.getRandomGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap, additionValue);
         }
 
         if (gunRewardMap.size() > 0) {
@@ -551,8 +551,8 @@ public class ChestServiceImpl implements ChestService {
     }
 
     @Override
-    public Map<Integer, Integer> extractGunRewardsFromGunLibraryAsync(UserData userData, GunLibraryType gunLibraryType, int chestLevel, int getGunCount, boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, String gameVersion) {
-        getGunCount = getGunCount + (int) Math.ceil(getGunCount * 0.2);
+    public Map<Integer, Integer> extractGunRewardsFromGunLibraryAsync(UserData userData, GunLibraryType gunLibraryType, int chestLevel, int getGunCount, boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, String gameVersion, float additionValue) {
+        getGunCount = getGunCount + (int) Math.ceil(getGunCount * additionValue);
         //确保数据存在
         obsoleteUserDataService.upgradePlayerChestOpenIndexMapData(userData);
 
@@ -733,8 +733,8 @@ public class ChestServiceImpl implements ChestService {
      * 从枪械类型库中，抽出对应数量的枪械奖励，并将枪械id顺序放入结果中
      */
     @Override
-    public Map<Integer, Integer> extractGunRewardsFromGunLibrary(UserData userData, GunLibraryType gunLibraryType, Integer chestLevel, Integer getGunCount, String gameVersion, Boolean enableDrawCountRequires, Map<Integer, Integer> resultMap) {
-        getGunCount = getGunCount + (int) Math.ceil(getGunCount * 0.2);
+    public Map<Integer, Integer> extractGunRewardsFromGunLibrary(UserData userData, GunLibraryType gunLibraryType, Integer chestLevel, Integer getGunCount, String gameVersion, Boolean enableDrawCountRequires, Map<Integer, Integer> resultMap, float additionValue) {
+        getGunCount = getGunCount + (int) Math.ceil(getGunCount * additionValue);
 
         resultMap = CollectionUtils.isEmpty(resultMap) ? new HashMap<>() : resultMap;
 

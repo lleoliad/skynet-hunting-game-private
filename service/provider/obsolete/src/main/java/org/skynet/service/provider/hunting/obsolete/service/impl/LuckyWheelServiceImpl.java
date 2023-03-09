@@ -44,7 +44,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
     private ChestService chestService;
 
     @Override
-    public LuckyWheelSpinReward spinLuckyWheelOnceReward(String userUid, String gameVersion) {
+    public LuckyWheelSpinReward spinLuckyWheelOnceReward(String userUid, String gameVersion, float additionValue) {
 
         UserData userData = GameEnvironment.userDataMap.get(userUid);
         LuckyWheelData luckyWheelData = userData.getLuckyWheelData();
@@ -136,7 +136,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
             //宝箱奖励
             ChestData chestData = new ChestData(NanoIdUtils.randomNanoId(30), rewardChestType, luckyWheelChapterId, TimeUtils.getUnixTimeSecond());
 
-            ChestOpenResult chestOpenReward = chestService.openChest(userData, chestData, gameVersion);
+            ChestOpenResult chestOpenReward = chestService.openChest(userData, chestData, gameVersion, additionValue);
             log.info("转盘获得宝箱奖励" + JSONObject.toJSONString(chestOpenReward));
             return new LuckyWheelSpinReward(targetRewardIndex, null, chestOpenReward);
         } else {
@@ -262,7 +262,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
     }
 
     @Override
-    public LuckyWheelV2SpinRewardBO spinLuckyWheelV2Reward(String userUid, String gameVersion) {
+    public LuckyWheelV2SpinRewardBO spinLuckyWheelV2Reward(String userUid, String gameVersion, float additionValue) {
         UserData userData = GameEnvironment.userDataMap.get(userUid);
         LuckyWheelV2Data luckyWheelV2Data = userData.getLuckyWheelV2Data();
 
@@ -374,7 +374,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                  * 从random枪库中抽卡
                  * */
                 Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
-                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Random, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion);
+                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Random, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, additionValue);
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
@@ -391,7 +391,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                  * 从common枪库中抽卡，都是蓝卡
                  * */
                 Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
-                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Common, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion);
+                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Common, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, additionValue);
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
@@ -408,7 +408,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                  * 从common枪库中抽卡，都是蓝卡
                  * */
                 Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
-                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion);
+                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, additionValue);
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
@@ -425,7 +425,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                  * 从common枪库中抽卡，都是蓝卡
                  * */
                 Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
-                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Epic, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion);
+                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Epic, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, additionValue);
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
@@ -469,7 +469,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
             }
             case BronzeChest: {
                 ChestData chestData = new ChestData(NanoIdUtils.randomNanoId(30), ChestType.BRONZE.getType(), playerHighestUnlockedChapterID, TimeUtils.getUnixTimeSecond());
-                ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, gameVersion);
+                ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, gameVersion, additionValue);
                 spinRewardResult.setChestOpenResult(chestOpenResult);
 //                userData.setCoin(userData.getCoin() + rewardCount);
 //                spinRewardResult.setRewardCoin(rewardCount);
@@ -477,7 +477,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
             }
             case SilverChest: {
                 ChestData chestData = new ChestData(NanoIdUtils.randomNanoId(30), ChestType.SILVER.getType(), playerHighestUnlockedChapterID, TimeUtils.getUnixTimeSecond());
-                ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, gameVersion);
+                ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, gameVersion, additionValue);
                 spinRewardResult.setChestOpenResult(chestOpenResult);
 //                userData.setCoin(userData.getCoin() + rewardCount);
 //                spinRewardResult.setRewardCoin(rewardCount);

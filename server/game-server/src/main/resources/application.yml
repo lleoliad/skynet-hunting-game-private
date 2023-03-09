@@ -24,8 +24,6 @@ skynet:
         addCoinTopic: add-coin-topic
       tag: RankLeague
 
-
-
 server:
   config:
     clientGameVersion: [1.0.7,1.0.9,1.0.10,1.0.11,1.0.12,1.0.13,1.0.14,1.1.0]
@@ -38,7 +36,7 @@ server:
     cloudUrl: "https://us-central1-wildhunthuntingclash.cloudfunctions.net"
     fightUrl: "http://localhost:17960"
     aiUrl: "http://47.88.90.222:9090"
-    rankUrl: "http://localhost:17920/skynet/service/provider/hunting/rank/league/player"
+#    rankUrl: "http://localhost:17920/skynet/service/provider/hunting/rank/league/player"
 
 google:
   config:

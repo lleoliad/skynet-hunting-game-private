@@ -3,6 +3,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.History;
 import org.skynet.components.hunting.user.domain.UserPendingPurchaseData;
@@ -56,6 +59,9 @@ public class IAPController {
 
     @Resource
     private TopUpOrderService topUpOrderService;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
     @PostMapping("iap-preparePurchase")
     @ApiOperation(value = "准备购买", notes = "记录玩家正在发起一次购买,玩家完成或者失败之后,清除该记录")
@@ -235,7 +241,10 @@ public class IAPController {
                 obsoleteUserDataService.checkUserDataExist(request.getUserUid());
                 UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
-                purchaseReward = iapService.iapPurchaseContentDelivery(userData.getUuid(), validateResult.getProductName(), pendingCustomOrder.getAdditionalParametersJSON(), request.getGameVersion());
+                Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+                float additionValue = rankAddition.getData();
+
+                purchaseReward = iapService.iapPurchaseContentDelivery(userData.getUuid(), validateResult.getProductName(), pendingCustomOrder.getAdditionalParametersJSON(), request.getGameVersion(), additionValue);
 
                 iapService.clearPendingPurchaseInUserData(userData, pendingCustomOrder.getCustomOrderId());
 

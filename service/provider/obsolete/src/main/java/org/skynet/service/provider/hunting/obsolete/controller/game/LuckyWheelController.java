@@ -1,5 +1,8 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
@@ -45,6 +48,8 @@ public class LuckyWheelController {
     @Resource
     private LuckyWheelService luckyWheelService;
 
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
     @PostMapping("luckyWheel-luckyWheelSpin")
     @ApiOperation("转动一次幸运转盘")
@@ -60,9 +65,11 @@ public class LuckyWheelController {
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
             Integer cumulativeDiamondRewardCount = null;
 
-
             obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
+
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
 
             if (Objects.isNull(userData.getLuckyWheelData())) {
                 throw new BusinessException("玩家没有luckyWheelData数据");
@@ -102,7 +109,7 @@ public class LuckyWheelController {
                     luckyWheelService.refreshNextFreeSpinTime(request.getUserUid(), request.getGameVersion());
                 }
 
-                LuckyWheelSpinReward singleSpinReward = luckyWheelService.spinLuckyWheelOnceReward(request.getUserUid(), request.getGameVersion());
+                LuckyWheelSpinReward singleSpinReward = luckyWheelService.spinLuckyWheelOnceReward(request.getUserUid(), request.getGameVersion(), additionValue);
                 spinRewards.add(singleSpinReward);
                 spinCount = 1;
             } else {
@@ -114,7 +121,7 @@ public class LuckyWheelController {
                 //一次性加完
                 for (Integer i = 0; i < luckyWheelData.getVipSpinCount(); i++) {
 
-                    LuckyWheelSpinReward singleSpinReward = luckyWheelService.spinLuckyWheelOnceReward(request.getUserUid(), request.getGameVersion());
+                    LuckyWheelSpinReward singleSpinReward = luckyWheelService.spinLuckyWheelOnceReward(request.getUserUid(), request.getGameVersion(), additionValue);
                     spinRewards.add(singleSpinReward);
                 }
 

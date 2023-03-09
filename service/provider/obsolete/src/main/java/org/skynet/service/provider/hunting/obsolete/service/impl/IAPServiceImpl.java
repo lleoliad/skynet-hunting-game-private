@@ -274,7 +274,7 @@ public class IAPServiceImpl implements IAPService {
 
 
     @Override
-    public IAPPurchaseReward iapPurchaseContentDelivery(String uuid, String productName, String additionalParametersJSON, String gameVersion) {
+    public IAPPurchaseReward iapPurchaseContentDelivery(String uuid, String productName, String additionalParametersJSON, String gameVersion, float additionValue) {
 
         JSONObject additionalParameter = Objects.isNull(additionalParametersJSON) ? new JSONObject() : JSONObject.parseObject(additionalParametersJSON);
         UserData userData = GameEnvironment.userDataMap.get(uuid);
@@ -358,7 +358,7 @@ public class IAPServiceImpl implements IAPService {
             if (promotionPackageData != null) {
 
                 log.info("内购活动礼包,数据: " + promotionPackageData);
-                ChestOpenResult chestOpenResult = purchasePromotionEventPackage(uuid, promotionPackageData, gameVersion);
+                ChestOpenResult chestOpenResult = purchasePromotionEventPackage(uuid, promotionPackageData, gameVersion, additionValue);
                 result.setChestOpenResult(chestOpenResult);
 
                 //这里update必须+1
@@ -379,7 +379,7 @@ public class IAPServiceImpl implements IAPService {
                             String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + giftPackagesV2Datum.getPackageType() + "_" + giftPackagesV2Datum.getPackageId();
                             Map<String, PromotionGiftPackageV2TableValue> packageV2TableValueMap = GameEnvironment.promotionGiftPackageV2TableMap.get(gameVersion);
                             PromotionGiftPackageV2TableValue promotionEventPackageV2 = packageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
-                            chestOpenResult = purchasePromotionEventPackageV2(userData, promotionEventPackageV2, purchaseKey, gameVersion);
+                            chestOpenResult = purchasePromotionEventPackageV2(userData, promotionEventPackageV2, purchaseKey, gameVersion, additionValue);
 
                             result.setChestOpenResult(chestOpenResult);
 
@@ -393,7 +393,7 @@ public class IAPServiceImpl implements IAPService {
                             String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + promotionEventPackageGroupV2.getPackageTypes().get(0) + "_" + giftPackagesV2Datum.getPackageId();
                             Map<String, PromotionGunGiftPackageV2TableValue> gunGiftPackageV2TableValueMap = GameEnvironment.promotionGunGiftPackageV2TableMap.get(gameVersion);
                             PromotionGunGiftPackageV2TableValue gunGiftPackageV2 = gunGiftPackageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
-                            chestOpenResult = promotionGunPackageRewardDelivery(gunGiftPackageV2, userData, gameVersion, purchaseKey);
+                            chestOpenResult = promotionGunPackageRewardDelivery(gunGiftPackageV2, userData, gameVersion, purchaseKey, additionValue);
                             result.setChestOpenResult(chestOpenResult);
 
                             //这里update必须+1
@@ -446,7 +446,7 @@ public class IAPServiceImpl implements IAPService {
                 if (tableValue.getProductId().equals(productName)) {
 
                     log.info("内购章节礼包" + tableValue.getProductId() + ",id" + tableValue.getId());
-                    ChestOpenResult chestOpenResult = purchaseChapterBonusPackage(uuid, tableValue.getId(), gameVersion);
+                    ChestOpenResult chestOpenResult = purchaseChapterBonusPackage(uuid, tableValue.getId(), gameVersion, additionValue);
                     result.setChestOpenResult(chestOpenResult);
 
                     //这里update必须+1
@@ -473,7 +473,7 @@ public class IAPServiceImpl implements IAPService {
                     ChapterGunGiftPackageTableValue tableValue = chapterGunGiftPackageTable.get(key);
                     if (tableValue.getProductId().equals(productName)) {
                         log.info("内购章节礼包" + tableValue.getProductId() + ",章节id" + tableValue.getId());
-                        IAPPurchaseReward iapPurchaseReward = chapterGunPackageRewardDelivery(uuid, tableValue.getId(), gameVersion);
+                        IAPPurchaseReward iapPurchaseReward = chapterGunPackageRewardDelivery(uuid, tableValue.getId(), gameVersion, additionValue);
                         ChestOpenResult chestOpenResult = iapPurchaseReward.getChestOpenResult();
                         result.setChestOpenResult(chestOpenResult);
 
@@ -527,7 +527,7 @@ public class IAPServiceImpl implements IAPService {
             //子弹礼包
             int bulletGiftPackageId = additionalParameter.getIntValue("bulletGiftPackageId");
             if (bulletGiftPackageId > 0) {
-                IAPPurchaseReward iapPurchaseReward = bulletPackageRewardDelivery(uuid, bulletGiftPackageId, gameVersion);
+                IAPPurchaseReward iapPurchaseReward = bulletPackageRewardDelivery(uuid, bulletGiftPackageId, gameVersion, additionValue);
                 result.setChestOpenResult(iapPurchaseReward.getChestOpenResult());
                 increaseUserIapProductPurchaseCount(uuid, String.format("%s_%s_%s", IAPProductPrefix.bulletGiftPackage, productName, bulletGiftPackageId));
                 //这里update必须+1
@@ -541,7 +541,7 @@ public class IAPServiceImpl implements IAPService {
             //五日枪械礼包
             int fifthDayGunGiftPackageId = additionalParameter.getIntValue("fifthDayGunGiftPackageId");
             if (fifthDayGunGiftPackageId > 0) {
-                IAPPurchaseReward iapPurchaseReward = fifthDayGunGiftPackageRewardDelivery(uuid, fifthDayGunGiftPackageId, gameVersion);
+                IAPPurchaseReward iapPurchaseReward = fifthDayGunGiftPackageRewardDelivery(uuid, fifthDayGunGiftPackageId, gameVersion, additionValue);
                 result.setChestOpenResult(iapPurchaseReward.getChestOpenResult());
                 //这里update必须+1
                 chestService.saveChestOpenResult(result.getChestOpenResult(), uuid, userData.getUpdateCount() + 1);
@@ -555,7 +555,7 @@ public class IAPServiceImpl implements IAPService {
             int gunGiftPackageId = additionalParameter.getIntValue("gunGiftPackageId");
             if (gunGiftPackageId > 0) {
                 //枪械礼包
-                IAPPurchaseReward iapPurchaseReward = gunPackageRewardDelivery(uuid, gunGiftPackageId, gameVersion);
+                IAPPurchaseReward iapPurchaseReward = gunPackageRewardDelivery(uuid, gunGiftPackageId, gameVersion, additionValue);
                 result.setChestOpenResult(iapPurchaseReward.getChestOpenResult());
                 //这里update必须+1
                 chestService.saveChestOpenResult(result.getChestOpenResult(), uuid, userData.getUpdateCount() + 1);
@@ -578,7 +578,7 @@ public class IAPServiceImpl implements IAPService {
         return result;
     }
 
-    private ChestOpenResult promotionGunPackageRewardDelivery(PromotionGunGiftPackageV2TableValue packageTableValue, UserData userData, String gameVersion, String purchaseKey) {
+    private ChestOpenResult promotionGunPackageRewardDelivery(PromotionGunGiftPackageV2TableValue packageTableValue, UserData userData, String gameVersion, String purchaseKey, float additionValue) {
         List<String> eventPackagesV2Keys = userData.getServerOnly().getPurchasedPromotionEventPackagesV2Keys();
 
         if (eventPackagesV2Keys.contains(purchaseKey)) {
@@ -625,10 +625,10 @@ public class IAPServiceImpl implements IAPService {
 
         Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount());
         List<Integer> newUnlockGunIds = new ArrayList<>();
-        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion);
+        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
-        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion);
-        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap);
+        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
+        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
 
         //记录购买的礼包
         eventPackagesV2Keys.add(purchaseKey);
@@ -641,7 +641,7 @@ public class IAPServiceImpl implements IAPService {
         return chestOpenResult;
     }
 
-    private ChestOpenResult purchasePromotionEventPackageV2(UserData userData, PromotionGiftPackageV2TableValue promotionEventPackageV2, String purchaseKey, String gameVersion) {
+    private ChestOpenResult purchasePromotionEventPackageV2(UserData userData, PromotionGiftPackageV2TableValue promotionEventPackageV2, String purchaseKey, String gameVersion, float additionValue) {
 
         List<String> packagesV2Keys = userData.getServerOnly().getPurchasedPromotionEventPackagesV2Keys();
         if (packagesV2Keys.contains(purchaseKey)) {
@@ -672,10 +672,10 @@ public class IAPServiceImpl implements IAPService {
             obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData,
                     promotionEventPackageV2.getRewardGunIDs(),
                     promotionEventPackageV2.getRewardGunCounts(),
-                    chestOpenResult.getNewUnlockedGunIDs(), gameVersion);
+                    chestOpenResult.getNewUnlockedGunIDs(), gameVersion, additionValue);
             obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult,
-                    CommonUtils.combineGunIdAndCountArrayToGunCountMap(promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts()));
-            obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, CommonUtils.combineGunIdAndCountArrayToGunCountMap(promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts()), gameVersion);
+                    CommonUtils.combineGunIdAndCountArrayToGunCountMap(promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts()), additionValue);
+            obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, CommonUtils.combineGunIdAndCountArrayToGunCountMap(promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts()), gameVersion, additionValue);
         }
 
         //子弹
@@ -699,7 +699,7 @@ public class IAPServiceImpl implements IAPService {
         return chestOpenResult;
     }
 
-    private ChestOpenResult promotionGunPackageRewardDelivery(String uuid, PromotionEventPackageData purchasePackageData, String gameVersion) {
+    private ChestOpenResult promotionGunPackageRewardDelivery(String uuid, PromotionEventPackageData purchasePackageData, String gameVersion, float additionValue) {
         UserData userData = GameEnvironment.userDataMap.get(uuid);
         List<PromotionGiftPackageV2Data> promotionGiftPackagesV2Data = userData.getPromotionGiftPackagesV2Data();
         if (promotionGiftPackagesV2Data == null || promotionGiftPackagesV2Data.size() == 0) {
@@ -758,10 +758,10 @@ public class IAPServiceImpl implements IAPService {
 
         Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount());
         List<Integer> newUnlockGunIds = new ArrayList<>();
-        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion);
+        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
-        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion);
-        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap);
+        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
+        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
 
         //记录购买的礼包
         purchasedPromotionEventPackagesKeys.add(purchasePackageData.getServer_only_purchaseKey());
@@ -775,7 +775,7 @@ public class IAPServiceImpl implements IAPService {
 
 
     @Override
-    public ChestOpenResult purchasePromotionEventPackage(String uuid, PromotionEventPackageData purchasePackageData, String gameVersion) {
+    public ChestOpenResult purchasePromotionEventPackage(String uuid, PromotionEventPackageData purchasePackageData, String gameVersion, float additionValue) {
 
         UserData userData = GameEnvironment.userDataMap.get(uuid);
         List<PromotionEventPackageData> promotionEventPackagesData = userData.getPromotionEventPackagesData();
@@ -817,10 +817,10 @@ public class IAPServiceImpl implements IAPService {
             obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData,
                     tableValue.getRewardGunIDs(),
                     tableValue.getRewardGunCounts(),
-                    chestOpenResult.getNewUnlockedGunIDs(), gameVersion);
+                    chestOpenResult.getNewUnlockedGunIDs(), gameVersion, additionValue);
             obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult,
-                    CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()));
-            obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()), gameVersion);
+                    CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()), additionValue);
+            obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()), gameVersion, additionValue);
         }
 
         //子弹
@@ -848,7 +848,7 @@ public class IAPServiceImpl implements IAPService {
     }
 
     @Override
-    public ChestOpenResult purchaseChapterBonusPackage(String uuid, Integer packageId, String gameVersion) {
+    public ChestOpenResult purchaseChapterBonusPackage(String uuid, Integer packageId, String gameVersion, float additionValue) {
 
         UserData userData = GameEnvironment.userDataMap.get(uuid);
 
@@ -891,9 +891,9 @@ public class IAPServiceImpl implements IAPService {
         chestOpenResult.setDiamond(tableValue.getDiamond());
         if (tableValue.getRewardGunIDs().size() > 0) {
 
-            obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts(), chestOpenResult.getNewUnlockedGunIDs(), gameVersion);
+            obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts(), chestOpenResult.getNewUnlockedGunIDs(), gameVersion, additionValue);
 
-            obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()));
+            obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()), additionValue);
         }
 
 
@@ -962,7 +962,7 @@ public class IAPServiceImpl implements IAPService {
     }
 
     @Override
-    public IAPPurchaseReward bulletPackageRewardDelivery(String uuid, int bulletGiftPackageId, String gameVersion) {
+    public IAPPurchaseReward bulletPackageRewardDelivery(String uuid, int bulletGiftPackageId, String gameVersion, float additionValue) {
         log.info("购买子弹礼包：" + bulletGiftPackageId);
         UserData userData = GameEnvironment.userDataMap.get(uuid);
         List<PlayerBulletGiftPackageData> availableBulletGiftPackageData = userData.getAvailableBulletGiftPackageData();
@@ -986,7 +986,7 @@ public class IAPServiceImpl implements IAPService {
                 purchaseBulletGiftPackageData.getChestLevel(),
                 TimeUtils.getUnixTimeSecond());
 
-        ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, gameVersion);
+        ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, gameVersion, additionValue);
         if (tableValue.getRewardBulletId().size() != tableValue.getRewardBulletCount().size()) {
             throw new BusinessException("子弹礼包id" + tableValue.getId() + "rewardBulletIdArray 和 rewardBulletCountArray 长度不一致");
         }
@@ -1018,7 +1018,7 @@ public class IAPServiceImpl implements IAPService {
     }
 
     @Override
-    public IAPPurchaseReward fifthDayGunGiftPackageRewardDelivery(String uuid, int packageId, String gameVersion) {
+    public IAPPurchaseReward fifthDayGunGiftPackageRewardDelivery(String uuid, int packageId, String gameVersion, float additionValue) {
         log.info("五日枪械礼包：" + packageId);
         UserData userData = GameEnvironment.userDataMap.get(uuid);
 
@@ -1080,10 +1080,10 @@ public class IAPServiceImpl implements IAPService {
 
         Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount());
         List<Integer> newUnlockGunIds = new ArrayList<>();
-        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion);
+        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
-        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion);
-        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap);
+        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
+        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
 
         // TODO: 2023/1/2 同上面方法一样，需要核实
         final PlayerFifthDayGunGiftPackageData playerFifthDayGunGiftPackageData = targetPackageData;
@@ -1101,7 +1101,7 @@ public class IAPServiceImpl implements IAPService {
 
 
     @Override
-    public IAPPurchaseReward chapterGunPackageRewardDelivery(String uuid, int packageId, String gameVersion) {
+    public IAPPurchaseReward chapterGunPackageRewardDelivery(String uuid, int packageId, String gameVersion, float additionValue) {
         log.info("章节枪械礼包：" + packageId);
         UserData userData = GameEnvironment.userDataMap.get(uuid);
 
@@ -1168,10 +1168,10 @@ public class IAPServiceImpl implements IAPService {
 
         Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount());
         List<Integer> newUnlockGunIds = new ArrayList<>();
-        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion);
+        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
-        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion);
-        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap);
+        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
+        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
 
         List<ChapterBonusPackageData> bonusPackagesData = userData.getChapterBonusPackagesData();
         ChapterBonusPackageData finalTargetPackageData = targetPackageData;
@@ -1188,7 +1188,7 @@ public class IAPServiceImpl implements IAPService {
     }
 
     @Override
-    public IAPPurchaseReward gunPackageRewardDelivery(String uuid, int packageId, String gameVersion) {
+    public IAPPurchaseReward gunPackageRewardDelivery(String uuid, int packageId, String gameVersion, float additionValue) {
         log.info("枪械礼包：" + packageId);
         UserData userData = GameEnvironment.userDataMap.get(uuid);
 
@@ -1251,10 +1251,10 @@ public class IAPServiceImpl implements IAPService {
 
         Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount());
         List<Integer> newUnlockGunIds = new ArrayList<>();
-        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion);
+        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
-        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion);
-        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap);
+        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
+        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
 
         // TODO: 2023/1/2 同上面方法一样，需要核实
         final PlayerGunGiftPackageData playerGunGiftPackageData = targetPackageData;

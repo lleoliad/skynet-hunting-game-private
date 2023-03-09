@@ -2,6 +2,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.exception.Assert;
 import org.skynet.service.provider.hunting.obsolete.common.result.R;
 import org.skynet.service.provider.hunting.obsolete.common.result.ResponseEnum;
@@ -48,6 +51,9 @@ public class GMOperationController {
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
 
 //    @PostMapping("check/integrity")
@@ -377,9 +383,12 @@ public class GMOperationController {
             UserData userData = GameEnvironment.userDataMap.get(userInfo);
             String gameVersion = userData.getServerOnly().getLastLoginClientVersion();
 
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
+
             PendingPurchaseOrder pendingCustomOrder = iapService.getPendingCustomOrder(customOrderId);
 
-            purchaseReward = iapService.iapPurchaseContentDelivery(userInfo, productName, pendingCustomOrder.getAdditionalParametersJSON(), gameVersion);
+            purchaseReward = iapService.iapPurchaseContentDelivery(userInfo, productName, pendingCustomOrder.getAdditionalParametersJSON(), gameVersion, additionValue);
             map.put(userInfo, purchaseReward);
             topUpOrder.setOrderOmitState(OmitState.Supplement.getType());
 

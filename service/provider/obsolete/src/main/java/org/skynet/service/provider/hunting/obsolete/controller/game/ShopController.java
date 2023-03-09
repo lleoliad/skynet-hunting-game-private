@@ -1,6 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.NanoIdUtils;
@@ -49,6 +52,9 @@ public class ShopController {
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
 //    @GetMapping("coin")
 //    @ApiOperation("购买金币")
@@ -113,6 +119,9 @@ public class ShopController {
             obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
+            Result<Float> rankAddition = rankLeagueFeignService.getRankAddition(GetRankAdditionQuery.builder().userId(request.getUserUid()).build());
+            float additionValue = rankAddition.getData();
+
             Integer chestLevel = obsoleteUserDataService.playerHighestUnlockedChapterID(userData);
             Map<String, ShopChestsTableValue> shopChestsTable = GameEnvironment.shopChestsTableMap.get(request.getGameVersion());
             ShopChestsTableValue tableValue = shopChestsTable.get(String.valueOf(request.getShopChestTableId()));
@@ -137,7 +146,7 @@ public class ShopController {
                     TimeUtils.getUnixTimeSecond()
             );
 
-            ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, request.getGameVersion());
+            ChestOpenResult chestOpenResult = chestService.openChest(userData, chestData, request.getGameVersion(), additionValue);
 
             sendToClientData.setCoin(userData.getCoin());
             sendToClientData.setDiamond(userData.getDiamond());

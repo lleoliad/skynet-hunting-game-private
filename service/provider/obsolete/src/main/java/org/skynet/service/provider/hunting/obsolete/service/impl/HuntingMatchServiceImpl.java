@@ -3,6 +3,7 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.skynet.components.hunting.robot.data.RobotPlayerBasicInfoBO;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.GetPlayerRankQuery;
@@ -284,11 +285,11 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
 
         Result<Integer> playerRankResult = rankLeagueFeignService.getPlayerRank(GetPlayerRankQuery.builder().userId(userData.getUuid()).build());
         if (playerRankResult.isSuccess()) {
-            Result<RobotPlayerInfoBO> robotPlayerInfoBOResult = robotFactoryFeignService.randomGet(RobotsQuery.builder().rank(playerRankResult.getData()).build());
-            if (robotPlayerInfoBOResult.isSuccess()) {
-                RobotPlayerInfoBO robotPlayerInfoBO = robotPlayerInfoBOResult.getData();
-                opponentPlayerInfo.setName(robotPlayerInfoBO.getNickname());
-                opponentPlayerInfo.setIcon_base64(robotPlayerInfoBO.getHeadPic());
+            Result<RobotPlayerBasicInfoBO> robotPlayerBasicInfoBOResult = robotFactoryFeignService.randomGet(RobotsQuery.builder().rank(playerRankResult.getData()).build());
+            if (robotPlayerBasicInfoBOResult.isSuccess()) {
+                RobotPlayerBasicInfoBO robotPlayerBasicInfoBO = robotPlayerBasicInfoBOResult.getData();
+                opponentPlayerInfo.setName(robotPlayerBasicInfoBO.getNickname());
+                opponentPlayerInfo.setIcon_base64(robotPlayerBasicInfoBO.getHeadPic());
                 opponentPlayerInfo.setUseDefaultIcon(false);
                 return opponentPlayerInfo;
             }

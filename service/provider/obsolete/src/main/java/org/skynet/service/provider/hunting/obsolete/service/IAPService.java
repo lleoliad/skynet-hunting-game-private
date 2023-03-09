@@ -48,8 +48,6 @@ public interface IAPService {
 
     /**
      * 验证google play订单
-     *
-     * @param params @return
      */
     ReceiptValidateResult googlePlayReceiptValidate(IapReceiptValidateDTO request);
 
@@ -61,7 +59,7 @@ public interface IAPService {
      * @param gameVersion
      * @return
      */
-    IAPPurchaseReward iapPurchaseContentDelivery(String uuid, String productName, String additionalParametersJSON, String gameVersion);
+    IAPPurchaseReward iapPurchaseContentDelivery(String uuid, String productName, String additionalParametersJSON, String gameVersion, float additionValue);
 
     /**
      * 购买活动礼包
@@ -70,7 +68,7 @@ public interface IAPService {
      * @param gameVersion
      * @return
      */
-    ChestOpenResult purchasePromotionEventPackage(String uuid, PromotionEventPackageData purchasePackageData, String gameVersion);
+    ChestOpenResult purchasePromotionEventPackage(String uuid, PromotionEventPackageData purchasePackageData, String gameVersion, float additionValue);
 
     /**
      * 购买章节礼包
@@ -80,7 +78,7 @@ public interface IAPService {
      * @param gameVersion
      * @return
      */
-    ChestOpenResult purchaseChapterBonusPackage(String uuid, Integer packageId, String gameVersion);
+    ChestOpenResult purchaseChapterBonusPackage(String uuid, Integer packageId, String gameVersion, float additionValue);
 
     /**
      * 清除掉商品的开始购买记录
@@ -113,7 +111,7 @@ public interface IAPService {
      * @param gameVersion
      * @return
      */
-    IAPPurchaseReward bulletPackageRewardDelivery(String uuid, int bulletGiftPackageId, String gameVersion);
+    IAPPurchaseReward bulletPackageRewardDelivery(String uuid, int bulletGiftPackageId, String gameVersion, float additionValue);
 
     /**
      * 五日枪械礼包内购奖励发放
@@ -123,7 +121,7 @@ public interface IAPService {
      * @param gameVersion
      * @return
      */
-    IAPPurchaseReward fifthDayGunGiftPackageRewardDelivery(String uuid, int packageId, String gameVersion);
+    IAPPurchaseReward fifthDayGunGiftPackageRewardDelivery(String uuid, int packageId, String gameVersion, float additionValue);
 
 
     /**
@@ -134,7 +132,7 @@ public interface IAPService {
      * @param gameVersion
      * @return
      */
-    IAPPurchaseReward chapterGunPackageRewardDelivery(String uuid, int packageId, String gameVersion);
+    IAPPurchaseReward chapterGunPackageRewardDelivery(String uuid, int packageId, String gameVersion, float additionValue);
 
     /**
      * 枪械礼包内购奖励发放
@@ -144,7 +142,7 @@ public interface IAPService {
      * @param gameVersion
      * @return
      */
-    IAPPurchaseReward gunPackageRewardDelivery(String uuid, int packageId, String gameVersion);
+    IAPPurchaseReward gunPackageRewardDelivery(String uuid, int packageId, String gameVersion, float additionValue);
 
     /**
      * 根据玩家过往内购数据，推荐礼包弹出的时候，应该选择哪个价位的
