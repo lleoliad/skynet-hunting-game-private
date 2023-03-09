@@ -16,6 +16,12 @@ import java.io.Serializable;
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler"})
 public class OpenChestQuery implements Serializable {
 
+    @ApiModelProperty(value = "版本号")
+    private String version;
+
+    @ApiModelProperty(value = "用户ID")
+    private String userId;
+
     @ApiModelProperty(value = "箱子id")
     String uid;
 
