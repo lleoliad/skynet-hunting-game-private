@@ -387,7 +387,7 @@ public class ChestServiceImpl implements ChestService {
         }
 
         //宝箱加成
-        int[] playerChestRewardAddition = obsoleteUserDataService.getPlayerChestRewardAddition(userData.getUuid());
+        // int[] playerChestRewardAddition = obsoleteUserDataService.getPlayerChestRewardAddition(userData.getUuid());
         ChestOpenResult chestOpenResult = new ChestOpenResult();
         chestOpenResult.setChestData(chestData);
 

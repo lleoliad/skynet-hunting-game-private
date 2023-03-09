@@ -35,7 +35,10 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
 
         UserData userData = userDataResult.getData();
 
-        ChestOpenResult chestOpenResult = chestService.openChest(userDataResult.getData(), ChestData.builder().build(), openChestQuery.getVersion());
+        ChestOpenResult chestOpenResult = chestService.openChest(userDataResult.getData(), ChestData.builder()
+                .chestType(openChestQuery.getChestType())
+                .level(openChestQuery.getLevel())
+                .build(), openChestQuery.getVersion());
 
         userFeignService.update(UserDataUpdateQuery.builder().userId(openChestQuery.getUserId()).userData(userData).build());
         ClientUserData clientUserData = ClientUserData.builder().build();
@@ -45,6 +48,7 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
             clientUserData.setDiamond(userData.getDiamond());
             clientUserData.setGunLevelMap(userData.getGunLevelMap());
             clientUserData.setGunCountMap(userData.getGunCountMap());
+            clientUserData.setHistory(userData.getHistory());
         }
 
         return Result.ok().push("userData", clientUserData).push("openResult", chestOpenResult);
