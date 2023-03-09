@@ -2,10 +2,10 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.domain.ChapterWinChestData;
-import org.skynet.commons.hunting.user.domain.ChestData;
-import org.skynet.commons.hunting.user.domain.FreeChestData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.ChapterWinChestData;
+import org.skynet.components.hunting.user.domain.ChestData;
+import org.skynet.components.hunting.user.domain.FreeChestData;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
@@ -19,7 +19,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.StartUnlockDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ import java.util.prefs.BackingStoreException;
 public class ChestController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private ChestService chestService;
@@ -120,12 +120,12 @@ public class ChestController {
             log.info("[cmd] startUnlockChapterWinChest" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             List<ChapterWinChestData> chapterWinChestsData = userData.getChapterWinChestsData();
@@ -146,7 +146,7 @@ public class ChestController {
                 throw new BusinessException("player" + request.getUserUid() + "chapter win chest at index" + request.getSlotIndex() + " is already start unlocking");
             }
 
-            boolean[] playerVipStatus = userDataService.getPlayerVipStatus(userData);
+            boolean[] playerVipStatus = obsoleteUserDataService.getPlayerVipStatus(userData);
             boolean isVip = playerVipStatus[0];
             boolean isSVip = playerVipStatus[1];
             boolean isVipV2 = playerVipStatus[2];
@@ -206,7 +206,7 @@ public class ChestController {
             sendToClientData.setChapterWinChestsData(userData.getChapterWinChestsData());
             log.info("开始解锁章节胜利宝箱,index" + request.getSlotIndex() + ",chest data" + JSONObject.toJSONString(targetChestData));
             //处理返回结果
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
             sendToClientData.setCoin(userData.getCoin());
             sendToClientData.setDiamond(userData.getDiamond());
             sendToClientData.setHistory(userData.getHistory());
@@ -240,12 +240,12 @@ public class ChestController {
             log.info("[cmd] openChapterWinChestNow" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             ChestOpenResult openResult = new ChestOpenResult();
@@ -316,7 +316,7 @@ public class ChestController {
             chestService.saveChestOpenResult(openResult, request.getUserUid(), userData.getUpdateCount());
 
             sendToClientData.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
             map.put("userData", sendToClientData);
             map.put("openResult", openResult);
             long needTime = System.currentTimeMillis() - startTime;
@@ -344,12 +344,12 @@ public class ChestController {
             log.info("[cmd] openFreeChest" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             FreeChestData[] freeChestsData = userData.getFreeChestsData();
@@ -378,7 +378,7 @@ public class ChestController {
             sendToClientData.setGunLevelMap(userData.getGunLevelMap());
             sendToClientData.setGunCountMap(userData.getGunCountMap());
             //处理返回结果
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             chestService.saveChestOpenResult(openResult, request.getUserUid(), userData.getUpdateCount());
             map.put("userData", sendToClientData);
@@ -407,13 +407,13 @@ public class ChestController {
             log.info("[cmd] getLatestOpenedChestOpenResult" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             String collectionPath = Path.getPlayerChestOpenResultDocPath(request.getUserUid());
@@ -425,7 +425,7 @@ public class ChestController {
 
             userData.getChapterWinChestsData().removeIf(Objects::isNull);
             log.info("获取最近一次宝箱开启结果");
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 
             map.put("chestOpenResult", archiveChestOpenResult.getOpenResult());
@@ -449,9 +449,9 @@ public class ChestController {
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             if (userData.getAdvertisementData().getRemainedRewardAdCountToday() <= 0) {
@@ -484,7 +484,7 @@ public class ChestController {
             log.info("加速章节胜利宝箱。slot" + request.getSlotIndex() + "," + JSONObject.toJSONString(targetChestData));
 
             userDataSendToClient.setChapterWinChestsData(userData.getChapterWinChestsData());
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", userDataSendToClient);
 

@@ -17,17 +17,16 @@ import org.skynet.service.provider.hunting.obsolete.pojo.bo.RecordDataAndBase64;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.AIControlRecordDataQueryDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordDocData;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.AiService;
 import org.skynet.service.provider.hunting.obsolete.service.HuntingMatchService;
 import org.skynet.service.provider.hunting.obsolete.service.PlayerControlRecordDataService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +43,7 @@ import java.util.*;
 public class AIController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private HuntingMatchService huntingMatchService;
@@ -264,7 +263,7 @@ public class AIController {
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
 
             //载入当前玩家信息
-            userDataService.checkUserDataExist(userUid);
+            obsoleteUserDataService.checkUserDataExist(userUid);
             UserData userData = GameEnvironment.userDataMap.get(userUid);
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
@@ -389,7 +388,7 @@ public class AIController {
 //            huntingMatchService.reSaveHuntingMatchNowData(matchPath,request.getHuntingMatchNowUid(),userUid,huntingMatchNowData);
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
-            userDataService.userDataSettlement(userData, sendToClientData, false, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, false, request.getGameVersion());
             if (findControlRecordEncodeData != null) {
                 map.put("recordDataBase64", findControlRecordEncodeData);
             }

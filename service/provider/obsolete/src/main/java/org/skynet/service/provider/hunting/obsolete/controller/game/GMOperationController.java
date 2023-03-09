@@ -12,12 +12,12 @@ import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLoc
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.enums.OmitState;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.IAPPurchaseReward;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.TopUpOrder;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.service.provider.hunting.obsolete.dao.entity.TopUpOrder;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.IAPService;
-import org.skynet.service.provider.hunting.obsolete.service.TopUpOrderService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.dao.service.TopUpOrderService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ import java.util.*;
 public class GMOperationController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private TopUpOrderService topUpOrderService;
@@ -82,7 +82,7 @@ public class GMOperationController {
 
             if (dto.getControlType().equals("getAllUserData")) {
 
-                List<UserData> allUserData = userDataService.getAllUserData();
+                List<UserData> allUserData = obsoleteUserDataService.getAllUserData();
 
 
                 return R.ok().serverTime(TimeUtils.getUnixTimeSecond()).data("allUserData", allUserData);
@@ -105,7 +105,7 @@ public class GMOperationController {
 
         try {
             CommonUtils.processAdminRequest(dto.getAdminKey());
-            UserData userData = userDataService.getUserData("User:" + dto.getUserUid());
+            UserData userData = obsoleteUserDataService.getUserData("User:" + dto.getUserUid());
 
             return R.ok().serverTime(TimeUtils.getUnixTimeSecond()).data("userData", userData);
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class GMOperationController {
     public R saveUserData(@RequestBody GMDTO dto) {
         try {
             CommonUtils.processAdminRequest(dto.getAdminKey());
-            UserData userData = userDataService.getUserData("User:" + dto.getUserUid());
+            UserData userData = obsoleteUserDataService.getUserData("User:" + dto.getUserUid());
 
             return R.ok().serverTime(TimeUtils.getUnixTimeSecond()).data("userData", userData);
         } catch (Exception e) {
@@ -143,7 +143,7 @@ public class GMOperationController {
             CommonUtils.processAdminRequest(dto.getAdminKey());
 
             Assert.isTrue(dto.getControlType().equals("removeUserData"), ResponseEnum.CMD_ERROR);
-            String result = userDataService.removeUserData(dto.getUserUid());
+            String result = obsoleteUserDataService.removeUserData(dto.getUserUid());
 
             return R.ok().data("result", result).serverTime(TimeUtils.getUnixTimeSecond());
 
@@ -171,7 +171,7 @@ public class GMOperationController {
             String unzipString = DeflaterUtils.unzipString(zipString);
 
             UserData userData = JSONObject.parseObject(unzipString, UserData.class);
-            String result = userDataService.updateUserData(userData);
+            String result = obsoleteUserDataService.updateUserData(userData);
 
             return R.ok().data("result", result).serverTime(TimeUtils.getUnixTimeSecond());
 
@@ -195,7 +195,7 @@ public class GMOperationController {
 
             Assert.isTrue(dto.getControlType().equals("logoutUser"), ResponseEnum.CMD_ERROR);
 
-            String result = userDataService.logoutUserData(dto.getUserUid());
+            String result = obsoleteUserDataService.logoutUserData(dto.getUserUid());
 
             return R.ok().data("result", result).serverTime(TimeUtils.getUnixTimeSecond());
 
@@ -218,7 +218,7 @@ public class GMOperationController {
 
             Assert.isTrue(dto.getControlType().equals("blockUser"), ResponseEnum.CMD_ERROR);
 
-            String result = userDataService.blockUserData(dto.getUserUid(), dto.getBlockTime());
+            String result = obsoleteUserDataService.blockUserData(dto.getUserUid(), dto.getBlockTime());
 
             return R.ok().data("result", result).serverTime(TimeUtils.getUnixTimeSecond());
 
@@ -240,7 +240,7 @@ public class GMOperationController {
         try {
             CommonUtils.processAdminRequest(dto.getAdminKey());
             Assert.isTrue(dto.getControlType().equals("updateGun"), ResponseEnum.CMD_ERROR);
-            String result = userDataService.updateUserGun(dto);
+            String result = obsoleteUserDataService.updateUserGun(dto);
 
             return R.ok().serverTime(TimeUtils.getUnixTimeSecond()).data("result", result);
         } catch (Exception e) {
@@ -260,7 +260,7 @@ public class GMOperationController {
         try {
             CommonUtils.processAdminRequest(dto.getAdminKey());
             Assert.isTrue(dto.getControlType().equals("deleteGun"), ResponseEnum.CMD_ERROR);
-            String result = userDataService.deleteUserGun(dto);
+            String result = obsoleteUserDataService.deleteUserGun(dto);
 
             return R.ok().serverTime(TimeUtils.getUnixTimeSecond()).data("result", result);
         } catch (Exception e) {
@@ -280,7 +280,7 @@ public class GMOperationController {
         try {
             CommonUtils.processAdminRequest(dto.getAdminKey());
             Assert.isTrue(dto.getControlType().equals("updateProp"), ResponseEnum.CMD_ERROR);
-            String result = userDataService.updateProp(dto);
+            String result = obsoleteUserDataService.updateProp(dto);
 
             return R.ok().serverTime(TimeUtils.getUnixTimeSecond()).data("result", result);
         } catch (Exception e) {
@@ -373,7 +373,7 @@ public class GMOperationController {
 
             //帮用户登录一下
             //补单调用该接口时，用户没有登录
-            userDataService.checkUserDataExist(userInfo);
+            obsoleteUserDataService.checkUserDataExist(userInfo);
             UserData userData = GameEnvironment.userDataMap.get(userInfo);
             String gameVersion = userData.getServerOnly().getLastLoginClientVersion();
 
@@ -384,7 +384,7 @@ public class GMOperationController {
             topUpOrder.setOrderOmitState(OmitState.Supplement.getType());
 
             topUpOrderService.updateById(topUpOrder);
-            userDataService.saveUserData(userData);
+            obsoleteUserDataService.saveUserData(userData);
             return R.ok().serverTime(TimeUtils.getUnixTimeSecond()).data("purchaseRewardList", map);
         } catch (Exception e) {
             CommonUtils.responseException(request, e, request.getUserUid());

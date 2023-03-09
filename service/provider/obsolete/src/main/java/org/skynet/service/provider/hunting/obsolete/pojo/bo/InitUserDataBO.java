@@ -1,6 +1,6 @@
 package org.skynet.service.provider.hunting.obsolete.pojo.bo;
 
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

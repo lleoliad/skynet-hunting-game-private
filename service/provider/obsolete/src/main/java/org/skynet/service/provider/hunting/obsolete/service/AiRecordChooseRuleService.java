@@ -1,6 +1,6 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
-import org.skynet.commons.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CalculateAIFilterParametersBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.LocalPlayerCalculateAIFilterParametersBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.LocalPlayerInAiFilterConfigBO;

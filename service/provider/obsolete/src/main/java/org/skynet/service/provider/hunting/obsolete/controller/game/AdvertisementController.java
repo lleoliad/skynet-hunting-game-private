@@ -1,6 +1,6 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 public class AdvertisementController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
 //    @GetMapping("watch")
 //    @ApiOperation("通过观看广告来获得金币")

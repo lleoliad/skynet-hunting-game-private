@@ -4,7 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.skynet.commons.hunting.user.data.ClientUserData;
+import org.skynet.components.hunting.user.data.ClientUserData;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.game.query.OpenChestQuery;
 import org.skynet.service.provider.hunting.game.service.ChestAssignmentService;

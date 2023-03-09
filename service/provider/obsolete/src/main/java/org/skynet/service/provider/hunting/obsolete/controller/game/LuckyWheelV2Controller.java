@@ -9,13 +9,13 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.LuckyWheelV2SpinRewardBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.LuckyWheelDTO;
-import org.skynet.commons.hunting.user.domain.LuckyWheelV2Data;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.LuckyWheelV2Data;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.LuckyWheelV2PropertyTableValue;
 import org.skynet.service.provider.hunting.obsolete.service.LuckyWheelService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class LuckyWheelV2Controller {
     private SystemPropertiesConfig systemPropertiesConfig;
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private LuckyWheelService luckyWheelService;
@@ -52,11 +52,11 @@ public class LuckyWheelV2Controller {
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
 
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             luckyWheelService.refreshLuckyWheelV2Content(request.getUserUid(), request.getGameVersion());
@@ -64,7 +64,7 @@ public class LuckyWheelV2Controller {
             if (userData.getLuckyWheelV2Data().getNextFreeSpinUnixTime() <= 0) {
                 userData.getLuckyWheelV2Data().setNextFreeSpinUnixTime(TimeUtils.getUnixTimeSecond() + 1000);
             }
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
 
 //            if (userData.getLuckyWheelV2Data().getFreeSpinCount() <= 0){
 //                userData.getLuckyWheelV2Data().setNextFreeSpinUnixTime(TimeUtils.getUnixTimeSecond() + 1000);
@@ -96,13 +96,13 @@ public class LuckyWheelV2Controller {
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             LuckyWheelV2SpinRewardBO spinReward = null;
 
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
 
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
 
             LuckyWheelV2PropertyTableValue luckyWheelV2PropertyTable = GameEnvironment.luckyWheelV2PropertyTableMap.get(request.getGameVersion());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
@@ -154,7 +154,7 @@ public class LuckyWheelV2Controller {
             userDataSendToClient.setHistory(userData.getHistory());
 
 
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", userDataSendToClient);

@@ -1,6 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
@@ -11,7 +12,7 @@ import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.MailDataDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import org.skynet.service.provider.hunting.obsolete.service.WeaponService;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
@@ -35,7 +36,7 @@ import java.util.Map;
 public class MailController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
@@ -55,7 +56,7 @@ public class MailController {
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             MailData mailData = RedisDBOperation.selectInboxMail(request.getMailUid());
             log.info("领取邮件" + JSONObject.toJSONString(mailData));
 
@@ -63,7 +64,7 @@ public class MailController {
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             switch (mailData.getAttachmentType()) {
@@ -103,7 +104,7 @@ public class MailController {
                     gunIdCountData.add(new GunReward(gunId, gunCount));
 //                    Map<Integer, Integer> gunCountMap = Maps.newHashMap();
 //                    gunCountMap.put(gunId, gunCount);
-                    userDataService.addGunToUserDataByGunIdCountData(userData, gunIdCountData, unlockNewGunIds, request.getGameVersion());
+                    obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunIdCountData, unlockNewGunIds, request.getGameVersion());
 
                     userDataSendToClient.setGunLevelMap(userData.getGunLevelMap());
                     userDataSendToClient.setGunCountMap(userData.getGunCountMap());
@@ -115,14 +116,14 @@ public class MailController {
 
                     Map<Integer, Integer> bulletCountMap = Maps.newHashMap();
                     bulletCountMap.put(bulletId, bulletCount);
-                    userDataService.addBulletToUserData(userData, bulletCountMap);
+                    obsoleteUserDataService.addBulletToUserData(userData, bulletCountMap);
 
                     userDataSendToClient.setBulletCountMap(userData.getBulletCountMap());
                     break;
             }
 
             userDataSendToClient.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
 
             //删除该邮件
             RedisDBOperation.deleteMail(request.getUserUid(), mailData.getUid());
@@ -185,7 +186,7 @@ public class MailController {
             }
 
             //这里直接按收取邮件的时间，数量作为判断条件返回
-            List<MailData> resultMails = userDataService.getAllInboxMails(request.getUserUid(), fetchMailOnceCount, request.getCursorReceiveTime(), request.getCursorMailUid());
+            List<MailData> resultMails = obsoleteUserDataService.getAllInboxMails(request.getUserUid(), fetchMailOnceCount, request.getCursorReceiveTime(), request.getCursorMailUid());
             log.info("邮件拉取结果：{}", resultMails);
             boolean maybeMore = resultMails.size() >= fetchMailOnceCount;
 
@@ -220,10 +221,10 @@ public class MailController {
             //如果客户端没有上报最后一封邮件的信息，说明进入游戏时收件箱是空的，这里直接返回所有邮件。
             if (request.getClientLatestMailReceiveTime() == null || request.getClientLatestMailUid() == null) {
 
-                resultMails = userDataService.getAllInboxMails(request.getUserUid(), GameConfig.mailInboxCapacity, null, null);
+                resultMails = obsoleteUserDataService.getAllInboxMails(request.getUserUid(), GameConfig.mailInboxCapacity, null, null);
             } else {
 
-                resultMails = userDataService.getAllInboxMails(request.getUserUid(), GameConfig.mailInboxCapacity, request.getClientLatestMailReceiveTime(), request.getClientLatestMailUid());
+                resultMails = obsoleteUserDataService.getAllInboxMails(request.getUserUid(), GameConfig.mailInboxCapacity, request.getClientLatestMailReceiveTime(), request.getClientLatestMailUid());
             }
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);

@@ -2,6 +2,8 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.PlayerRecordModeData;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -11,7 +13,6 @@ import org.skynet.service.provider.hunting.obsolete.common.util.NumberUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
-import org.skynet.service.provider.hunting.obsolete.controller.admin.RecordIndex;
 import org.skynet.service.provider.hunting.obsolete.module.dto.BattleCompleteDto;
 import org.skynet.service.provider.hunting.obsolete.module.util.ThreadLocalForFight;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
@@ -22,7 +23,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue
 import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTableValue;
 import org.skynet.service.provider.hunting.obsolete.service.HuntingMatchService;
 import org.skynet.service.provider.hunting.obsolete.service.PlayerControlRecordDataService;
-import org.skynet.service.provider.hunting.obsolete.service.RecordIndexService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -230,7 +230,7 @@ public class PlayerControlRecordDataServiceImpl implements PlayerControlRecordDa
             indexList.add(recordKey);
         }
         //获取的是压缩文件
-        List<Object> tempList = RedisDBOperation.MultipleGet(indexList);
+        List<String> tempList = RedisDBOperation.MultipleGet(indexList);
         List<String> zipList = new ArrayList<>();
         List<PlayerUploadWholeMatchControlRecordData> collection = new LinkedList<>();
 
@@ -377,8 +377,8 @@ public class PlayerControlRecordDataServiceImpl implements PlayerControlRecordDa
         return results;
     }
 
-    @Resource
-    private RecordIndexService recordIndexService;
+    // @Resource
+    // private RecordIndexService recordIndexService;
 
     @Override
     public void downloadPlayerWholeData(Boolean IsOpponentDisconnect, String gameVersion, PlayerUploadWholeMatchControlRecordData wholeData) {
@@ -447,25 +447,25 @@ public class PlayerControlRecordDataServiceImpl implements PlayerControlRecordDa
                             controlRecordData.getWindId(),
                             controlRecordData.getAverageShowPrecision()
                     );
-                    RecordIndex recordIndex = new RecordIndex(null,
-                            controlRecordData.getUid(),
-                            key,
-                            controlRecordData.getPlayerUid(),
-                            controlRecordData.getGameVersion(),
-                            controlRecordData.getRecordVersion().longValue(),
-                            controlRecordData.getAnimalRouteUid().toString(),
-                            controlRecordData.getAnimalId().longValue(),
-                            controlRecordData.getBulletId().longValue(),
-                            controlRecordData.getGunId(),
-                            controlRecordData.getGunLevel(),
-                            controlRecordData.getWindId(),
-                            controlRecordData.getIsAnimalKilled(),
-                            controlRecordData.getFinalScore(),
-                            controlRecordData.getAverageShowPrecision(),
-                            controlRecordData.getSource().getType(),
-                            controlRecordData.getUploadTime()
-                    );
-                    recordIndexService.save(recordIndex);
+                    // RecordIndex recordIndex = new RecordIndex(null,
+                    //         controlRecordData.getUid(),
+                    //         key,
+                    //         controlRecordData.getPlayerUid(),
+                    //         controlRecordData.getGameVersion(),
+                    //         controlRecordData.getRecordVersion().longValue(),
+                    //         controlRecordData.getAnimalRouteUid().toString(),
+                    //         controlRecordData.getAnimalId().longValue(),
+                    //         controlRecordData.getBulletId().longValue(),
+                    //         controlRecordData.getGunId(),
+                    //         controlRecordData.getGunLevel(),
+                    //         controlRecordData.getWindId(),
+                    //         controlRecordData.getIsAnimalKilled(),
+                    //         controlRecordData.getFinalScore(),
+                    //         controlRecordData.getAverageShowPrecision(),
+                    //         controlRecordData.getSource().getType(),
+                    //         controlRecordData.getUploadTime()
+                    // );
+                    // recordIndexService.save(recordIndex);
                 });
 
 

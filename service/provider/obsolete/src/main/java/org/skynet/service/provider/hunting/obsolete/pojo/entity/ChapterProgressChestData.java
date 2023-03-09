@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.skynet.components.hunting.user.domain.ChestData;
 
 import java.io.Serializable;
 

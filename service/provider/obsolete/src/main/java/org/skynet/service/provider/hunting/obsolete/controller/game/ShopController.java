@@ -12,16 +12,16 @@ import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseBulletDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseChestDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseCoinPackageDTO;
-import org.skynet.commons.hunting.user.domain.ChestData;
+import org.skynet.components.hunting.user.domain.ChestData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.ChestOpenResult;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.BulletTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.CoinBonusPackageTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ShopChestsTableValue;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ import java.util.Map;
 public class ShopController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private ChestService chestService;
@@ -104,16 +104,16 @@ public class ShopController {
             log.info("[cmd] purchaseChest" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
-            Integer chestLevel = userDataService.playerHighestUnlockedChapterID(userData);
+            Integer chestLevel = obsoleteUserDataService.playerHighestUnlockedChapterID(userData);
             Map<String, ShopChestsTableValue> shopChestsTable = GameEnvironment.shopChestsTableMap.get(request.getGameVersion());
             ShopChestsTableValue tableValue = shopChestsTable.get(String.valueOf(request.getShopChestTableId()));
 
@@ -133,7 +133,7 @@ public class ShopController {
             ChestData chestData = new ChestData(
                     NanoIdUtils.randomNanoId(30),
                     tableValue.getChestType(),
-                    userDataService.playerHighestUnlockedChapterID(userData),
+                    obsoleteUserDataService.playerHighestUnlockedChapterID(userData),
                     TimeUtils.getUnixTimeSecond()
             );
 
@@ -145,7 +145,7 @@ public class ShopController {
             sendToClientData.setGunLevelMap(userData.getGunLevelMap());
             sendToClientData.setBulletCountMap(userData.getBulletCountMap());
             sendToClientData.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             chestService.saveChestOpenResult(chestOpenResult, request.getUserUid(), sendToClientData.getUpdateCount());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
@@ -178,7 +178,7 @@ public class ShopController {
             log.info("[cmd] purchaseCoinBonusPackage" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             Map<String, CoinBonusPackageTableValue> coinBonusPackageTable = GameEnvironment.coinBonusPackageTableMap.get(request.getGameVersion());
             CoinBonusPackageTableValue tableValue = null;
@@ -193,7 +193,7 @@ public class ShopController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
 
@@ -233,7 +233,7 @@ public class ShopController {
             sendToClientData.setDiamond(userData.getDiamond());
             sendToClientData.setHistory(userData.getHistory());
             sendToClientData.setAdvertisementData(userData.getAdvertisementData());
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", sendToClientData);
@@ -260,12 +260,12 @@ public class ShopController {
             log.info("[cmd] purchaseBullet" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
             String playerUUID = userData.getUuid();
 
@@ -313,7 +313,7 @@ public class ShopController {
             sendToClientData.setHistory(userData.getHistory());
 
             //处理返回结果
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 

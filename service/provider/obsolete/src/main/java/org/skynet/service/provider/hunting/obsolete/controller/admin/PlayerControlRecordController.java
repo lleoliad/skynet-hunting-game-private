@@ -20,7 +20,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.entity.OpponentProfile;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordDocData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerUploadWholeMatchControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.service.PlayerControlRecordDataService;
-import org.skynet.service.provider.hunting.obsolete.service.RecordIndexService;
 import org.skynet.starter.codis.service.CodisService;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -177,13 +176,13 @@ public class PlayerControlRecordController {
 
     public static int total;
 
-    @Resource
-    private RecordIndexService recordIndexService;
+    // @Resource
+    // private RecordIndexService recordIndexService;
 
     private static HashMap<String, String> indexHashMap = new HashMap<>();
 
 
-    private static List<RecordIndex> indexList = new ArrayList<>();
+    // private static List<RecordIndex> indexList = new ArrayList<>();
 
 
     @PostMapping("/download/singleData")
@@ -213,39 +212,39 @@ public class PlayerControlRecordController {
                                 data.getWindId(),
                                 data.getAverageShowPrecision()
                         );
-                        RecordIndex recordIndex = new RecordIndex(null,
-                                docId,
-                                key,
-                                data.getPlayerUid(),
-                                data.getGameVersion(),
-                                data.getRecordVersion().longValue(),
-                                data.getAnimalRouteUid().toString(),
-                                data.getAnimalId().longValue(),
-                                data.getBulletId().longValue(),
-                                data.getGunId(),
-                                data.getGunLevel(),
-                                data.getWindId(),
-                                data.getIsAnimalKilled(),
-                                data.getFinalScore(),
-                                data.getAverageShowPrecision(),
-                                data.getSource().getType(),
-                                data.getUploadTime()
-                        );
-
-                        if (!indexHashMap.containsKey(docId)) {
-                            indexHashMap.put(docId, docId);
-                            indexList.add(recordIndex);
-                        }
+                        // RecordIndex recordIndex = new RecordIndex(null,
+                        //         docId,
+                        //         key,
+                        //         data.getPlayerUid(),
+                        //         data.getGameVersion(),
+                        //         data.getRecordVersion().longValue(),
+                        //         data.getAnimalRouteUid().toString(),
+                        //         data.getAnimalId().longValue(),
+                        //         data.getBulletId().longValue(),
+                        //         data.getGunId(),
+                        //         data.getGunLevel(),
+                        //         data.getWindId(),
+                        //         data.getIsAnimalKilled(),
+                        //         data.getFinalScore(),
+                        //         data.getAverageShowPrecision(),
+                        //         data.getSource().getType(),
+                        //         data.getUploadTime()
+                        // );
+                        //
+                        // if (!indexHashMap.containsKey(docId)) {
+                        //     indexHashMap.put(docId, docId);
+                        //     indexList.add(recordIndex);
+                        // }
 
                         playerControlRecordDataService.downloadSingleData(data);
 
                         //                        System.out.println("12313");
 //                        recordIndexService.selectAndSave(indexList);
 
-                        if (indexList.size() >= 10000) {
-                            recordIndexService.saveBatch(indexList);
-                            indexList.clear();
-                        }
+                        // if (indexList.size() >= 10000) {
+                        //     recordIndexService.saveBatch(indexList);
+                        //     indexList.clear();
+                        // }
 
 //                        try {
 //                            PlayerControlRecordDocData data = JSONObject.parseObject(map.get("docDataJson").toString(), PlayerControlRecordDocData.class);
@@ -265,8 +264,8 @@ public class PlayerControlRecordController {
                     serverResponse = HttpUtil.serverResponse("https://us-central1-wildhunthuntingclash.cloudfunctions.net/admin-batchDownloadDocuments", request);
                 }
             } while (flag);
-            recordIndexService.saveBatch(indexList);
-            indexList.clear();
+            // recordIndexService.saveBatch(indexList);
+            // indexList.clear();
             return CommonUtils.responsePrepare(null);
         } catch (Exception e) {
             log.warn("错误信息{}:", e.toString());

@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "org.skynet.commons.db.mongodb",
         "org.skynet.commons.db.redis.service",
         "org.skynet.starter.codis",
+        "org.skynet.components.hunting.data",
+        "org.skynet.components.hunting.robot",
 })
 @EnableMongoRepositories(basePackages = {
         "org.skynet.service.provider.hunting.obsolete.dao.repository"
@@ -34,7 +36,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableFeignClients(basePackages = {
         "org.skynet.components.hunting.rank.league.service",
         "org.skynet.components.hunting.robot.service",
-        "org.skynet.service.provider.hunting.obsolete.service"
+        "org.skynet.components.hunting.user.service",
 })
 @RefreshScope
 @EnableCaching

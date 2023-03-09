@@ -13,7 +13,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.entity.OpponentPlayerIn
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.OpponentProfile;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ import java.util.Map;
 public class AiUtilController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
@@ -141,7 +141,7 @@ public class AiUtilController {
             }
         }
         if (useTotalRandomAiProfile) {
-            opponentPlayerInfo.setName(userDataService.createGuestName(userUid));
+            opponentPlayerInfo.setName(obsoleteUserDataService.createGuestName(userUid));
             opponentPlayerInfo.setIcon_base64(null);
             opponentPlayerInfo.setUseDefaultIcon(true);
         } else {

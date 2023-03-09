@@ -8,10 +8,10 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.GiftPackageDataDTO;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import org.skynet.service.provider.hunting.obsolete.service.impl.PromotionEventPackageDataServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ import java.util.Map;
 public class GiftPackageDataController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
@@ -54,7 +54,7 @@ public class GiftPackageDataController {
             log.info(JSONObject.toJSONString(request));
 
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
             if (userData == null) {
@@ -78,7 +78,7 @@ public class GiftPackageDataController {
             userDataSendToClient.setAvailableGunGiftPackageData(userData.getAvailableGunGiftPackageData());
             userDataSendToClient.setAvailableFifthDayGunGiftPackageData(userData.getAvailableFifthDayGunGiftPackageData());
             userDataSendToClient.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
 
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
@@ -113,9 +113,9 @@ public class GiftPackageDataController {
             log.info(JSONObject.toJSONString(request));
 
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
 
@@ -125,7 +125,7 @@ public class GiftPackageDataController {
             userDataSendToClient.setPromotionEventPackagesData(userData.getPromotionEventPackagesData());
             userDataSendToClient.setPromotionGiftPackagesV2Data(userData.getPromotionGiftPackagesV2Data());
             userDataSendToClient.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 
             map.put("userData", userDataSendToClient);

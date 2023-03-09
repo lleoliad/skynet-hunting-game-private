@@ -11,6 +11,11 @@
 
     <artifactId>skynet-hunting-game-components</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>game</module>
+        <module>user</module>
+    </modules>
+
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

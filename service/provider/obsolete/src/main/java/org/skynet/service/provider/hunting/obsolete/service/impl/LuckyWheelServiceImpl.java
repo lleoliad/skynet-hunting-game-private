@@ -1,8 +1,10 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.domain.*;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.ChestData;
+import org.skynet.components.hunting.user.domain.LuckyWheelData;
+import org.skynet.components.hunting.user.domain.LuckyWheelV2Data;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.NanoIdUtils;
@@ -16,7 +18,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.bo.LuckyWheelV2SpinRewa
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
 import org.skynet.service.provider.hunting.obsolete.service.LuckyWheelService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,7 @@ import java.util.stream.Collectors;
 public class LuckyWheelServiceImpl implements LuckyWheelService {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private ChestService chestService;
@@ -159,7 +161,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
         if (standardDay <= luckyWheelData.getLastRefreshLuckyWheelStandardDay()) {
             return;
         }
-        luckyWheelData.setCurrentChapterId(userDataService.playerHighestUnlockedChapterID(userData));
+        luckyWheelData.setCurrentChapterId(obsoleteUserDataService.playerHighestUnlockedChapterID(userData));
         luckyWheelData.setCumulativeRewardSpinCount(0);
         luckyWheelData.setLastRefreshLuckyWheelStandardDay(standardDay);
         log.info("刷新转盘章节:" + JSONObject.toJSONString(luckyWheelData));
@@ -355,7 +357,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
 //        log.info("rewardType:" + rewardType.getType());
 //        log.info("luckyWheelV2SectorContentTable:" + luckyWheelV2SectorContentTable.toString());
         Integer rewardCount = sectorContentTableValue.getRewardAmounts().get(targetRewardIndex);
-        int playerHighestUnlockedChapterID = userDataService.getPlayerHighestUnlockedChapterID(userData);
+        int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
 
         LuckyWheelV2SpinRewardBO spinRewardResult = new LuckyWheelV2SpinRewardBO();
         spinRewardResult.setRewardIndex(targetRewardIndex);
@@ -376,7 +378,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
-                userDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
+                obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
 
                 spinRewardResult.setRewardGunInfo(new RewardGunInfo(gunRewards, newUnlockGunIds));
 //                spinRewardResult.getChestOpenResult().setNewUnlockedGunIDs(newUnlockGunIds);
@@ -393,7 +395,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
-                userDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
+                obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
 
                 spinRewardResult.setRewardGunInfo(new RewardGunInfo(gunRewards, newUnlockGunIds));
 //                spinRewardResult.getChestOpenResult().setNewUnlockedGunIDs(newUnlockGunIds);
@@ -410,7 +412,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
-                userDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
+                obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
 
                 spinRewardResult.setRewardGunInfo(new RewardGunInfo(gunRewards, newUnlockGunIds));
 //                spinRewardResult.getChestOpenResult().setNewUnlockedGunIDs(newUnlockGunIds);
@@ -427,7 +429,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                 List<Integer> newUnlockGunIds = Lists.newArrayList();
 
                 List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
-                userDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
+                obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, newUnlockGunIds, gameVersion);
 
                 spinRewardResult.setRewardGunInfo(new RewardGunInfo(gunRewards, newUnlockGunIds));
 //                spinRewardResult.getChestOpenResult().setNewUnlockedGunIDs(newUnlockGunIds);
@@ -439,7 +441,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                 Map<Integer, Integer> bulletRewardMap = Maps.newHashMap();
                 bulletRewardMap.put(luckyWheelV2PropertyTable.getRewardType6BulletId(), rewardCount);
                 List<BulletReward> bulletRewards = CommonUtils.convertBulletCountMapToBulletCountArray(bulletRewardMap);
-                userDataService.addBulletToUserDataByIdCountData(userData, bulletRewards);
+                obsoleteUserDataService.addBulletToUserDataByIdCountData(userData, bulletRewards);
                 spinRewardResult.setBulletRewards(bulletRewards);
 //                userData.setCoin(userData.getCoin() + rewardCount);
 //                spinRewardResult.setRewardCoin(rewardCount);
@@ -449,7 +451,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                 Map<Integer, Integer> bulletRewardMap = Maps.newHashMap();
                 bulletRewardMap.put(luckyWheelV2PropertyTable.getRewardType7BulletId(), rewardCount);
                 List<BulletReward> bulletRewards = CommonUtils.convertBulletCountMapToBulletCountArray(bulletRewardMap);
-                userDataService.addBulletToUserDataByIdCountData(userData, bulletRewards);
+                obsoleteUserDataService.addBulletToUserDataByIdCountData(userData, bulletRewards);
                 spinRewardResult.setBulletRewards(bulletRewards);
 //                userData.setCoin(userData.getCoin() + rewardCount);
 //                spinRewardResult.setRewardCoin(rewardCount);
@@ -459,7 +461,7 @@ public class LuckyWheelServiceImpl implements LuckyWheelService {
                 Map<Integer, Integer> bulletRewardMap = Maps.newHashMap();
                 bulletRewardMap.put(luckyWheelV2PropertyTable.getRewardType8BulletId(), rewardCount);
                 List<BulletReward> bulletRewards = CommonUtils.convertBulletCountMapToBulletCountArray(bulletRewardMap);
-                userDataService.addBulletToUserDataByIdCountData(userData, bulletRewards);
+                obsoleteUserDataService.addBulletToUserDataByIdCountData(userData, bulletRewards);
                 spinRewardResult.setBulletRewards(bulletRewards);
 //                userData.setCoin(userData.getCoin() + rewardCount);
 //                spinRewardResult.setRewardCoin(rewardCount);

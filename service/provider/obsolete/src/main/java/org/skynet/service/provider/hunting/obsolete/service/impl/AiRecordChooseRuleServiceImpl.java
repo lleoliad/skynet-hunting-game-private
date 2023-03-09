@@ -1,6 +1,6 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
-import org.skynet.commons.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.enums.ComparisonType;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CalculateAIFilterParametersBO;

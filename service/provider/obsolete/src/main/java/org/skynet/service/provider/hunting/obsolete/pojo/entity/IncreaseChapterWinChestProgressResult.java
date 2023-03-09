@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.skynet.commons.hunting.user.domain.ChapterWinChestData;
+import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

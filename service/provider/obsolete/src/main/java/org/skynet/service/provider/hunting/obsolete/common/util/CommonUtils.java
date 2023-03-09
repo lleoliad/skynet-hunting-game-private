@@ -11,7 +11,7 @@ import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.GunReward;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -93,7 +93,7 @@ public class CommonUtils {
         if (verifyToken == null)
             verifyToken = true;
 
-        log.info("请求数据：" + JSON.toJSONString(request));
+        // log.info("请求数据：" + JSON.toJSONString(request));
 
         if (verifyToken) {
             //验证token
@@ -137,9 +137,9 @@ public class CommonUtils {
 
         }
         //记录这次请求的客户端版本
-        log.info("登录的用户:" + request.getUserUid());
-        log.info("登录的版本:" + request.getGameVersion());
-        log.info("登录的平台:" + request.getPlatform());
+        // log.info("登录的用户:" + request.getUserUid());
+        // log.info("登录的版本:" + request.getGameVersion());
+        // log.info("登录的平台:" + request.getPlatform());
 
     }
 
@@ -180,7 +180,7 @@ public class CommonUtils {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("code", code);
         map.put("serverTime", TimeUtils.getUnixTimeSecond());
-        log.warn("获取到的服务器时间：{}", TimeUtils.getUnixTimeSecond());
+        // log.warn("获取到的服务器时间：{}", TimeUtils.getUnixTimeSecond());
         return map;
     }
 

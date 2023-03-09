@@ -2,7 +2,7 @@ package org.skynet.service.provider.hunting.obsolete.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.skynet.commons.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.enums.ABTestGroup;
 
 /**
  * A B test 分布配置

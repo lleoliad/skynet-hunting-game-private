@@ -1,13 +1,13 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import org.skynet.commons.hunting.user.domain.AchievementData;
+import org.skynet.components.hunting.user.domain.AchievementData;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.enums.AchievementType;
 import org.skynet.service.provider.hunting.obsolete.enums.AnimalSizeType;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerFireDetails;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.AchievementTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.AnimalTableValue;

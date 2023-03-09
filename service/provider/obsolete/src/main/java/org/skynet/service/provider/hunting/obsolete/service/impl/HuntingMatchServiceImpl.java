@@ -3,14 +3,15 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.domain.*;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.GetPlayerRankQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.components.hunting.robot.data.RobotPlayerInfoBO;
 import org.skynet.components.hunting.robot.query.RobotsQuery;
 import org.skynet.components.hunting.robot.service.RobotFactoryFeignService;
+import org.skynet.components.hunting.user.domain.History;
+import org.skynet.components.hunting.user.domain.PlayerRecordModeData;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -44,7 +45,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
     private AchievementService achievementService;
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private MatchWinRateTableService matchWinRateTableService;
@@ -89,11 +90,13 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
     public List<String> getPlayerHuntingMatchNowData(String userUid) {
 
 
-        List<Object> list = RedisDBOperation.selectPlayerHuntingMatchNowData(userUid);
-        List<String> huntingMatchNowUids = new ArrayList<>();
-        Collections.addAll(huntingMatchNowUids, list.toArray(new String[0]));
+        // List<Object> list = RedisDBOperation.selectPlayerHuntingMatchNowData(userUid);
+        // List<String> huntingMatchNowUids = new ArrayList<>();
+        // Collections.addAll(huntingMatchNowUids, list.toArray(new String[0]));
+        //
+        // return huntingMatchNowUids;
 
-        return huntingMatchNowUids;
+        return null; // TODO Z
 
     }
 
@@ -292,7 +295,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
         }
 
         if (StringUtils.isEmpty(opponentPlayerInfo.getName())) {
-            opponentPlayerInfo.setName(userDataService.createGuestName(userData.getName()));
+            opponentPlayerInfo.setName(obsoleteUserDataService.createGuestName(userData.getName()));
             opponentPlayerInfo.setIcon_base64(null);
             opponentPlayerInfo.setUseDefaultIcon(true);
             return opponentPlayerInfo;
@@ -325,7 +328,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
         }
         String osName = System.getProperty("os.name");
         if (useTotalRandomAiProfile || osName.equals("Mac OS X")) {
-            opponentPlayerInfo.setName(userDataService.createGuestName(userData.getName()));
+            opponentPlayerInfo.setName(obsoleteUserDataService.createGuestName(userData.getName()));
             opponentPlayerInfo.setIcon_base64(null);
             opponentPlayerInfo.setUseDefaultIcon(true);
         } else {
@@ -597,8 +600,8 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
          3、该章节较低胜率=较低胜率+养成胜率加成
          4、养成胜率加成=MAX(玩家养成分数-最小养成分数，0)/|最大养成分数-最小养成分数|*最大养成胜率加成
          * */
-        double chapterWinRate = userDataService.calculatePlayerChapterWinRate(userData, Integer.valueOf(chapterId));
-        double playerCultivateScore = userDataService.calculatePlayerCultivateScore(userUid, gameVersion);
+        double chapterWinRate = obsoleteUserDataService.calculatePlayerChapterWinRate(userData, Integer.valueOf(chapterId));
+        double playerCultivateScore = obsoleteUserDataService.calculatePlayerCultivateScore(userUid, gameVersion);
 //        double cultivateWinRateAddition = Math.max(0,playerCultivateScore - chapterTableValue.getMinGuaranteeWinRate()) *chapterTableValue.getMaxCultivateWinRateAddition()/
 //                Math.max(0,chapterTableValue.getMaxCultivateScore() - chapterTableValue.getMinCultivateScore());
 //

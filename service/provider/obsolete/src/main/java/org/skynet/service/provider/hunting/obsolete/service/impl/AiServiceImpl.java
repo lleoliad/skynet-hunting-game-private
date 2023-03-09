@@ -2,8 +2,8 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;

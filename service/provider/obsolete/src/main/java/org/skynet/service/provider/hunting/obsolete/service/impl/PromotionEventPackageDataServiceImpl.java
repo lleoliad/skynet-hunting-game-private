@@ -2,6 +2,8 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.NanoIdUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
@@ -10,7 +12,7 @@ import org.skynet.service.provider.hunting.obsolete.config.IAPProductPrefix;
 import org.skynet.service.provider.hunting.obsolete.enums.ForceTutorialStepNames;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.PromotionEventPackageDataService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
@@ -29,7 +31,7 @@ import java.util.stream.Collectors;
 public class PromotionEventPackageDataServiceImpl implements PromotionEventPackageDataService {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     /**
      * 激活活动礼包
@@ -49,7 +51,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         List<PromotionEventPackageData> promotionEventPackagesData = new ArrayList<>();
 
         //玩家最高解锁章节,就是礼包等级,同时也是箱子等级
-        Integer packageLevel = userDataService.playerHighestUnlockedChapterID(userData);
+        Integer packageLevel = obsoleteUserDataService.playerHighestUnlockedChapterID(userData);
 
         Map<String, PromotionEventPackageGroupTableValue> promotionEventPackageGroupTable = GameEnvironment.promotionEventPackageGroupTableMap.get(gameVersion);
         Set<String> keySet = promotionEventPackageGroupTable.keySet();
@@ -205,7 +207,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         List<PromotionEventPackageData> promotionEventPackagesData = new ArrayList<>();
 
         //玩家最高解锁章节,就是礼包等级,同时也是箱子等级
-        int packageLevel = userDataService.getPlayerHighestUnlockedChapterID(userData);
+        int packageLevel = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
 
         //版本号数字之和，用来判断当前版本是否小于某一个版本  1.0.12
         // int gameVersionNum = 0;
@@ -421,7 +423,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         long dayPassSinceSignUp = TimeUtils.getStandardTimeDay() - signUpStandardDay;
         long standardSecond = TimeUtils.getStandardTimeSecond();
         Map<String, BulletGiftPackageTableValue> bulletGiftPackageTable = GameEnvironment.bulletGiftPackageTableMap.get(gameVersion);
-        int chestLevel = Math.max(userDataService.getPlayerHighestUnlockedChapterID(userData), GameConfig.bulletGiftPackageMinChestLevel);
+        int chestLevel = Math.max(obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData), GameConfig.bulletGiftPackageMinChestLevel);
         List<PlayerBulletGiftPackageData> availableBulletGiftPackageData = userData.getAvailableBulletGiftPackageData();
         Map<String, Integer> iapProductPurchasedCountMap = userData.getIapProductPurchasedCountMap();
 
@@ -533,7 +535,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
             availableGroupIds.add(packageData.getGroupId());
         }
 
-        int playerHighestUnlockedChapterID = userDataService.getPlayerHighestUnlockedChapterID(userData);
+        int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
         List<Integer> purchasedGroupIds = getPurchasedGroupIdsFifthDayGunGiftPackageGroupTableValue(userData, fifthDayGunGiftPackageGroupTable);
         //添加新的礼包
         for (String key : fifthDayGunGiftPackageGroupTable.keySet()) {
@@ -639,7 +641,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
             availableGroupIds.add(packageData.getGroupId());
         }
 
-        Integer playerHighestUnlockedChapterID = userDataService.getPlayerHighestUnlockedChapterID(userData);
+        Integer playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
         List<Integer> purchasedGroupIds = getPurchasedGroupIdsGunGiftPackageGroupTableValue(userData, gunGiftPackageGroupTable);
 
         //添加新的礼包
@@ -723,7 +725,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
 
 
         //玩家最高解锁章节,就是礼包等级,同时也是箱子等级
-        int packageLevel = userDataService.getPlayerHighestUnlockedChapterID(userData);
+        int packageLevel = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
 
         List<String> purchasedPromotionEventPackagesV2Keys = userData.getServerOnly().getPurchasedPromotionEventPackagesV2Keys();
 
@@ -897,7 +899,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
     }
 
     private PlayerGunGiftPackageData createGunGiftPackageDataFromGroup(GunGiftPackageGroupTableValue packageGroupTableValue, UserData userData, String gameVersion, Long expireTime) {
-        int playerHighestUnlockedChapterID = userDataService.getPlayerHighestUnlockedChapterID(userData);
+        int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
         GunGiftPackageTableValue targetTableValue = null;
 
         Map<String, GunGiftPackageTableValue> gunGiftPackageTable = GameEnvironment.gunGiftPackageTableMap.get(gameVersion);
@@ -951,7 +953,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
 
     //获取购买过的group id
     private PlayerFifthDayGunGiftPackageData createFifthDayGunGiftPackageDataFromGroup(FifthDayGunGiftPackageGroupTableValue packageGroupTableValue, UserData userData, String gameVersion) {
-        int playerHighestUnlockedChapterID = userDataService.getPlayerHighestUnlockedChapterID(userData);
+        int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
         FifthDayGunGiftPackageTableValue targetTableValue = null;
 
         Map<String, FifthDayGunGiftPackageTableValue> fifthDayGunGiftPackageTable = GameEnvironment.fifthDayGunGiftPackageTableMap.get(gameVersion);

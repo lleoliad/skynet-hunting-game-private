@@ -9,13 +9,13 @@ import org.skynet.service.provider.hunting.obsolete.enums.GunQuality;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.EquipBulletDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.GunDTO;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.BulletTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.GunTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.GunUpgradeCountTableValue;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import org.skynet.service.provider.hunting.obsolete.service.WeaponService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class WeaponController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
@@ -60,7 +60,7 @@ public class WeaponController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(dto.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(dto.getUserUid());
             userData = GameEnvironment.userDataMap.get(dto.getUserUid());
 
             if (userData.getEquippedGunId().equals(dto.getGunId())) {
@@ -76,7 +76,7 @@ public class WeaponController {
             log.info("切换枪械" + userData.getEquippedGunId());
 
             //处理返回结果
-            userDataService.userDataSettlement(userData, sendToClientData, true, dto.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, dto.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 
             map.put("userData", sendToClientData);
@@ -107,7 +107,7 @@ public class WeaponController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
 
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
@@ -169,7 +169,7 @@ public class WeaponController {
                     + ".剩余金币" + userData.getCoin() + ",剩余数量" + userData.getGunCountMap().get(request.getGunId()));
 
             //处理返回结果
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", sendToClientData);
             long needTime = System.currentTimeMillis() - startTime;
@@ -200,7 +200,7 @@ public class WeaponController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             Map<String, BulletTableValue> bulletTable = GameEnvironment.bulletTableMap.get(request.getGameVersion());
@@ -225,7 +225,7 @@ public class WeaponController {
             log.info("装备子弹" + request.getBulletId());
 
             //处理返回结果
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", sendToClientData);
             long needTime = System.currentTimeMillis() - startTime;

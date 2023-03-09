@@ -3,10 +3,10 @@ package org.skynet.service.provider.hunting.obsolete.DBOperation;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.skynet.commons.context.exception.SkynetException;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.query.UserDataLandQuery;
-import org.skynet.commons.hunting.user.query.UserDataUpdateQuery;
-import org.skynet.commons.hunting.user.service.UserFeignService;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.query.UserDataLandQuery;
+import org.skynet.components.hunting.user.query.UserDataUpdateQuery;
+import org.skynet.components.hunting.user.service.UserFeignService;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -17,15 +17,12 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.CloudUserDataDto;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.skynet.starter.codis.service.CodisService;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.*;
-import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -710,12 +707,12 @@ public class RedisDBOperation {
         String key = "Token:" + userUid;
 
         // redisDBOperation.redisTemplate.opsForValue().set(key, token, tokenExpiration, TimeUnit.DAYS);
-        redisDBOperation.codisService.set(key, token, tokenExpiration, TimeUnit.DAYS);
+        redisDBOperation.codisService.set(key, token, tokenExpiration * 24 * 60, TimeUnit.SECONDS);
     }
 
     public static void setCacheObject(final String key, final String value, final Integer timeout, final TimeUnit timeUnit) {
         // redisDBOperation.redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
-        redisDBOperation.codisService.set(key, value, timeout, TimeUnit.DAYS);
+        redisDBOperation.codisService.set(key, value, timeout, TimeUnit.MILLISECONDS);
     }
     public static String getCacheObject(final String key) {
         // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);

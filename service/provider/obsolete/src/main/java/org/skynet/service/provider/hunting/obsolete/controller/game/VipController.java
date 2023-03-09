@@ -7,11 +7,11 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.config.VipConfig;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.VipDTO;
-import org.skynet.commons.hunting.user.domain.PlayerVipData;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.PlayerVipData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class VipController {
     private SystemPropertiesConfig systemPropertiesConfig;
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @PostMapping("/vip-claimVipDailyRewards")
     @ApiOperation("获得vip每日奖励")
@@ -43,15 +43,15 @@ public class VipController {
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             int diamondRewardCount = 0;
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
             PlayerVipData vipData = userData.getVipData();
-            boolean[] playerVipStatus = userDataService.getPlayerVipStatus(userData);
+            boolean[] playerVipStatus = obsoleteUserDataService.getPlayerVipStatus(userData);
             Long standardTimeDay = TimeUtils.getStandardTimeDay();
 
             //是否可以获得每日奖励
@@ -79,7 +79,7 @@ public class VipController {
             sendToClientData.setDiamond(userData.getDiamond());
             sendToClientData.setVipData(vipData);
             sendToClientData.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", sendToClientData);

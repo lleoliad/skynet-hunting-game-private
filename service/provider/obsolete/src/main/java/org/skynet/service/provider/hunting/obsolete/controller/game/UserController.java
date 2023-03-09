@@ -3,9 +3,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.domain.*;
-import org.skynet.commons.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.*;
+import org.skynet.components.hunting.user.enums.ABTestGroup;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.PlayerLoginQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
@@ -33,7 +33,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTa
 import org.skynet.service.provider.hunting.obsolete.service.HuntingMatchService;
 import org.skynet.service.provider.hunting.obsolete.service.IAPService;
 import org.skynet.service.provider.hunting.obsolete.service.SigninDiamondRewardTableService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class UserController {
     private HuntingMatchService huntingMatchService;
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
@@ -247,7 +247,7 @@ public class UserController {
             long startTime = System.currentTimeMillis();
             log.info("[cmd] login" + System.currentTimeMillis());
 
-            userDataService.createLoginSessionData(loginDTO);
+            obsoleteUserDataService.createLoginSessionData(loginDTO);
 
             CommonUtils.requestProcess(loginDTO, false, systemPropertiesConfig.getSupportRecordModeClient());
 
@@ -262,7 +262,7 @@ public class UserController {
                 log.warn("开始创建新用户");
                 //新用户
                 isNewUser = true;
-                newUserData = userDataService.createNewPlayer(loginDTO.getGameVersion());
+                newUserData = obsoleteUserDataService.createNewPlayer(loginDTO.getGameVersion());
                 if (newUserData != null) {
                     log.warn("新用户创建成功，用户信息为：{}", JSONUtil.toJsonStr(newUserData));
                 } else {
@@ -281,7 +281,7 @@ public class UserController {
                 //         throw new BusinessException("该玩家已经在线");
                 //     }
                 // }
-                userDataService.checkUserDataExist(loginDTO.getUserUid());
+                obsoleteUserDataService.checkUserDataExist(loginDTO.getUserUid());
                 loginUserData = GameEnvironment.userDataMap.get(loginDTO.getUserUid());
 
             }
@@ -292,7 +292,7 @@ public class UserController {
 
             String userToken = null;
 
-            InitUserDataBO initUserDataBO = userDataService.initUserData(loginUserData, privateKey, loginUserUid, loginDTO);
+            InitUserDataBO initUserDataBO = obsoleteUserDataService.initUserData(loginUserData, privateKey, loginUserUid, loginDTO);
 
             loginUserData = initUserDataBO.getUserData();
 
@@ -302,7 +302,7 @@ public class UserController {
 
             giftPackagePopUpRecommendPrice = iapService.getGiftPackagePopUpPriceRecommendPrice(loginUserData);
 
-            userDataService.userDataTransaction(loginUserData, false, loginDTO.getGameVersion());
+            obsoleteUserDataService.userDataTransaction(loginUserData, false, loginDTO.getGameVersion());
             loginUserData.getServerOnly().setLastLoginClientVersion(loginDTO.getGameVersion());
             GameEnvironment.userDataMap.remove(loginUserUid);
 
@@ -396,7 +396,7 @@ public class UserController {
 
             Result<?> rankLeagueLoginResult = rankLeagueFeignService.playerInitialize(PlayerLoginQuery.builder()
                     .version(loginDTO.getGameVersion())
-                    .userId(loginDTO.getUserUid())
+                    .userId(loginUserUid)
                     .nickname(loginUserData.getName())
                     .headPic(null)
                     .coin(0L)
@@ -432,7 +432,7 @@ public class UserController {
                 map.put("privateKey", privateKey);
             }
 
-            userDataService.updateSessionToken(loginUserData, userToken, loginDTO.getRequestRandomId());
+            obsoleteUserDataService.updateSessionToken(loginUserData, userToken, loginDTO.getRequestRandomId());
 
             long needTime = System.currentTimeMillis() - startTime;
             GameEnvironment.timeMessage.get("login").add(needTime);
@@ -525,11 +525,11 @@ public class UserController {
             long startTime = System.currentTimeMillis();
             log.info("[cmd] changePlayerName" + System.currentTimeMillis());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             Map<String, Object> changeNameResult = new HashMap<>();
@@ -542,7 +542,7 @@ public class UserController {
                 changeNameResult.put("rejectReason", "new_name_is_empty");
                 log.error("玩家" + request.getUserUid() + "新名称为空");
                 map.put("result", changeNameResult);
-                userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
                 map.put("userData", sendToClientData);
                 return map;
 //                throw new BusinessException(map.toString());
@@ -553,7 +553,7 @@ public class UserController {
                 changeNameResult.put("rejectReason", "contain_illegal_character");
                 log.error("修改名称" + request.getNewName() + "包含非法字符");
                 map.put("result", changeNameResult);
-                userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
                 map.put("userData", sendToClientData);
                 return map;
 //                throw new BusinessException(map.toString());
@@ -561,11 +561,11 @@ public class UserController {
 
             //bad word check
             log.info("check name" + request.getNewName());
-            if (userDataService.checkContainBadWords(request.getNewName())) {
+            if (obsoleteUserDataService.checkContainBadWords(request.getNewName())) {
                 changeNameResult.put("rejectReason", "bad_word_check_not_pass");
                 log.error("修改名称" + request.getNewName() + "包含脏字");
                 map.put("result", changeNameResult);
-                userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
                 map.put("userData", sendToClientData);
                 return map;
 //                throw new BusinessException(map.toString());
@@ -576,7 +576,7 @@ public class UserController {
             sendToClientData.setName(userData.getName());
             changeNameResult.put("success", true);
             map.put("result", changeNameResult);
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             map.put("userData", sendToClientData);
             long needTime = System.currentTimeMillis() - startTime;

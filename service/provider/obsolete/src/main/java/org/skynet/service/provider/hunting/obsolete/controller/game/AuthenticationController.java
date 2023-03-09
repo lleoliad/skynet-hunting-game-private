@@ -16,13 +16,13 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.AuthenticationDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.AccountMapData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.AccountSummaryData;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.vo.DeviceIdUser;
 import org.skynet.service.provider.hunting.obsolete.pojo.vo.FacebookIdUser;
 import org.skynet.service.provider.hunting.obsolete.pojo.vo.GoogleIdUser;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,7 +48,7 @@ public class AuthenticationController {
     private SystemPropertiesConfig systemPropertiesConfig;
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
 
     @PostMapping("auth-getAuthenticationProviderBindGameAccount")
@@ -60,7 +60,7 @@ public class AuthenticationController {
             String cloudUrl = systemPropertiesConfig.getCloudUrl();
             UserData bindPlayerData;
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             AccountSummaryData accountSummaryData = new AccountSummaryData();
 
@@ -69,7 +69,7 @@ public class AuthenticationController {
             if (request.getAuthenticationProvider() == AuthenticationProvider.Google) {
                 log.warn("开始验证玩家谷歌账号");
                 //验证玩家登陆账号
-                userDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+                obsoleteUserDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
                 AccountMapData googleAccountData = RedisDBOperation.selectGoogleAccountMapData(request.getProviderUserId());
                 if (googleAccountData == null) {
                     log.warn("本地数据库不存在玩家数据，开始从远程拉取");
@@ -120,7 +120,7 @@ public class AuthenticationController {
             } else if (request.getAuthenticationProvider() == AuthenticationProvider.Facebook) {
                 log.warn("开始验证玩家Facebook账号");
 
-                userDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+                obsoleteUserDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
 
                 AccountMapData facebookAccountData = RedisDBOperation.selectFacebookAccountMapData(request.getProviderUserId());
 
@@ -191,13 +191,13 @@ public class AuthenticationController {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             String cloudUrl = systemPropertiesConfig.getCloudUrl();
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
             if (request.getAuthenticationProvider() == AuthenticationProvider.Google) {
 
                 log.warn("开始验证玩家谷歌账号");
                 //验证玩家登陆账号
-                userDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+                obsoleteUserDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
 
                 AccountMapData googleAccountData = RedisDBOperation.selectGoogleAccountMapData(request.getProviderUserId());
 
@@ -226,7 +226,7 @@ public class AuthenticationController {
                     log.warn("恢复的玩家数据信息为：{}", JSONUtil.toJsonStr(existPlayerData));
                     Map<String, Object> map = CommonUtils.responsePrepare(null);
                     BeanUtils.copyProperties(existPlayerData, userDataSendToClient);
-                    userDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
+                    obsoleteUserDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
                     map.put("userData", userDataSendToClient);
                     map.put("privateKey", existPlayerData.getServerOnly().getPrivateKey());
 
@@ -246,7 +246,7 @@ public class AuthenticationController {
                 log.warn("恢复的玩家数据信息为：{}", JSONUtil.toJsonStr(existPlayerData));
                 Map<String, Object> map = CommonUtils.responsePrepare(null);
                 BeanUtils.copyProperties(existPlayerData, userDataSendToClient);
-                userDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
                 map.put("userData", userDataSendToClient);
                 map.put("privateKey", existPlayerData.getServerOnly().getPrivateKey());
 
@@ -261,7 +261,7 @@ public class AuthenticationController {
             } else if (request.getAuthenticationProvider() == AuthenticationProvider.Facebook) {
                 log.warn("开始验证玩家Facebook账号");
 
-                userDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+                obsoleteUserDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
 
                 AccountMapData facebookAccountData = RedisDBOperation.selectFacebookAccountMapData(request.getProviderUserId());
 
@@ -292,7 +292,7 @@ public class AuthenticationController {
                     log.warn("恢复的玩家数据信息为：{}", JSONUtil.toJsonStr(existPlayerData));
                     Map<String, Object> map = CommonUtils.responsePrepare(null);
                     BeanUtils.copyProperties(existPlayerData, userDataSendToClient);
-                    userDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
+                    obsoleteUserDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
                     map.put("userData", userDataSendToClient);
                     map.put("privateKey", existPlayerData.getServerOnly().getPrivateKey());
 
@@ -313,7 +313,7 @@ public class AuthenticationController {
                 log.warn("恢复的玩家数据信息为：{}", JSONUtil.toJsonStr(existPlayerData));
                 Map<String, Object> map = CommonUtils.responsePrepare(null);
                 BeanUtils.copyProperties(existPlayerData, userDataSendToClient);
-                userDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(existPlayerData, userDataSendToClient, false, request.getGameVersion());
                 map.put("userData", userDataSendToClient);
                 map.put("privateKey", existPlayerData.getServerOnly().getPrivateKey());
 
@@ -346,7 +346,7 @@ public class AuthenticationController {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             String cloudUrl = systemPropertiesConfig.getCloudUrl();
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             UserDataSendToClient userDataSendToClient = GameEnvironment.prepareSendToClientUserData();
 
 
@@ -359,7 +359,7 @@ public class AuthenticationController {
             if (request.getAuthenticationProvider().equals(AuthenticationProvider.Google)) {
                 log.info("google鉴权登陆");
 
-                GoogleIdToken.Payload payload = userDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+                GoogleIdToken.Payload payload = obsoleteUserDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
 
                 //检查该账号是否有游戏账号
                 AccountMapData googleAccountMapData = RedisDBOperation.selectGoogleAccountMapData(request.getProviderUserId());
@@ -419,7 +419,7 @@ public class AuthenticationController {
 
                 String pictureUrl = (String) payload.get("picture");
                 //保存头像
-                userDataService.saveUserProfileImage(pictureUrl, request.getUserUid());
+                obsoleteUserDataService.saveUserProfileImage(pictureUrl, request.getUserUid());
 
                 //正常登录，绑定该账号
                 if (StringUtils.isEmpty(existPlayerData.getLinkedAuthProviderData().getGooglePlayUserId())) {
@@ -430,9 +430,9 @@ public class AuthenticationController {
 
                 //这里是否会传deviceId
                 if (request.getDeviceId() != null) {
-                    userDataService.deleteGuestAccountData(existPlayerData, request.getDeviceId());
+                    obsoleteUserDataService.deleteGuestAccountData(existPlayerData, request.getDeviceId());
                 }
-                userDataService.userDataSettlement(existPlayerData, userDataSendToClient, true, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(existPlayerData, userDataSendToClient, true, request.getGameVersion());
 
                 Map<String, Object> map = CommonUtils.responsePrepare(null);
                 map.put("userData", userDataSendToClient);
@@ -441,7 +441,7 @@ public class AuthenticationController {
 
                 log.info("facebook 鉴权登录");
 
-                String serverToken = userDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+                String serverToken = obsoleteUserDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
                 log.info("facebook 鉴权登陆验证成功");
 
                 //检查该账号是否有游戏账号
@@ -501,7 +501,7 @@ public class AuthenticationController {
 
                 //保存头像
                 String profileImageUrl = "https://graph.facebook.com/v14.0/" + request.getProviderUserId() + "/picture?type=square&access_token=" + serverToken;
-                userDataService.saveUserProfileImage(profileImageUrl, request.getUserUid());
+                obsoleteUserDataService.saveUserProfileImage(profileImageUrl, request.getUserUid());
 
                 //正常登录，绑定该账号
                 if (StringUtils.isEmpty(existPlayerData.getLinkedAuthProviderData().getFacebookUserId())) {
@@ -512,9 +512,9 @@ public class AuthenticationController {
 
                 //这里是否会传deviceId
                 if (request.getDeviceId() != null) {
-                    userDataService.deleteGuestAccountData(existPlayerData, request.getDeviceId());
+                    obsoleteUserDataService.deleteGuestAccountData(existPlayerData, request.getDeviceId());
                 }
-                userDataService.userDataSettlement(existPlayerData, userDataSendToClient, true, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(existPlayerData, userDataSendToClient, true, request.getGameVersion());
 
                 Map<String, Object> map = CommonUtils.responsePrepare(null);
                 map.put("userData", userDataSendToClient);
@@ -540,7 +540,7 @@ public class AuthenticationController {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             String cloudUrl = systemPropertiesConfig.getCloudUrl();
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             AccountMapData accountMapData = RedisDBOperation.selectGuestAccount(request.getDeviceId(), request.getUserUid());
 

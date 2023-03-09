@@ -1,6 +1,6 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordChooseMode;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CheckNewUnlockChapterBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;

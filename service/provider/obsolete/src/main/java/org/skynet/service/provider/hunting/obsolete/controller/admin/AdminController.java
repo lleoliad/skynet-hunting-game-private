@@ -3,9 +3,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.admin;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.domain.ChestData;
-import org.skynet.commons.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.ChestData;
+import org.skynet.components.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.*;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.skynet.starter.codis.service.CodisService;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private HuntingMatchService huntingMatchService;
@@ -85,7 +84,7 @@ public class AdminController {
 //            CommonUtils.processAdminRequest(request.getAdminKey());
             UserData userData = RedisDBOperation.selectUserData("User:" + request.getUserUid());
 
-            userDataService.saveUserData(request.getUserData());
+            obsoleteUserDataService.saveUserData(request.getUserData());
 
             return CommonUtils.responsePrepare(null);
         } catch (Exception e) {
@@ -99,7 +98,7 @@ public class AdminController {
 
         try {
             CommonUtils.processAdminRequest(request.getAdminKey());
-            userDataService.checkUserData(request.getTargetPlayerUid());
+            obsoleteUserDataService.checkUserData(request.getTargetPlayerUid());
             if (request.getChestContent() != null) {
 
                 ChestData chestData = request.getChestContent().getChestData();
@@ -851,7 +850,7 @@ public class AdminController {
             }
         }
         if (useTotalRandomAiProfile) {
-            opponentPlayerInfo.setName(userDataService.createGuestName(userUid));
+            opponentPlayerInfo.setName(obsoleteUserDataService.createGuestName(userUid));
             opponentPlayerInfo.setIcon_base64(null);
             opponentPlayerInfo.setUseDefaultIcon(true);
         } else {

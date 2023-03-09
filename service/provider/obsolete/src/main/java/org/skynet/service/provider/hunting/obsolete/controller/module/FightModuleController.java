@@ -2,9 +2,9 @@ package org.skynet.service.provider.hunting.obsolete.controller.module;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.domain.*;
-import org.skynet.commons.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.*;
+import org.skynet.components.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.*;
@@ -52,7 +52,7 @@ public class FightModuleController {
 
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private HuntingMatchService huntingMatchService;
@@ -111,7 +111,7 @@ public class FightModuleController {
             PlayerUploadWholeMatchControlRecordData wholeMatchControlRecordsData = null;
             PlayerRecordModeData recordModeData = null;
 
-            userDataService.checkUserDataExist(playerUUID);
+            obsoleteUserDataService.checkUserDataExist(playerUUID);
             UserData userData = GameEnvironment.userDataMap.get(playerUUID);
 
             recordModeData = userData.getServerOnly().getRecordModeData();
@@ -144,7 +144,7 @@ public class FightModuleController {
             //因为上面章节进入次数已经+1了，这里-1
             matchId = huntingMatchService.determineEnterWhichMatch(playerUUID, realChapterId, chapterEnteredCount - 1, request.getGameVersion());
 
-            double playerCultivateScore = userDataService.calculatePlayerCultivateScore(request.getUserUid(), request.getGameVersion());
+            double playerCultivateScore = obsoleteUserDataService.calculatePlayerCultivateScore(request.getUserUid(), request.getGameVersion());
             double cultivateWinRateAddition = Math.max(0, Math.min(playerCultivateScore, chapterTableValue.getMaxCultivateScore()) - chapterTableValue.getMinCultivateScore()) * chapterTableValue.getMaxCultivateWinRateAddition() /
                     Math.max(0, chapterTableValue.getMaxCultivateScore() - chapterTableValue.getMinCultivateScore());
 
@@ -247,7 +247,7 @@ public class FightModuleController {
             }
 
             userDataSendToClient.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             String huntingMatchUUID = NanoIdUtils.randomNanoId(30);
 
@@ -429,7 +429,7 @@ public class FightModuleController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             PlayerRecordModeData recordModeData = userData.getServerOnly().getRecordModeData();
@@ -515,7 +515,7 @@ public class FightModuleController {
 
             //如果胜利,且已经完成了第一次PVP匹配教学,获得一个章节胜利宝箱
             if (isPlayerWin
-                    && userDataService.isForceTutorialStepComplete(userData.getUuid(), ForceTutorialStepNames.forceCompleteFirstPvPMatch.getName())
+                    && obsoleteUserDataService.isForceTutorialStepComplete(userData.getUuid(), ForceTutorialStepNames.forceCompleteFirstPvPMatch.getName())
                     && !request.getClientBuildInAppInfo().getRecordOnlyMode()) {
                 newCreateChapterWinChestData = chestService.tryCreateChapterWinChest(userData.getUuid(), chapterTableValue.getId(), request.getGameVersion());
             }
@@ -576,7 +576,7 @@ public class FightModuleController {
 //            sendToClientUserData.setHistory(history);
 
 
-            userDataService.userDataSettlement(userData, sendToClientUserData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientUserData, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 
             map.put("userData", sendToClientUserData);
@@ -615,7 +615,7 @@ public class FightModuleController {
 
             //载入当前玩家信息
             String userUid = request.getUserUid();
-            userDataService.checkUserDataExist(userUid);
+            obsoleteUserDataService.checkUserDataExist(userUid);
             UserData userData = GameEnvironment.userDataMap.get(userUid);
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
@@ -774,7 +774,7 @@ public class FightModuleController {
             huntingMatchService.reSaveHuntingMatchNowData(matchPath, request.getHuntingMatchNowUid(), userUid, huntingMatchNowData);
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
-            userDataService.userDataSettlement(userData, sendToClientData, false, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, false, request.getGameVersion());
             if (findControlRecordData != null) {
                 map.put("recordDataBase64", findControlRecordEncodeData);
             }
@@ -810,7 +810,7 @@ public class FightModuleController {
             long startTime = System.currentTimeMillis();
             log.info("[cmd] login" + System.currentTimeMillis());
 
-            userDataService.createLoginSessionData(loginDTO);
+            obsoleteUserDataService.createLoginSessionData(loginDTO);
 
             CommonUtils.requestProcess(loginDTO, false, systemPropertiesConfig.getSupportRecordModeClient());
 
@@ -825,7 +825,7 @@ public class FightModuleController {
                 log.warn("开始创建新用户");
                 //新用户
                 isNewUser = true;
-                newUserData = userDataService.createNewPlayer(loginDTO.getGameVersion());
+                newUserData = obsoleteUserDataService.createNewPlayer(loginDTO.getGameVersion());
                 if (newUserData != null) {
                     log.warn("新用户创建成功，用户信息为：{}", JSONUtil.toJsonStr(newUserData));
                 } else {
@@ -844,7 +844,7 @@ public class FightModuleController {
                         throw new BusinessException("该玩家已经在线");
                     }
                 }
-                userDataService.checkUserDataExist(loginDTO.getUserUid());
+                obsoleteUserDataService.checkUserDataExist(loginDTO.getUserUid());
                 loginUserData = GameEnvironment.userDataMap.get(loginDTO.getUserUid());
 
             }
@@ -855,7 +855,7 @@ public class FightModuleController {
 
             String userToken = null;
 
-            InitUserDataBO initUserDataBO = userDataService.initUserData(loginUserData, privateKey, loginUserUid, loginDTO);
+            InitUserDataBO initUserDataBO = obsoleteUserDataService.initUserData(loginUserData, privateKey, loginUserUid, loginDTO);
 
             loginUserData = initUserDataBO.getUserData();
 
@@ -865,7 +865,7 @@ public class FightModuleController {
 
             giftPackagePopUpRecommendPrice = iapService.getGiftPackagePopUpPriceRecommendPrice(loginUserData);
 
-            userDataService.userDataTransaction(loginUserData, false, loginDTO.getGameVersion());
+            obsoleteUserDataService.userDataTransaction(loginUserData, false, loginDTO.getGameVersion());
             loginUserData.getServerOnly().setLastLoginClientVersion(loginDTO.getGameVersion());
             GameEnvironment.userDataMap.remove(loginUserUid);
 
@@ -877,7 +877,7 @@ public class FightModuleController {
 
             LuckyWheelV2PropertyTableValue luckyWheelV2PropertyTable = GameEnvironment.luckyWheelV2PropertyTableMap.get(loginDTO.getGameVersion());
 
-            Integer newRequestId = userDataService.getUserMaxRequestIdNow(loginUserUid);
+            Integer newRequestId = obsoleteUserDataService.getUserMaxRequestIdNow(loginUserUid);
 
             if (loginDTO.getPlatform().equals(PlatformName.IOS.getPlatform())) {
 
@@ -955,7 +955,7 @@ public class FightModuleController {
                 map.put("privateKey", privateKey);
             }
 
-            userDataService.updateSessionToken(loginUserData, userToken, loginDTO.getRequestRandomId());
+            obsoleteUserDataService.updateSessionToken(loginUserData, userToken, loginDTO.getRequestRandomId());
 
             long needTime = System.currentTimeMillis() - startTime;
             GameEnvironment.timeMessage.get("login").add(needTime);

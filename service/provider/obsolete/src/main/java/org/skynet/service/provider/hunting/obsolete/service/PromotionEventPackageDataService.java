@@ -1,7 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
-import org.skynet.commons.hunting.user.domain.PromotionEventPackageData;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.PromotionEventPackageData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PromotionGiftPackageGroupV2TableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PromotionEventPackageTableValue;
 

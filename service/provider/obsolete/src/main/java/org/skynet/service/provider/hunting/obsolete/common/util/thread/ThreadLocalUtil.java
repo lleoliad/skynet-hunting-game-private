@@ -13,7 +13,7 @@ public class ThreadLocalUtil {
         SystemPropertiesConfig bean = ApplicationContextUtil.getBean(SystemPropertiesConfig.class);
         if (!bean.getProduction()) {
             if (time != null) {
-                log.warn("非生产环境，向ThreadLocal中添加值：{}", time);
+                // log.warn("非生产环境，向ThreadLocal中添加值：{}", time);
                 localVar.set(time);
             }
         } else {

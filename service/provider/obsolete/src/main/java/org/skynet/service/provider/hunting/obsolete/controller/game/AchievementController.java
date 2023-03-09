@@ -8,14 +8,14 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.enums.AchievementType;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.AchievementDTO;
-import org.skynet.commons.hunting.user.domain.AchievementData;
-import org.skynet.commons.hunting.user.domain.History;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.AchievementData;
+import org.skynet.components.hunting.user.domain.History;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.AchievementTableValue;
 import org.skynet.service.provider.hunting.obsolete.service.AchievementService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class AchievementController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private AchievementService achievementService;
@@ -58,12 +58,12 @@ public class AchievementController {
             log.info(JSONObject.toJSONString(request));
 
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             if (!(request.getAchievementType() instanceof Integer)) {
@@ -149,7 +149,7 @@ public class AchievementController {
             sendToClientData.setHistory(userData.getHistory());
 
             //处理返回结果
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 //            sendToClientData.setHistory(userData.getHistory());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", sendToClientData);

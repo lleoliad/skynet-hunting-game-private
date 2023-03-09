@@ -3,7 +3,7 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.GunReward;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.GunTableValue;
 import org.skynet.service.provider.hunting.obsolete.service.WeaponService;

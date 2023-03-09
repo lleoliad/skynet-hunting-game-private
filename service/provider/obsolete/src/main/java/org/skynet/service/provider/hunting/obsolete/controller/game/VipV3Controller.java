@@ -11,12 +11,12 @@ import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.VipDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
-import org.skynet.commons.hunting.user.domain.PlayerVipV3Data;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.PlayerVipV3Data;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class VipV3Controller {
     private SystemPropertiesConfig systemPropertiesConfig;
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private ChestService chestService;
@@ -54,15 +54,15 @@ public class VipV3Controller {
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             int diamondRewardCount = 0;
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
             PlayerVipV3Data vipV3Data = userData.getVipV3Data();
-            boolean[] playerVipV3Status = userDataService.getPlayerVipV3Status(userData);
+            boolean[] playerVipV3Status = obsoleteUserDataService.getPlayerVipV3Status(userData);
             Long standardTimeDay = TimeUtils.getStandardTimeDay();
 
             boolean isSVipV3 = playerVipV3Status[1];
@@ -84,18 +84,18 @@ public class VipV3Controller {
             Map<Integer, Integer> dailyBulletRewardCountMap = new HashMap<Integer, Integer>() {{
                 put(VipV3Config.svipDailyRewardBulletId, VipV3Config.svipDailyRewardBulletCount);
             }};
-            userDataService.addBulletToUserDataByIdCountData(userData, new ArrayList<BulletReward>() {
+            obsoleteUserDataService.addBulletToUserDataByIdCountData(userData, new ArrayList<BulletReward>() {
                 {
                     add(new BulletReward(VipV3Config.svipDailyRewardBulletId, VipV3Config.svipDailyRewardBulletCount));
                 }
             });
 
             // 橙卡枪
-            Integer playerHighestUnlockedChapterID = userDataService.playerHighestUnlockedChapterID(userData);
+            Integer playerHighestUnlockedChapterID = obsoleteUserDataService.playerHighestUnlockedChapterID(userData);
             Map<Integer, Integer> gunRewards = chestService.extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, VipV3Config.svipDailyRewardOrangeGunCount, request.getGameVersion(), false, null);
 
             List<Integer> newUnlockedGunIDs = new ArrayList<>();
-            userDataService.addGunToUserData(userData, gunRewards, newUnlockedGunIDs, request.getGameVersion());
+            obsoleteUserDataService.addGunToUserData(userData, gunRewards, newUnlockedGunIDs, request.getGameVersion());
 
             log.info("领取vip每日钻石: " + diamondRewardCount + ",领取子弹: " + JSONObject.toJSONString(dailyBulletRewardCountMap) + ",橙卡枪：" + JSONObject.toJSONString(gunRewards));
 
@@ -108,7 +108,7 @@ public class VipV3Controller {
             sendToClientData.setGunLevelMap(userData.getGunLevelMap());
             sendToClientData.setVipV3Data(vipV3Data);
             sendToClientData.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             List<Map<String, Integer>> rewardGunData = new ArrayList<>();
             for (Map.Entry<Integer, Integer> entry : gunRewards.entrySet()) {
@@ -141,15 +141,15 @@ public class VipV3Controller {
         try {
             ThreadLocalUtil.set(request.getServerTimeOffset());
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
             int diamondRewardCount = 0;
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
             PlayerVipV3Data vipV3Data = userData.getVipV3Data();
-            boolean[] playerVipV3Status = userDataService.getPlayerVipV3Status(userData);
+            boolean[] playerVipV3Status = obsoleteUserDataService.getPlayerVipV3Status(userData);
             Long standardTimeDay = TimeUtils.getStandardTimeDay();
 
             boolean isVipV3 = playerVipV3Status[0];
@@ -171,7 +171,7 @@ public class VipV3Controller {
             Map<Integer, Integer> dailyBulletRewardCountMap = new HashMap<Integer, Integer>() {{
                 put(VipV3Config.vipDailyRewardBulletId, VipV3Config.vipDailyRewardBulletCount);
             }};
-            userDataService.addBulletToUserDataByIdCountData(userData, new ArrayList<BulletReward>() {
+            obsoleteUserDataService.addBulletToUserDataByIdCountData(userData, new ArrayList<BulletReward>() {
                 {
                     add(new BulletReward(VipV3Config.vipDailyRewardBulletId, VipV3Config.vipDailyRewardBulletCount));
                 }
@@ -186,7 +186,7 @@ public class VipV3Controller {
             sendToClientData.setBulletCountMap(userData.getBulletCountMap());
             sendToClientData.setVipV3Data(vipV3Data);
             sendToClientData.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", sendToClientData);

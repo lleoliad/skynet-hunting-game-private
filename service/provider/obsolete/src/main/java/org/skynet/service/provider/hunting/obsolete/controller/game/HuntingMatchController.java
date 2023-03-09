@@ -7,12 +7,10 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
-import org.skynet.commons.hunting.user.dao.entity.UserData;
-import org.skynet.commons.hunting.user.domain.ChapterWinChestData;
-import org.skynet.commons.hunting.user.domain.PlayerRecordModeData;
-import org.skynet.commons.hunting.user.query.AddCoinsQuery;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.ChapterWinChestData;
+import org.skynet.components.hunting.user.domain.PlayerRecordModeData;
 import org.skynet.components.hunting.rank.league.message.AddCoinMessage;
-import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
@@ -40,7 +38,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTa
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,7 +55,7 @@ import java.util.*;
 public class HuntingMatchController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private HuntingMatchService huntingMatchService;
@@ -609,7 +606,7 @@ public class HuntingMatchController {
             PlayerUploadWholeMatchControlRecordData wholeMatchControlRecordsData = null;
             PlayerRecordModeData recordModeData = null;
 
-            userDataService.checkUserDataExist(playerUUID);
+            obsoleteUserDataService.checkUserDataExist(playerUUID);
             UserData userData = GameEnvironment.userDataMap.get(playerUUID);
 
             recordModeData = userData.getServerOnly().getRecordModeData();
@@ -642,7 +639,7 @@ public class HuntingMatchController {
             //因为上面章节进入次数已经+1了，这里-1
 //            matchId  = huntingMatchService.determineEnterWhichMatch(playerUUID, realChapterId, chapterEnteredCount - 1,request.getGameVersion());
 
-            double playerCultivateScore = userDataService.calculatePlayerCultivateScore(request.getUserUid(), request.getGameVersion());
+            double playerCultivateScore = obsoleteUserDataService.calculatePlayerCultivateScore(request.getUserUid(), request.getGameVersion());
             double cultivateWinRateAddition = Math.max(0, Math.min(playerCultivateScore, chapterTableValue.getMaxCultivateScore()) - chapterTableValue.getMinCultivateScore()) * chapterTableValue.getMaxCultivateWinRateAddition() /
                     Math.max(0, chapterTableValue.getMaxCultivateScore() - chapterTableValue.getMinCultivateScore());
 
@@ -766,7 +763,7 @@ public class HuntingMatchController {
             }
 
             userDataSendToClient.setHistory(userData.getHistory());
-            userDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, userDataSendToClient, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             String huntingMatchUUID = NanoIdUtils.randomNanoId(30);
 
@@ -1012,7 +1009,7 @@ public class HuntingMatchController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             PlayerRecordModeData recordModeData = userData.getServerOnly().getRecordModeData();
@@ -1122,7 +1119,7 @@ public class HuntingMatchController {
 
             //如果胜利,且已经完成了第一次PVP匹配教学,获得一个章节胜利宝箱
             if (isPlayerWin
-                    && userDataService.isForceTutorialStepComplete(userData.getUuid(), ForceTutorialStepNames.forceCompleteFirstPvPMatch.getName())
+                    && obsoleteUserDataService.isForceTutorialStepComplete(userData.getUuid(), ForceTutorialStepNames.forceCompleteFirstPvPMatch.getName())
                     && !request.getClientBuildInAppInfo().getRecordOnlyMode()) {
                 newCreateChapterWinChestData = chestService.tryCreateChapterWinChest(userData.getUuid(), chapterTableValue.getId(), request.getGameVersion());
             }
@@ -1186,7 +1183,7 @@ public class HuntingMatchController {
 //            sendToClientUserData.setHistory(history);
 
 
-            userDataService.userDataSettlement(userData, sendToClientUserData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientUserData, true, request.getGameVersion());
 
             //删除正在比赛的数据
             huntingMatchService.removeHuntingMatchNowData(matchPath, request.getUserUid(), request.getMatchUUID());

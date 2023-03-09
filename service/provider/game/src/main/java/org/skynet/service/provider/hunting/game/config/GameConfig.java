@@ -31,11 +31,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableMongoRepositories(basePackages = {
         "org.skynet.service.provider.hunting.game.dao.repository"
 })
-// @EnableFeignClients(basePackages = {
-//         "org.skynet.components.hunting.rank.league.service",
-//         "org.skynet.components.hunting.robot.service",
-//         "org.skynet.service.provider.hunting.obsolete.service"
-// })
+@EnableFeignClients(basePackages = {
+        "org.skynet.components.hunting.rank.league.service",
+        "org.skynet.components.hunting.robot.service",
+        "org.skynet.components.hunting.user.service",
+})
 @RefreshScope
 @EnableCaching
 // @EnableKafka

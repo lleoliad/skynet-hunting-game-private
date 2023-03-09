@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.skynet.cloud</groupId>
-        <artifactId>spring-cloud-skynet-hunting-game</artifactId>
+        <artifactId>skynet-hunting-game-components</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>skynet-hunting-game-components-game</artifactId>
@@ -57,7 +56,7 @@
 
         <dependency>
             <groupId>org.skynet.cloud</groupId>
-            <artifactId>skynet-hunting-commons-user</artifactId>
+            <artifactId>skynet-hunting-game-components-user</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

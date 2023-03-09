@@ -3,11 +3,15 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.domain.History;
+import org.skynet.components.hunting.user.domain.UserPendingPurchaseData;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.NanoIdUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
+import org.skynet.service.provider.hunting.obsolete.dao.entity.TopUpOrder;
 import org.skynet.service.provider.hunting.obsolete.enums.OrderState;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
@@ -18,8 +22,8 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.SyncPendingDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
 import org.skynet.service.provider.hunting.obsolete.service.IAPService;
-import org.skynet.service.provider.hunting.obsolete.service.TopUpOrderService;
-import org.skynet.service.provider.hunting.obsolete.service.UserDataService;
+import org.skynet.service.provider.hunting.obsolete.dao.service.TopUpOrderService;
+import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +46,7 @@ import java.util.stream.Collectors;
 public class IAPController {
 
     @Resource
-    private UserDataService userDataService;
+    private ObsoleteUserDataService obsoleteUserDataService;
 
     @Resource
     private IAPService iapService;
@@ -64,14 +68,14 @@ public class IAPController {
             log.info("[cmd] preparePurchase" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
             String customOrderId = NanoIdUtils.randomNanoId(30);
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             List<UserPendingPurchaseData> pendingPurchasesData = new ArrayList<>();
@@ -114,7 +118,7 @@ public class IAPController {
             sendToClientData.setIapPendingPurchaseProductsData(pendingPurchasesData);
             log.info("正在发起购买. product: " + request.getProductName() + ",pending data" + JSONObject.toJSONString(pendingPurchasesData));
 
-            userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 
             map.put("userData", sendToClientData);
@@ -144,7 +148,7 @@ public class IAPController {
             log.info("[cmd] iapReceiptValidate" + System.currentTimeMillis());
             log.info(JSONObject.toJSONString(request));
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            userDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
 
             UserDataSendToClient sendToClientData = GameEnvironment.prepareSendToClientUserData();
 
@@ -228,7 +232,7 @@ public class IAPController {
                 IAPPurchaseReward purchaseReward = null;
 
                 //处理userData
-                userDataService.checkUserDataExist(request.getUserUid());
+                obsoleteUserDataService.checkUserDataExist(request.getUserUid());
                 UserData userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
                 purchaseReward = iapService.iapPurchaseContentDelivery(userData.getUuid(), validateResult.getProductName(), pendingCustomOrder.getAdditionalParametersJSON(), request.getGameVersion());
@@ -253,7 +257,7 @@ public class IAPController {
                 BeanUtils.copyProperties(userData.getHistory(), history);
                 sendToClientData.setHistory(history);
 
-                userDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
+                obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, request.getGameVersion());
                 iapService.saveCompletedOrder(validateResult, request.getReceipt(), pendingCustomOrder.getCustomOrderId(), request.getUserUid());
                 sendToClientData.setGunCountMap(userData.getGunCountMap());
                 sendToClientData.setGunLevelMap(userData.getGunLevelMap());
@@ -302,7 +306,7 @@ public class IAPController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(dto.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(dto.getUserUid());
             userData = GameEnvironment.userDataMap.get(dto.getUserUid());
 
             if (userData.getIapPendingPurchaseProductsData() == null) {
@@ -330,7 +334,7 @@ public class IAPController {
 
             sendToClientData.setIapPendingPurchaseProductsData(userData.getIapPendingPurchaseProductsData());
 
-            userDataService.userDataSettlement(userData, sendToClientData, true, dto.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, true, dto.getGameVersion());
 
             Map<String, Object> map = CommonUtils.responsePrepare(null);
 
@@ -362,7 +366,7 @@ public class IAPController {
             UserData userData = null;
 
             //处理userData
-            userDataService.checkUserDataExist(request.getUserUid());
+            obsoleteUserDataService.checkUserDataExist(request.getUserUid());
             userData = GameEnvironment.userDataMap.get(request.getUserUid());
 
             List<UserPendingPurchaseData> pendingPurchaseProductsData = userData.getIapPendingPurchaseProductsData();
@@ -371,7 +375,7 @@ public class IAPController {
             userData.setIapPendingPurchaseProductsData(pendingPurchaseProductsData);
             sendToClientData.setIapPendingPurchaseProductsData(userData.getIapPendingPurchaseProductsData());
 
-            userDataService.userDataSettlement(userData, sendToClientData, false, request.getGameVersion());
+            obsoleteUserDataService.userDataSettlement(userData, sendToClientData, false, request.getGameVersion());
             Map<String, Object> map = CommonUtils.responsePrepare(null);
             map.put("userData", sendToClientData);
             log.info("[cmd] syncPendingPurchaseProducts finish need time" + (System.currentTimeMillis() - startTime));
