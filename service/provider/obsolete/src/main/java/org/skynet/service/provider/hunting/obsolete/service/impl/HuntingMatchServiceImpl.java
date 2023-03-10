@@ -290,8 +290,9 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
                 RobotPlayerBasicInfoBO robotPlayerBasicInfoBO = robotPlayerBasicInfoBOResult.getData();
                 opponentPlayerInfo.setName(robotPlayerBasicInfoBO.getNickname());
                 opponentPlayerInfo.setIcon_base64(robotPlayerBasicInfoBO.getHeadPic());
+                opponentPlayerInfo.setTrophy(opponentTrophyCount);
                 opponentPlayerInfo.setUseDefaultIcon(false);
-                return opponentPlayerInfo;
+                // return opponentPlayerInfo;
             }
         }
 
@@ -299,7 +300,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
             opponentPlayerInfo.setName(obsoleteUserDataService.createGuestName(userData.getName()));
             opponentPlayerInfo.setIcon_base64(null);
             opponentPlayerInfo.setUseDefaultIcon(true);
-            return opponentPlayerInfo;
+            // return opponentPlayerInfo;
         }
 
         Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(gameVersion);
@@ -314,59 +315,59 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
             log.info("直接设置对手奖杯数:" + opponentTrophyCount);
         }
 
-        boolean useTotalRandomAiProfile = NumberUtils.randomFloat(0d, 1d) <= GameConfig.randomNameAiRatioInPlayerMatching;
-
-        //如果是第一章前三局,那么都是随机玩家信息
-        if (chapterId == 1) {
-
-            Integer firstChapterEnteredCount = 0;
-            if (userData.getChapterEnteredCountMap().containsKey(1)) {
-                firstChapterEnteredCount = userData.getChapterEnteredCountMap().get(1);
-            }
-            if (firstChapterEnteredCount <= 3) {
-                useTotalRandomAiProfile = true;
-            }
-        }
-        String osName = System.getProperty("os.name");
-        if (useTotalRandomAiProfile || osName.equals("Mac OS X")) {
-            opponentPlayerInfo.setName(obsoleteUserDataService.createGuestName(userData.getName()));
-            opponentPlayerInfo.setIcon_base64(null);
-            opponentPlayerInfo.setUseDefaultIcon(true);
-        } else {
-            //从服务器中获得对手名称和头像
-            List<Integer> latestMatchedAiProfileIds = userData.getServerOnly().getLatestMatchedAiProfileIds();
-            Integer aiProfileId = NumberUtils.randomInt(1.0, aiProfileCount);
-            int loopCount = 0;
-            while (loopCount < 20) {
-
-                if (!latestMatchedAiProfileIds.contains(aiProfileId)) {
-
-                    latestMatchedAiProfileIds.add(aiProfileId);
-                    //注意一下
-                    if (latestMatchedAiProfileIds.size() > GameConfig.maxNotDuplicateMatchingAIProfileCount) {
-                        latestMatchedAiProfileIds.subList(0, latestMatchedAiProfileIds.size() - GameConfig.maxNotDuplicateMatchingAIProfileCount);
-                    }
-
-                    break;
-                }
-
-                //ai头像id是从1开始的
-                aiProfileId = NumberUtils.randomInt(1.0, aiProfileCount);
-                loopCount++;
-            }
-
-            String collectionPath = Path.getDefaultAiProfileCollectionPath();
-
-            String redisAiProfileId = collectionPath + ":" + aiProfileId;
-            OpponentProfile opponentProfile = RedisDBOperation.selectOpponentProfile(redisAiProfileId);
-
-            if (opponentProfile == null) {
-                throw new BusinessException("获取ai profile id" + aiProfileId + "不存在");
-            }
-            opponentPlayerInfo.setName(opponentProfile.getName());
-            opponentPlayerInfo.setIcon_base64(opponentProfile.getIcon_base64());
-            opponentPlayerInfo.setUseDefaultIcon(opponentProfile.getUseDefaultIcon());
-        }
+        // boolean useTotalRandomAiProfile = NumberUtils.randomFloat(0d, 1d) <= GameConfig.randomNameAiRatioInPlayerMatching;
+        //
+        // //如果是第一章前三局,那么都是随机玩家信息
+        // if (chapterId == 1) {
+        //
+        //     Integer firstChapterEnteredCount = 0;
+        //     if (userData.getChapterEnteredCountMap().containsKey(1)) {
+        //         firstChapterEnteredCount = userData.getChapterEnteredCountMap().get(1);
+        //     }
+        //     if (firstChapterEnteredCount <= 3) {
+        //         useTotalRandomAiProfile = true;
+        //     }
+        // }
+        // String osName = System.getProperty("os.name");
+        // if (useTotalRandomAiProfile || osName.equals("Mac OS X")) {
+        //     opponentPlayerInfo.setName(obsoleteUserDataService.createGuestName(userData.getName()));
+        //     opponentPlayerInfo.setIcon_base64(null);
+        //     opponentPlayerInfo.setUseDefaultIcon(true);
+        // } else {
+        //     //从服务器中获得对手名称和头像
+        //     List<Integer> latestMatchedAiProfileIds = userData.getServerOnly().getLatestMatchedAiProfileIds();
+        //     Integer aiProfileId = NumberUtils.randomInt(1.0, aiProfileCount);
+        //     int loopCount = 0;
+        //     while (loopCount < 20) {
+        //
+        //         if (!latestMatchedAiProfileIds.contains(aiProfileId)) {
+        //
+        //             latestMatchedAiProfileIds.add(aiProfileId);
+        //             //注意一下
+        //             if (latestMatchedAiProfileIds.size() > GameConfig.maxNotDuplicateMatchingAIProfileCount) {
+        //                 latestMatchedAiProfileIds.subList(0, latestMatchedAiProfileIds.size() - GameConfig.maxNotDuplicateMatchingAIProfileCount);
+        //             }
+        //
+        //             break;
+        //         }
+        //
+        //         //ai头像id是从1开始的
+        //         aiProfileId = NumberUtils.randomInt(1.0, aiProfileCount);
+        //         loopCount++;
+        //     }
+        //
+        //     String collectionPath = Path.getDefaultAiProfileCollectionPath();
+        //
+        //     String redisAiProfileId = collectionPath + ":" + aiProfileId;
+        //     OpponentProfile opponentProfile = RedisDBOperation.selectOpponentProfile(redisAiProfileId);
+        //
+        //     if (opponentProfile == null) {
+        //         throw new BusinessException("获取ai profile id" + aiProfileId + "不存在");
+        //     }
+        //     opponentPlayerInfo.setName(opponentProfile.getName());
+        //     opponentPlayerInfo.setIcon_base64(opponentProfile.getIcon_base64());
+        //     opponentPlayerInfo.setUseDefaultIcon(opponentProfile.getUseDefaultIcon());
+        // }
 
 
         return opponentPlayerInfo;

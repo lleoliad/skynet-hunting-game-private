@@ -501,7 +501,8 @@ public class RedisDBOperation {
 
         String key = "PlayerControlRecords:HuntingMatchNowUUid" + ":" + userUid;
         // redisDBOperation.redisTemplate.opsForList().remove(key, 0, huntingMatchUUid);
-        throw new RuntimeException("功能取消");
+        redisDBOperation.codisService.lrem(key, 0, huntingMatchUUid);
+        // throw new RuntimeException("功能取消");
 
     }
 

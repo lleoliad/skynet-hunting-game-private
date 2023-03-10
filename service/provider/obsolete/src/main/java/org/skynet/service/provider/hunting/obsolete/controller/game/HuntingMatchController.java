@@ -1128,7 +1128,7 @@ public class HuntingMatchController {
             huntingMatchService.refreshPlayerHistoryData(userData.getUuid(), chapterTableValue, isPlayerWin, playerFireDetails, request.getGameVersion());
 
             //保存玩家比赛得分
-            huntingMatchService.savePlayerChapterLatestMatchScoreCollection(userData.getUuid(), chapterTableValue.getId(), localPlayerFinalScore, request.getGameVersion());
+            // huntingMatchService.savePlayerChapterLatestMatchScoreCollection(userData.getUuid(), chapterTableValue.getId(), localPlayerFinalScore, request.getGameVersion()); // 重构取消
 
             if (haveNewChapterUnlocked) {
                 //创建章节礼包
