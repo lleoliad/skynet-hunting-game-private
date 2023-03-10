@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 // })
 @EnableFeignClients(basePackages = {
         "org.skynet.components.hunting.battle.service",
+        "org.skynet.components.hunting.championship.service",
 })
 @RefreshScope
 @EnableCaching

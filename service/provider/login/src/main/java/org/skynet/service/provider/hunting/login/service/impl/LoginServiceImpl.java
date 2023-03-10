@@ -1,7 +1,6 @@
 package org.skynet.service.provider.hunting.login.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.alibaba.fastjson2.JSONObject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.commons.lang.common.Result;
@@ -9,6 +8,7 @@ import org.skynet.commons.lang.common.SkynetObject;
 import org.skynet.components.hunting.battle.query.BattleUserCreateQuery;
 import org.skynet.components.hunting.battle.query.OnlineQuery;
 import org.skynet.components.hunting.battle.service.BattleFeignService;
+import org.skynet.components.hunting.championship.service.ChampionshipFeignService;
 import org.skynet.components.hunting.rank.league.query.PlayerLoginQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.components.hunting.user.dao.entity.UserData;
@@ -20,7 +20,6 @@ import org.skynet.service.provider.hunting.login.query.LoginQuery;
 import org.skynet.service.provider.hunting.login.service.LoginService;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
-import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
@@ -28,7 +27,6 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.config.VipV2Config;
 import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
-import org.skynet.service.provider.hunting.obsolete.module.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.LoginDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
@@ -60,6 +58,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Resource
     private BattleFeignService battleFeignService;
+
+    @Resource
+    private ChampionshipFeignService championshipFeignService;
 
     @SneakyThrows
     @Override
@@ -177,6 +178,14 @@ public class LoginServiceImpl implements LoginService {
         if (rankLeagueLoginResult.failed()) {
             return rankLeagueLoginResult.build();
         }
+
+        championshipFeignService.playerInitialize(org.skynet.components.hunting.championship.query.PlayerLoginQuery.builder()
+                .version(loginQuery.getGameVersion())
+                .userId(loginUserUid)
+                .nickname(loginUserData.getName())
+                .headPic(null)
+                .trophyCount(loginUserData.getTrophy())
+                .build());
 
         if (updateUserData) {
             RedisDBOperation.insertUserData(loginUserData);
