@@ -111,12 +111,12 @@ public class CommonUtils {
                 throw new BusinessException(request.getUserUid() + "该玩家正在被封禁");
             }
 
-            if (GameEnvironment.userDataMap.containsKey(request.getUserUid())) {
-                // if (unixTimeNow - userData.getLastRequestTime() < 10) {
-                //     log.info("玩家在10秒内有重复请求，抛出错误信息");
-                //     throw new BusinessException("请求未完成，等待请求结束中");
-                // }
-            }
+            // if (GameEnvironment.userDataMap.containsKey(request.getUserUid())) {
+            //     // if (unixTimeNow - userData.getLastRequestTime() < 10) {
+            //     //     log.info("玩家在10秒内有重复请求，抛出错误信息");
+            //     //     throw new BusinessException("请求未完成，等待请求结束中");
+            //     // }
+            // }
 
             userData.setLastRequestTime(unixTimeNow);
         }

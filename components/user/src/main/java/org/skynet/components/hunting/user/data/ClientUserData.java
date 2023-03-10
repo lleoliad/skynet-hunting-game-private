@@ -115,7 +115,7 @@ public class ClientUserData implements Serializable {
     private ServerOnly serverOnly;
 
     @ApiModelProperty(value = "历史数据")
-    private History history;
+    private HistoryVO history;
 
     @ApiModelProperty(value = "成就数据")
     List<AchievementData> achievements;
@@ -127,10 +127,10 @@ public class ClientUserData implements Serializable {
     private LuckyWheelV2Data luckyWheelV2Data;
 
     @ApiModelProperty(value = "广告数据")
-    private PlayerAdvertisementData advertisementData;
+    private PlayerAdvertisementDataVO advertisementData;
 
     @ApiModelProperty(value = "vip数据, 1.0.10之后新注册用户不再有该值")
-    private PlayerVipData vipData;
+    private PlayerVipDataVO vipData;
 
     @ApiModelProperty(value = "vipV2数据")
     private PlayerVipV2Data vipV2Data;

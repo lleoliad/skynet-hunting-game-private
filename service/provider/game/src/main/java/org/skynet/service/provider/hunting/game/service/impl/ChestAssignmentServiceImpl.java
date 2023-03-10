@@ -1,10 +1,12 @@
 package org.skynet.service.provider.hunting.game.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.data.ClientUserData;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.game.query.OpenChestQuery;
+import org.skynet.components.hunting.user.data.HistoryVO;
 import org.skynet.components.hunting.user.domain.ChestData;
 import org.skynet.components.hunting.user.query.UserDataLandQuery;
 import org.skynet.components.hunting.user.query.UserDataUpdateQuery;
@@ -48,7 +50,7 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
             clientUserData.setDiamond(userData.getDiamond());
             clientUserData.setGunLevelMap(userData.getGunLevelMap());
             clientUserData.setGunCountMap(userData.getGunCountMap());
-            clientUserData.setHistory(userData.getHistory());
+            clientUserData.setHistory(BeanUtil.copyProperties(userData.getHistory(), HistoryVO.class));
         }
 
         return Result.ok().push("userData", clientUserData).push("openResult", chestOpenResult);

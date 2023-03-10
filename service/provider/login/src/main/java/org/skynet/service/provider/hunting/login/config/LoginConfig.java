@@ -12,27 +12,27 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
 @Configuration
-@EnableTransactionManagement // 添加 MySQL 事件管理
-@MapperScan(basePackages = {
-        "org.skynet.components.cache.dao.mapper",
-        "org.skynet.service.provider.hunting.obsolete.dao.mapper",
-})
+// @EnableTransactionManagement // 添加 MySQL 事件管理
+// @MapperScan(basePackages = {
+//         "org.skynet.components.cache.dao.mapper",
+//         "org.skynet.service.provider.hunting.obsolete.dao.mapper",
+// })
 @ComponentScan(basePackages = {
         "org.skynet.starter.config",
         "org.skynet.starter.logging.config",
         "org.skynet.starter.scheduler.executor",
         "org.skynet.commons.context",
         "org.skynet.starter.quartz",
-        "org.skynet.commons.db.mysql",
-        "org.skynet.commons.db.mongodb",
-        "org.skynet.commons.db.redis.service",
-        "org.skynet.starter.codis",
+        // "org.skynet.commons.db.mysql",
+        // "org.skynet.commons.db.mongodb",
+        // "org.skynet.commons.db.redis.service",
+        // "org.skynet.starter.codis",
 })
 // @EnableMongoRepositories(basePackages = {
 //         "org.skynet.service.provider.hunting.obsolete.dao.repository"
 // })
 @EnableFeignClients(basePackages = {
-        "org.skynet.service.provider.hunting.login.service"
+        "org.skynet.components.hunting.battle.service",
 })
 @RefreshScope
 @EnableCaching

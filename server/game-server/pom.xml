@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>org.skynet.cloud</groupId>
-            <artifactId>skynet-hunting-service-provider-game</artifactId>
+            <artifactId>skynet-hunting-service-provider-login</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
