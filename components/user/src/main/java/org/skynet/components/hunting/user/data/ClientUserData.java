@@ -159,4 +159,10 @@ public class ClientUserData implements Serializable {
 
     @ApiModelProperty(value = "最后一次请求时间")
     private long lastRequestTime;
+
+    @ApiModelProperty(value = "玩家锦标赛信息")
+    private Object playerChampionshipData;
+
+    @ApiModelProperty(value = "玩家锦标赛徽章信息")
+    private List<Object> championshipBadgeData;
 }

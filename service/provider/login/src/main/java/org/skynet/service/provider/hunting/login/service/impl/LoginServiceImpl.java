@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -179,7 +180,7 @@ public class LoginServiceImpl implements LoginService {
             return rankLeagueLoginResult.build();
         }
 
-        championshipFeignService.playerInitialize(org.skynet.components.hunting.championship.query.PlayerLoginQuery.builder()
+        Result<?> championshipLoginResult = championshipFeignService.playerLogin(org.skynet.components.hunting.championship.query.PlayerLoginQuery.builder()
                 .version(loginQuery.getGameVersion())
                 .userId(loginUserUid)
                 .nickname(loginUserData.getName())
@@ -187,11 +188,17 @@ public class LoginServiceImpl implements LoginService {
                 .trophyCount(loginUserData.getTrophy())
                 .build());
 
+        if (championshipLoginResult.failed()) {
+            return championshipLoginResult.build();
+        }
+
         if (updateUserData) {
             RedisDBOperation.insertUserData(loginUserData);
         }
 
         clientUserData.setPlayerRankData(rankLeagueLoginResult.getData());
+        clientUserData.setPlayerChampionshipData(championshipLoginResult.get("playerChampionshipData"));
+        clientUserData.setChampionshipBadgeData(championshipLoginResult.get("championshipBadgeData"));
 
         LoginVO loginVO = LoginVO.builder()
                 .userData(clientUserData)

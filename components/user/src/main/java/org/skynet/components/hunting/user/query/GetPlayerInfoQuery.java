@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @ApiModel(value="GetPlayerInfoQuery 对象", description="")
 @Data
@@ -21,5 +22,8 @@ public class GetPlayerInfoQuery implements Serializable {
 
     @ApiModelProperty(value = "用户ID")
     private String userId;
+
+    @ApiModelProperty(value = "属性Key")
+    private List<String> keys;
 
 }
