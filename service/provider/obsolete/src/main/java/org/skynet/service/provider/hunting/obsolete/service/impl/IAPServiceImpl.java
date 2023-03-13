@@ -3,6 +3,7 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Maps;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
@@ -16,6 +17,8 @@ import org.skynet.service.provider.hunting.obsolete.config.VipV2Config;
 import org.skynet.service.provider.hunting.obsolete.config.VipV3Config;
 import org.skynet.service.provider.hunting.obsolete.dao.entity.TopUpOrder;
 import org.skynet.service.provider.hunting.obsolete.dao.service.TopUpOrderService;
+import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
+import org.skynet.service.provider.hunting.obsolete.enums.GunQuality;
 import org.skynet.service.provider.hunting.obsolete.enums.OrderState;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
@@ -379,7 +382,7 @@ public class IAPServiceImpl implements IAPService {
                             String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + giftPackagesV2Datum.getPackageType() + "_" + giftPackagesV2Datum.getPackageId();
                             Map<String, PromotionGiftPackageV2TableValue> packageV2TableValueMap = GameEnvironment.promotionGiftPackageV2TableMap.get(gameVersion);
                             PromotionGiftPackageV2TableValue promotionEventPackageV2 = packageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
-                            chestOpenResult = purchasePromotionEventPackageV2(userData, promotionEventPackageV2, purchaseKey, gameVersion, additionValue);
+                            chestOpenResult = purchasePromotionEventPackageV2(userData, promotionEventPackageV2, purchaseKey, gameVersion, 0.0f);
 
                             result.setChestOpenResult(chestOpenResult);
 
@@ -446,7 +449,8 @@ public class IAPServiceImpl implements IAPService {
                 if (tableValue.getProductId().equals(productName)) {
 
                     log.info("内购章节礼包" + tableValue.getProductId() + ",id" + tableValue.getId());
-                    ChestOpenResult chestOpenResult = purchaseChapterBonusPackage(uuid, tableValue.getId(), gameVersion, additionValue);
+                    // ChestOpenResult chestOpenResult = purchaseChapterBonusPackage(uuid, tableValue.getId(), gameVersion, additionValue);
+                    ChestOpenResult chestOpenResult = purchaseChapterBonusPackage(uuid, tableValue.getId(), gameVersion, 0.0f);
                     result.setChestOpenResult(chestOpenResult);
 
                     //这里update必须+1
@@ -625,10 +629,62 @@ public class IAPServiceImpl implements IAPService {
 
         Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount());
         List<Integer> newUnlockGunIds = new ArrayList<>();
-        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
+        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, 0f);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
-        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
-        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
+        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, 0f);
+
+        if (additionValue > 0) {
+            int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
+            Map<String, GunTableValue> gunTable = GameEnvironment.gunTableMap.get(gameVersion);
+            Map<Integer, Integer> swapRewardGunCountMap = new HashMap<>(rewardGunCountMap);
+            for (Map.Entry<Integer, Integer> entry : swapRewardGunCountMap.entrySet()) {
+                Integer gunId = entry.getKey();
+                Integer gunCount = entry.getValue();
+                // gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
+
+                GunTableValue gunTableValue = gunTable.get(gunId.toString());
+                GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];
+
+                Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
+                int rewardCount = (int) Math.ceil(gunCount * additionValue);
+                // switch (quality) {
+                //     case White:
+                //         //不应该会给白色品质的枪
+                //         throw new BusinessException("不应该会给白色品质的枪。 id " + gunId);
+                //     case Blue:
+                //         //所有蓝色品质都算common，也就是random库不会增加
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Common, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                //     case Orange:
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                //     case Red:
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Epic, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                // }
+                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Random, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0.0f);
+                List<Integer> tempNewUnlockGunIds = com.google.common.collect.Lists.newArrayList();
+                List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
+                obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, tempNewUnlockGunIds, gameVersion);
+
+                for (Integer value : tempNewUnlockGunIds) {
+                    if (!newUnlockGunIds.contains(value)) {
+                        newUnlockGunIds.add(value);
+                    }
+                }
+
+                for (Map.Entry<Integer, Integer> rgentry : gunRewardMap.entrySet()) {
+                    Integer integer = rewardGunCountMap.get(rgentry.getKey());
+                    if (null == integer) {
+                        integer = rgentry.getValue();
+                    } else {
+                        integer += rgentry.getValue();
+                    }
+                    rewardGunCountMap.put(rgentry.getKey(), integer);
+                }
+            }
+        }
+        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, 0.0f);
 
         //记录购买的礼包
         eventPackagesV2Keys.add(purchaseKey);
@@ -669,13 +725,64 @@ public class IAPServiceImpl implements IAPService {
                 chestOpenResult.setNewUnlockedGunIDs(new ArrayList<>());
             }
 
-            obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData,
-                    promotionEventPackageV2.getRewardGunIDs(),
-                    promotionEventPackageV2.getRewardGunCounts(),
-                    chestOpenResult.getNewUnlockedGunIDs(), gameVersion, additionValue);
-            obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult,
-                    CommonUtils.combineGunIdAndCountArrayToGunCountMap(promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts()), additionValue);
-            obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, CommonUtils.combineGunIdAndCountArrayToGunCountMap(promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts()), gameVersion, additionValue);
+            Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts());
+            obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, promotionEventPackageV2.getRewardGunIDs(), promotionEventPackageV2.getRewardGunCounts(), chestOpenResult.getNewUnlockedGunIDs(), gameVersion, 0.0f);
+            obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult,rewardGunCountMap, additionValue);
+            obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, 0.0f);
+
+            // if (additionValue > 0) {
+            //     List<Integer> newUnlockedGunIDs = chestOpenResult.getNewUnlockedGunIDs();
+            //     int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
+            //     Map<String, GunTableValue> gunTable = GameEnvironment.gunTableMap.get(gameVersion);
+            //     Map<Integer, Integer> swapRewardGunCountMap = new HashMap<>(rewardGunCountMap);
+            //     for (Map.Entry<Integer, Integer> entry : swapRewardGunCountMap.entrySet()) {
+            //         Integer gunId = entry.getKey();
+            //         Integer gunCount = entry.getValue();
+            //         // gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
+            //
+            //         GunTableValue gunTableValue = gunTable.get(gunId.toString());
+            //         GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];
+            //
+            //         Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
+            //         int rewardCount = (int) Math.ceil(gunCount * additionValue);
+            //         // switch (quality) {
+            //         //     case White:
+            //         //         //不应该会给白色品质的枪
+            //         //         throw new BusinessException("不应该会给白色品质的枪。 id " + gunId);
+            //         //     case Blue:
+            //         //         //所有蓝色品质都算common，也就是random库不会增加
+            //         //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Common, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+            //         //         break;
+            //         //     case Orange:
+            //         //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+            //         //         break;
+            //         //     case Red:
+            //         //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Epic, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+            //         //         break;
+            //         // }
+            //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Random, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0.0f);
+            //         List<Integer> tempNewUnlockGunIds = com.google.common.collect.Lists.newArrayList();
+            //         List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
+            //         obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, tempNewUnlockGunIds, gameVersion);
+            //
+            //         for (Integer value : tempNewUnlockGunIds) {
+            //             if (!newUnlockedGunIDs.contains(value)) {
+            //                 newUnlockedGunIDs.add(value);
+            //             }
+            //         }
+            //
+            //         for (Map.Entry<Integer, Integer> rgentry : gunRewardMap.entrySet()) {
+            //             Integer integer = rewardGunCountMap.get(rgentry.getKey());
+            //             if (null == integer) {
+            //                 integer = rgentry.getValue();
+            //             } else {
+            //                 integer += rgentry.getValue();
+            //             }
+            //             rewardGunCountMap.put(rgentry.getKey(), integer);
+            //         }
+            //     }
+            // }
+            // obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, 0.0f);
         }
 
         //子弹
@@ -814,13 +921,63 @@ public class IAPServiceImpl implements IAPService {
                 chestOpenResult.setNewUnlockedGunIDs(new ArrayList<>());
             }
 
-            obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData,
-                    tableValue.getRewardGunIDs(),
-                    tableValue.getRewardGunCounts(),
-                    chestOpenResult.getNewUnlockedGunIDs(), gameVersion, additionValue);
-            obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult,
-                    CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()), additionValue);
+            Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts());
+            obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts(), chestOpenResult.getNewUnlockedGunIDs(), gameVersion, additionValue);
+            // obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()), additionValue);
             obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, CommonUtils.combineGunIdAndCountArrayToGunCountMap(tableValue.getRewardGunIDs(), tableValue.getRewardGunCounts()), gameVersion, additionValue);
+            if (additionValue > 0) {
+                List<Integer> newUnlockedGunIDs = chestOpenResult.getNewUnlockedGunIDs();
+                int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
+                Map<String, GunTableValue> gunTable = GameEnvironment.gunTableMap.get(gameVersion);
+                Map<Integer, Integer> swapRewardGunCountMap = new HashMap<>(rewardGunCountMap);
+                for (Map.Entry<Integer, Integer> entry : swapRewardGunCountMap.entrySet()) {
+                    Integer gunId = entry.getKey();
+                    Integer gunCount = entry.getValue();
+                    // gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
+
+                    GunTableValue gunTableValue = gunTable.get(gunId.toString());
+                    GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];
+
+                    Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
+                    int rewardCount = (int) Math.ceil(gunCount * additionValue);
+                    // switch (quality) {
+                    //     case White:
+                    //         //不应该会给白色品质的枪
+                    //         throw new BusinessException("不应该会给白色品质的枪。 id " + gunId);
+                    //     case Blue:
+                    //         //所有蓝色品质都算common，也就是random库不会增加
+                    //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Common, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                    //         break;
+                    //     case Orange:
+                    //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                    //         break;
+                    //     case Red:
+                    //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Epic, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                    //         break;
+                    // }
+                    gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Random, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0.0f);
+                    List<Integer> tempNewUnlockGunIds = com.google.common.collect.Lists.newArrayList();
+                    List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
+                    obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, tempNewUnlockGunIds, gameVersion);
+
+                    for (Integer value : tempNewUnlockGunIds) {
+                        if (!newUnlockedGunIDs.contains(value)) {
+                            newUnlockedGunIDs.add(value);
+                        }
+                    }
+
+                    for (Map.Entry<Integer, Integer> rgentry : gunRewardMap.entrySet()) {
+                        Integer integer = rewardGunCountMap.get(rgentry.getKey());
+                        if (null == integer) {
+                            integer = rgentry.getValue();
+                        } else {
+                            integer += rgentry.getValue();
+                        }
+                        rewardGunCountMap.put(rgentry.getKey(), integer);
+                    }
+                }
+            }
+            obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, 0.0f);
         }
 
         //子弹
@@ -1171,6 +1328,57 @@ public class IAPServiceImpl implements IAPService {
         obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
         obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
+        if (additionValue > 0) {
+            int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
+            Map<String, GunTableValue> gunTable = GameEnvironment.gunTableMap.get(gameVersion);
+            Map<Integer, Integer> swapRewardGunCountMap = new HashMap<>(rewardGunCountMap);
+            for (Map.Entry<Integer, Integer> entry : swapRewardGunCountMap.entrySet()) {
+                Integer gunId = entry.getKey();
+                Integer gunCount = entry.getValue();
+                // gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
+
+                GunTableValue gunTableValue = gunTable.get(gunId.toString());
+                GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];
+
+                Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
+                int rewardCount = (int) Math.ceil(gunCount * additionValue);
+                // switch (quality) {
+                //     case White:
+                //         //不应该会给白色品质的枪
+                //         throw new BusinessException("不应该会给白色品质的枪。 id " + gunId);
+                //     case Blue:
+                //         //所有蓝色品质都算common，也就是random库不会增加
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Common, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                //     case Orange:
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                //     case Red:
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Epic, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                // }
+                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Random, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0.0f);
+                List<Integer> tempNewUnlockGunIds = com.google.common.collect.Lists.newArrayList();
+                List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
+                obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, tempNewUnlockGunIds, gameVersion);
+
+                for (Integer value : tempNewUnlockGunIds) {
+                    if (!newUnlockGunIds.contains(value)) {
+                        newUnlockGunIds.add(value);
+                    }
+                }
+
+                for (Map.Entry<Integer, Integer> rgentry : gunRewardMap.entrySet()) {
+                    Integer integer = rewardGunCountMap.get(rgentry.getKey());
+                    if (null == integer) {
+                        integer = rgentry.getValue();
+                    } else {
+                        integer += rgentry.getValue();
+                    }
+                    rewardGunCountMap.put(rgentry.getKey(), integer);
+                }
+            }
+        }
         obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
 
         List<ChapterBonusPackageData> bonusPackagesData = userData.getChapterBonusPackagesData();
@@ -1251,10 +1459,61 @@ public class IAPServiceImpl implements IAPService {
 
         Map<Integer, Integer> rewardGunCountMap = CommonUtils.combineGunIdAndCountArrayToGunCountMap(packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount());
         List<Integer> newUnlockGunIds = new ArrayList<>();
-        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, additionValue);
+        obsoleteUserDataService.addGunToUserDataByIdAndCountArray(userData, packageTableValue.getRewardGunId(), packageTableValue.getRewardGunCount(), newUnlockGunIds, gameVersion, 0.0f);
         chestOpenResult.setNewUnlockedGunIDs(newUnlockGunIds);
-        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, additionValue);
-        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, additionValue);
+        obsoleteUserDataService.recordDirectlyGunRewardsCountToGunLibraryDrawCountMap(userData, rewardGunCountMap, gameVersion, 0.0f);
+        if (additionValue > 0) {
+            int playerHighestUnlockedChapterID = obsoleteUserDataService.getPlayerHighestUnlockedChapterID(userData);
+            Map<String, GunTableValue> gunTable = GameEnvironment.gunTableMap.get(gameVersion);
+            Map<Integer, Integer> swapRewardGunCountMap = new HashMap<>(rewardGunCountMap);
+            for (Map.Entry<Integer, Integer> entry : swapRewardGunCountMap.entrySet()) {
+                Integer gunId = entry.getKey();
+                Integer gunCount = entry.getValue();
+                // gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
+
+                GunTableValue gunTableValue = gunTable.get(gunId.toString());
+                GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];
+
+                Map<Integer, Integer> gunRewardMap = Maps.newHashMap();
+                int rewardCount = (int) Math.ceil(gunCount * additionValue);
+                // switch (quality) {
+                //     case White:
+                //         //不应该会给白色品质的枪
+                //         throw new BusinessException("不应该会给白色品质的枪。 id " + gunId);
+                //     case Blue:
+                //         //所有蓝色品质都算common，也就是random库不会增加
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Common, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                //     case Orange:
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Rare, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                //     case Red:
+                //         gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Epic, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0f);
+                //         break;
+                // }
+                gunRewardMap = chestService.extractGunRewardsFromGunLibraryAsync(userData, GunLibraryType.Random, playerHighestUnlockedChapterID, rewardCount, false, gunRewardMap, gameVersion, 0.0f);
+                List<Integer> tempNewUnlockGunIds = com.google.common.collect.Lists.newArrayList();
+                List<GunReward> gunRewards = CommonUtils.convertGunCountMapToGunCountArray(gunRewardMap);
+                obsoleteUserDataService.addGunToUserDataByGunIdCountData(userData, gunRewards, tempNewUnlockGunIds, gameVersion);
+
+                for (Integer value : tempNewUnlockGunIds) {
+                    if (!newUnlockGunIds.contains(value)) {
+                        newUnlockGunIds.add(value);
+                    }
+                }
+
+                for (Map.Entry<Integer, Integer> rgentry : gunRewardMap.entrySet()) {
+                    Integer integer = rewardGunCountMap.get(rgentry.getKey());
+                    if (null == integer) {
+                        integer = rgentry.getValue();
+                    } else {
+                        integer += rgentry.getValue();
+                    }
+                    rewardGunCountMap.put(rgentry.getKey(), integer);
+                }
+            }
+        }
+        obsoleteUserDataService.mergeGunCountMapToChestOpenResult(chestOpenResult, rewardGunCountMap, 0.0f);
 
         // TODO: 2023/1/2 同上面方法一样，需要核实
         final PlayerGunGiftPackageData playerGunGiftPackageData = targetPackageData;

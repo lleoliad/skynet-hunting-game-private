@@ -18,7 +18,7 @@ public class SystemPropertiesConfig implements InitializingBean {
     private String facebookAppId;
     private String facebookAppSecret;
     private String cloudUrl;
-    private String fightUrl;
+    // private String fightUrl;
     private String aiUrl;
     // private String rankUrl;
 
@@ -44,7 +44,7 @@ public class SystemPropertiesConfig implements InitializingBean {
         FACEBOOK_APP_ID = facebookAppId;
         FACEBOOK_APP_SECRET = facebookAppSecret;
         CLOUD_URL = cloudUrl;
-        FIGHT_URL = fightUrl;
+        // FIGHT_URL = fightUrl;
         AI_URL = aiUrl;
         // RANK_URL = rankUrl;
     }

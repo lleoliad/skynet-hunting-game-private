@@ -34,7 +34,7 @@ server:
     facebookAppId: 1081749179209791
     facebookAppSecret: 866df893ab602b34a92552d0a4155ed7
     cloudUrl: "https://us-central1-wildhunthuntingclash.cloudfunctions.net"
-    fightUrl: "http://localhost:17960"
+#    fightUrl: "http://localhost:17960"
     aiUrl: "http://47.88.90.222:9090"
 #    rankUrl: "http://localhost:17920/skynet/service/provider/hunting/rank/league/player"
 

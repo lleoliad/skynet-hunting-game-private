@@ -1,7 +1,16 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.battle.data.BattleStartInfoCVO;
+import org.skynet.components.hunting.battle.query.StartQuery;
+import org.skynet.components.hunting.battle.service.BattleFeignService;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.result.ResponseResult;
@@ -10,23 +19,19 @@ import org.skynet.service.provider.hunting.obsolete.common.util.DeflaterUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
+import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.module.dto.BattleStartDto;
 import org.skynet.service.provider.hunting.obsolete.module.dto.SearchAiDto;
-import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.RecordDataAndBase64;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.AIControlRecordDataQueryDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordDocData;
-import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.service.AiService;
 import org.skynet.service.provider.hunting.obsolete.service.HuntingMatchService;
-import org.skynet.service.provider.hunting.obsolete.service.PlayerControlRecordDataService;
 import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import org.skynet.service.provider.hunting.obsolete.service.PlayerControlRecordDataService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,6 +61,9 @@ public class AIController {
 
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
+
+    @Resource
+    private BattleFeignService battleFeignService;
 
 
 //    @PostMapping("ai-aiControlRecordDataQuery")
@@ -252,7 +260,7 @@ public class AIController {
         GameEnvironment.timeMessage.computeIfAbsent("aiControlRecordDataQuery", k -> new ArrayList<>());
 
         String aiUrl = systemPropertiesConfig.getAiUrl();
-        String fightUrl = systemPropertiesConfig.getFightUrl();
+        // String fightUrl = systemPropertiesConfig.getFightUrl();
         String userUid = request.getUserUid();
 
         try {
@@ -287,22 +295,33 @@ public class AIController {
             battleStartDto.setPlayerAveragePrecision(request.getPlayerAverageShowPrecision());
 //            http://192.168.2.199:9301/battle/start
 //            http://localhost:9301/battle/start
-            String fightFinalUrl = fightUrl + "/battle/start";
-            Map<String, Object> fightInfo = HttpUtil.getFightInfo(fightFinalUrl, battleStartDto);
-            if (fightInfo != null) {
-                Object data = fightInfo.get("data");
-                if (data != null) {
-                    JSONObject jsonObject = JSONObject.parseObject(data.toString());
-                    Object recordData = jsonObject.get("recordDataBase64");
-                    if (recordData != null) {
-                        findControlRecordEncodeData = recordData.toString();
-                        // log.warn("查询出的ai录像原始数据，recordDataAndBase64为{}", JSONUtil.toJsonStr(recordDataAndBase64));
-                    }
+//             String fightFinalUrl = fightUrl + "/battle/start";
+//             Map<String, Object> fightInfo = HttpUtil.getFightInfo(fightFinalUrl, battleStartDto);
+            Result<BattleStartInfoCVO> startResult = battleFeignService.start(StartQuery.builder()
+                    .version(request.getGameVersion())
+                    .userId(request.getUserUid())
+                    .playerAveragePrecision(request.getPlayerAverageShowPrecision().floatValue())
+                    .playerScore(request.getPlayerFinalScore())
+                    .round(request.getRound())
+                    .animalRouteUid(request.getAnimalRouteUid())
+                    .build());
+            if (startResult.getSuccess()) {
+                // Object data = fightInfo.get("data");
+                // if (data != null) {
+                //     JSONObject jsonObject = JSONObject.parseObject(data.toString());
+                // Map jsonObject = (Map) startResult.getData();
+                BattleStartInfoCVO jsonObject = startResult.getData();
+                // Object recordData = jsonObject.get("recordDataBase64");
+                // if (recordData != null) {
+                //     findControlRecordEncodeData = recordData.toString();
+                //     // log.warn("查询出的ai录像原始数据，recordDataAndBase64为{}", JSONUtil.toJsonStr(recordDataAndBase64));
+                // }
+                findControlRecordEncodeData = jsonObject.getRecordDataBase64();
 
-                    //如果战斗服返回的数据为空，再去本地数据库查找
-                    if (findControlRecordEncodeData == null) {
-                        log.info("到本地数据库中查找数据");
-                        //获得单回合的录像信息
+                //如果战斗服返回的数据为空，再去本地数据库查找
+                if (findControlRecordEncodeData == null) {
+                    log.info("到本地数据库中查找数据");
+                    //获得单回合的录像信息
 //                        String singlePath = Path.getMatchSingleRoundControlRecordsPoolCollectionPath(
 //                                request.getGameVersion(),
 //                                Integer.valueOf(jsonObject.get("AnimalId").toString()),
@@ -317,35 +336,36 @@ public class AIController {
 //                        recordDataAndBase64 = findRecordDataFromLocal(singlePath);
 
 
-                        SearchAiDto searchAiDto = new SearchAiDto(request.getGameVersion(),
-                                Integer.valueOf(jsonObject.get("animalId").toString()),
-                                Long.valueOf(jsonObject.get("animalRouteUid").toString()),
-                                Integer.valueOf(jsonObject.get("gunId").toString()),
-                                Integer.valueOf(jsonObject.get("gunLevel").toString()),
-                                Integer.valueOf(jsonObject.get("bulletId").toString()),
-                                Integer.valueOf(jsonObject.get("windId").toString()),
-                                Integer.valueOf(jsonObject.get("averagePrecisionLevel").toString()));
+                    SearchAiDto searchAiDto = new SearchAiDto(request.getGameVersion(),
+                            jsonObject.getAnimalId(), //Integer.valueOf(jsonObject.get("animalId").toString()),
+                            jsonObject.getAnimalRouteUid(),//Long.valueOf(jsonObject.get("animalRouteUid").toString()),
+                            jsonObject.getGunId(), //Integer.valueOf(jsonObject.get("gunId").toString()),
+                            jsonObject.getGunLevel(), //Integer.valueOf(jsonObject.get("gunLevel").toString()),
+                            jsonObject.getBulletId(), //Integer.valueOf(jsonObject.get("bulletId").toString()),
+                            jsonObject.getWindId(), //Integer.valueOf(jsonObject.get("windId").toString()),
+                            jsonObject.getAveragePrecisionLevel()//Integer.valueOf(jsonObject.get("averagePrecisionLevel").toString())
+                            );
 
-                        Map<String, Object> aiInfo = HttpUtil.getAiInfo(aiUrl + "/huntingrival/ai-searchAiRecordData", searchAiDto);
-                        if (aiInfo != null) {
-                            try {
-                                RecordDataAndBase64 recordDataAndBase64 = JSONUtil.toBean(aiInfo.get("data").toString(), RecordDataAndBase64.class);
-                                findControlRecordEncodeData = recordDataAndBase64.getBase64();
-                                log.info("找到的战斗信息：{}", recordDataAndBase64);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                // recordDataAndBase64 = null;
-                                log.error("战报格式转换错误，先将战报设置为空");
-                            }
+                    Map<String, Object> aiInfo = HttpUtil.getAiInfo(aiUrl + "/huntingrival/ai-searchAiRecordData", searchAiDto);
+                    if (aiInfo != null) {
+                        try {
+                            RecordDataAndBase64 recordDataAndBase64 = JSONUtil.toBean(aiInfo.get("data").toString(), RecordDataAndBase64.class);
+                            findControlRecordEncodeData = recordDataAndBase64.getBase64();
+                            log.info("找到的战斗信息：{}", recordDataAndBase64);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            // recordDataAndBase64 = null;
+                            log.error("战报格式转换错误，先将战报设置为空");
                         }
-
-
                     }
 
 
-                    isOpponentDisconnect = jsonObject.get("isOpponentDisconnect") != null && (boolean) jsonObject.get("isOpponentDisconnect");
-
                 }
+
+
+                isOpponentDisconnect = BooleanUtil.isTrue(jsonObject.getIsOpponentDisconnect());//jsonObject.get("isOpponentDisconnect") != null && (boolean) jsonObject.get("isOpponentDisconnect");
+
+                // }
             } else {
                 log.warn("查询出的ai录像原始数据，recordDataAndBase64为空");
             }

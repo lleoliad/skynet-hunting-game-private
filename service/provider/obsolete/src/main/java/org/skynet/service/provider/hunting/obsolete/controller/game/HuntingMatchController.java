@@ -1,16 +1,28 @@
 package org.skynet.service.provider.hunting.obsolete.controller.game;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.battle.data.BattleCompleteInfoCVO;
+import org.skynet.components.hunting.battle.data.BattleMatchingInfoCVO;
+import org.skynet.components.hunting.battle.domain.MatchPlayerInfo;
+import org.skynet.components.hunting.battle.enums.BattleMode;
+import org.skynet.components.hunting.battle.query.CompleteQuery;
+import org.skynet.components.hunting.battle.query.MatchingQuery;
+import org.skynet.components.hunting.battle.service.BattleFeignService;
+import org.skynet.components.hunting.rank.league.message.AddCoinMessage;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 import org.skynet.components.hunting.user.domain.PlayerRecordModeData;
-import org.skynet.components.hunting.rank.league.message.AddCoinMessage;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.CommonUtils;
@@ -20,13 +32,13 @@ import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
-import org.skynet.service.provider.hunting.obsolete.module.dto.BattleCompleteDto;
-import org.skynet.service.provider.hunting.obsolete.module.dto.BattleMatchDto;
-import org.skynet.service.provider.hunting.obsolete.module.entity.Defender;
 import org.skynet.service.provider.hunting.obsolete.enums.ForceTutorialStepNames;
 import org.skynet.service.provider.hunting.obsolete.enums.HuntingMatchAIRecordChooseMode;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
+import org.skynet.service.provider.hunting.obsolete.module.dto.BattleCompleteDto;
+import org.skynet.service.provider.hunting.obsolete.module.dto.BattleMatchDto;
+import org.skynet.service.provider.hunting.obsolete.module.entity.Defender;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.CheckNewUnlockChapterBO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ConfirmHuntingMatchCompleteDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.ConfirmHuntingMatchStartDTO;
@@ -35,9 +47,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnviron
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.MatchAIRoundRuleTableValue;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.RecordModeMatchTableValue;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +55,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @Api(tags = "比赛")
 @RestController
@@ -83,6 +95,9 @@ public class HuntingMatchController {
 
     @Resource
     private RocketMQTemplate rocketMQTemplate;
+
+    @Resource
+    private BattleFeignService battleFeignService;
 
 //    @PostMapping("/huntingMatch-confirmHuntingMatchComplete")
 //    @ApiOperation("确认章节比赛结束")
@@ -581,7 +596,7 @@ public class HuntingMatchController {
     @RepeatSubmit(interval = 60000)
     public Map<String, Object> confirmHuntingMatchStart(@RequestBody ConfirmHuntingMatchStartDTO request) {
         try {
-            String fightUrl = systemPropertiesConfig.getFightUrl();
+            // String fightUrl = systemPropertiesConfig.getFightUrl();
             GameEnvironment.timeMessage.computeIfAbsent("confirmHuntingMatchStart", k -> new ArrayList<>());
             ThreadLocalUtil.set(request.getServerTimeOffset());
             long startTime = System.currentTimeMillis();
@@ -651,21 +666,39 @@ public class HuntingMatchController {
             matchDto.setUid(request.getUserUid());
 //            http://192.168.2.199:9301
             //47.88.90.222
-            Map<String, Object> fightInfo = HttpUtil.getFightInfo(fightUrl + "/battle/matching", matchDto);
-
-
-            if (fightInfo == null) {
+            // Map<String, Object> fightInfo = HttpUtil.getFightInfo(fightUrl + "/battle/matching", matchDto);
+            Result<BattleMatchingInfoCVO> matchingResult = battleFeignService.matching(MatchingQuery.builder()
+                    .version(request.getGameVersion())
+                    .userId(request.getUserUid())
+                    .chapterId(playerSelectChapterId)
+                    .trophyCount(userData.getTrophy())
+                    .cultivateWinRateAddition((float) cultivateWinRateAddition)
+                    .playerWeaponInfo(MatchPlayerInfo.builder()
+                            .gunId(gunId)
+                            .gunLevel(gunLevel)
+                            .bulletId(bulletId)
+                            .build())
+                    .isRecordMode(userData.getServerOnly().getRecordModeData() != null)
+                    .battleMode(userData.getServerOnly().getRecordModeData() != null ? BattleMode.RECORD : BattleMode.NORMAL)
+                    .build());
+            if (matchingResult.failed()) {
+                // return matchingResult.build();
                 throw new BusinessException("无法从战斗服务器获取数据");
             }
 
+            // if (fightInfo == null) {
+            //     throw new BusinessException("无法从战斗服务器获取数据");
+            // }
+
             //玩家的武器
-            JSONObject data = JSONObject.parseObject(fightInfo.get("data").toString());
+            // JSONObject data = JSONObject.parseObject(fightInfo.get("data").toString());
+            BattleMatchingInfoCVO battleMatchingInfoCVO = matchingResult.getData();
 //            MatchInfo matchInfo = JSONUtil.toBean(data.get("matchInfo").toString(), MatchInfo.class);
-            Defender attacker = JSONUtil.toBean(data.get("attacker").toString(), Defender.class);
+            MatchPlayerInfo attacker = battleMatchingInfoCVO.getAttacker();
             localPlayerWeaponInfo = new PlayerWeaponInfo(attacker.getGunId(), attacker.getGunLevel(), attacker.getBulletId());
 
             //todo 需要战斗服传matchId
-            matchId = (Integer) data.get("matchId");
+            matchId = battleMatchingInfoCVO.getMatchId(); //(Integer) data.get("matchId");
 
 //            localPlayerWeaponInfo = huntingMatchService.generateLocalPlayerWeaponInfo(userData,request.getGameVersion());
 
@@ -736,9 +769,10 @@ public class HuntingMatchController {
 //            }
 
             //todo 需要战斗服传的,是否是玩家先手
-            isLocalPlayerFirst = data.get("isLocalPlayerFirst") == null || (boolean) data.get("isLocalPlayerFirst");
+            isLocalPlayerFirst = BooleanUtil.isTrue(battleMatchingInfoCVO.getIsLocalPlayerFirst());// data.get("isLocalPlayerFirst") == null || (boolean) data.get("isLocalPlayerFirst");
 
-            Defender defender = JSONUtil.toBean(data.get("defender").toString(), Defender.class);
+            // Defender defender = JSONUtil.toBean(data.get("defender").toString(), Defender.class);
+            MatchPlayerInfo defender = battleMatchingInfoCVO.getDefender();
             opponentPlayerWeaponInfo = new PlayerWeaponInfo(defender.getGunId(), defender.getGunLevel(), defender.getBulletId());
             //使用子弹
             if (recordModeData == null) {
@@ -862,7 +896,7 @@ public class HuntingMatchController {
             CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
 //            userDataService.ensureUserDataIdempotence(request.getUserUid(),request.getUserDataUpdateCount(),request.getGameVersion());
 
-            String fightUrl = systemPropertiesConfig.getFightUrl();
+            // String fightUrl = systemPropertiesConfig.getFightUrl();
             //验证确实开始了这个比赛,防止刷数据
             String matchPath = Path.getHuntingMatchNowCollectionPath(request.getGameVersion());
 //
@@ -884,7 +918,7 @@ public class HuntingMatchController {
             List<PlayerFireDetails> playerFireDetails = huntingMatchService.generateFireDetailsFromControlRecordData(allPlayerControlRecordsData);
 
 
-            JSONObject data = null;
+            BattleCompleteInfoCVO data = null;
 
 
             BattleCompleteDto battleCompleteDto = new BattleCompleteDto();
@@ -899,12 +933,26 @@ public class HuntingMatchController {
                 battleCompleteDto.setRoundReportData(request.getAllEncodedControlRecordsData());
 //            http://192.168.2.199:9301
                 if (!(request.getDirectlyWin() != null || request.getDirectlyLose() != null)) {
-                    Map<String, Object> fightInfo = HttpUtil.getFightInfo(fightUrl + "/battle/complete", battleCompleteDto);
+                    // Map<String, Object> fightInfo = HttpUtil.getFightInfo(fightUrl + "/battle/complete", battleCompleteDto);
+                    Result<BattleCompleteInfoCVO> completeResult = battleFeignService.complete(CompleteQuery.builder()
+                            .version(request.getGameVersion())
+                            .userId(request.getUserUid())
+                            .playerFinalScore(request.getPlayerFinalScore())
+                            .aiFinalScore(request.getAiFinalScore())
+                            .totalRoundCount(roundCount)
+                            .roundReportData(request.getAllEncodedControlRecordsData())
+                            .playerDirectChangeResult(request.getPlayerDirectChangeResult())
+                            .directlyWin(request.getDirectlyWin())
+                            .build());
+
 //                if (fightInfo  == null){
 //                    throw new BusinessException("从战斗服获取到的数据为空");
 //                }
-                    if (fightInfo != null) {
-                        data = JSONObject.parseObject(fightInfo.get("data").toString());
+//                     if (fightInfo != null) {
+//                         data = JSONObject.parseObject(fightInfo.get("data").toString());
+//                     }
+                    if (completeResult.getSuccess()) {
+                        data = completeResult.getData();
                     }
 //                if (data  == null){
 
@@ -941,9 +989,11 @@ public class HuntingMatchController {
             }
             int aiFinalScore = request.getAiFinalScore();
             if (data != null) {
-                if (data.get("aiFinalScore") != null) {
-                    aiFinalScore = (int) data.get("aiFinalScore");
-                }
+                // if (data.get("aiFinalScore") != null) {
+                //     aiFinalScore = (int) data.get("aiFinalScore");
+                // }
+
+                aiFinalScore = data.getAiFinalScore();
             }
 
 
@@ -1025,7 +1075,7 @@ public class HuntingMatchController {
             //todo 需要战斗服传chapterId
             Integer chapterId = huntingMatchNowData.getChapterId();
             if (data != null) {
-                chapterId = (Integer) data.get("chapterId");
+                chapterId = data.getChapterId();//(Integer) data.get("chapterId");
             }
 
             Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(request.getGameVersion());
@@ -1096,7 +1146,7 @@ public class HuntingMatchController {
             //todo 当前回合的matchId
             Integer matchId = huntingMatchNowData.getMatchId();
             if (data != null) {
-                matchId = (Integer) data.get("matchId");
+                matchId = data.getMatchId();//(Integer) data.get("matchId");
             }
 
             huntingMatchService.recordChapterComplete(userData.getUuid(),

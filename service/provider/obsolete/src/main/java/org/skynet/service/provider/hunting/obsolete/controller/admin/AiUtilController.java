@@ -1,10 +1,15 @@
 package org.skynet.service.provider.hunting.obsolete.controller.admin;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.battle.service.BattleFeignService;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
-import org.skynet.service.provider.hunting.obsolete.common.util.HttpUtil;
 import org.skynet.service.provider.hunting.obsolete.common.util.NumberUtils;
 import org.skynet.service.provider.hunting.obsolete.config.GameConfig;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
@@ -14,9 +19,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.entity.OpponentProfile;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -36,12 +38,15 @@ public class AiUtilController {
     @Resource
     private SystemPropertiesConfig systemPropertiesConfig;
 
+    @Resource
+    private BattleFeignService battleFeignService;
+
 
     @PostMapping("battleScript")
     @ApiOperation("对战脚本")
     public Map<String, Object> battleScript(@RequestBody BattleScriptDTO request) {
 
-        String fightUrl = systemPropertiesConfig.getFightUrl();
+        // String fightUrl = systemPropertiesConfig.getFightUrl();
 
         Integer trophy = request.getTrophy();
         OpponentPlayerInfo opponentPlayerInfo = generateOpponentPlayerInfo(request.getTrophy(),
@@ -55,14 +60,16 @@ public class AiUtilController {
         Map<String, Object> returnMap = new LinkedHashMap<>();
         int aiScore = 0;
 
-        String url = fightUrl + "/battle/matchDebug";
-        log.info("最终的url地址：{}", url);
-        Map<String, Object> fightInfo = HttpUtil.getFightInfo(url, request);
+        // String url = fightUrl + "/battle/matchDebug";
+        // log.info("最终的url地址：{}", url);
+        // Map<String, Object> fightInfo = HttpUtil.getFightInfo(url, request);
+        Result<JSONObject> jsonObjectResult = battleFeignService.matchDebug(request);
+        JSONObject fightInfo = jsonObjectResult.getData();
         System.out.println(fightInfo);
         if (fightInfo != null) {
             Object data = fightInfo.get("data");
             if (data != null) {
-                JSONObject jsonObject = JSONObject.parseObject(data.toString());
+                JSONObject jsonObject = JSON.parseObject(data.toString());
                 fightMessageMap.put("AITrophy", opponentPlayerInfo.getTrophy());
                 fightMessageMap.put("aiRecordChooseMode", jsonObject.get("aiRecordChooseMode"));
                 fightMessageMap.put("windId", jsonObject.get("windId"));
@@ -104,7 +111,7 @@ public class AiUtilController {
 
 
         returnMap.put("fightMessageMap", fightMessageMap);
-        returnMap.put("log", JSONObject.toJSONString(fightMessageMap));
+        returnMap.put("log", JSON.toJSONString(fightMessageMap));
         return returnMap;
     }
 
