@@ -1925,7 +1925,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
         for (Map.Entry<Integer, Integer> entry : gunCountMap.entrySet()) {
             Integer gunId = entry.getKey();
             Integer gunCount = entry.getValue();
-            gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
+            // gunCount = (int) Math.ceil(gunCount * (1 + additionValue));
 
             GunTableValue gunTableValue = gunTable.get(gunId.toString());
             GunQuality quality = GunQuality.values()[gunTableValue.getQuality() - 1];
