@@ -40,6 +40,9 @@ public class PromotionEventPackageTableValue implements Serializable {
     @ApiModelProperty(value = "枪械奖励数量")
     private List<Integer> rewardGunCounts;
 
+    @ApiModelProperty("奖励枪械库类型")
+    private List<Integer> rewardGunLibraryTypes;
+
     @ApiModelProperty(value = "子弹奖励ID")
     private List<Integer> rewardBulletIDs;
 

@@ -7,9 +7,11 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.*;
 import org.skynet.components.hunting.user.enums.ABTestGroup;
+import org.skynet.components.hunting.user.query.PlayerCreateQuery;
 import org.skynet.components.hunting.user.service.UserFeignService;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
@@ -480,36 +482,44 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
     @Override
     @Transactional
     public UserData createNewPlayer(String gameVersion) {
-        int tryCount = 0;
+        String newUUID = NanoIdUtils.randomNanoId(30);
         Long userId = redisDBOperation.getIncr("userAutoIncrementId");
-        //    在redis中查不到对应id用户,那么就新建用户
-        String newKey = "User:" + userId;
-        try {
-            while (tryCount < 10) {
-                String newUUID = NanoIdUtils.randomNanoId(30);
-                if (!RedisDBOperation.checkKeyExist("User:" + newUUID)) {
-
-                    UserData newUserData = createDefaultUserData(userId, newUUID, gameVersion);
-
-                    //向数据库里插入用户数据
-                    // userDataVOService.insertUser(newUserData);// TODO 取消游戏服务器用户数据的创建
-
-                    log.info("userData:{}", newUserData);
-
-                    RedisDBOperation.insertUserData(newUserData);
-
-
-                    return newUserData;
-                }
-                tryCount++;
-            }
-
-            throw new BusinessException("无法创建新用户,因为生成的所有uuid都被占用了");
-        } catch (BusinessException e) {
-            // redisTemplate.delete(newKey);
-            codisService.del(newKey);
-            throw new BusinessException(e.getMessage());
+        UserData newUserData = createDefaultUserData(userId, newUUID, gameVersion);
+        Result<UserData> userDataResult = userFeignService.create(PlayerCreateQuery.builder().version(gameVersion).userId(newUUID).userData(newUserData).build());
+        if (userDataResult.failed()) {
+            throw new BusinessException(userDataResult.getMessage());
         }
+        return userDataResult.getData();
+
+        // int tryCount = 0;
+        // Long userId = redisDBOperation.getIncr("userAutoIncrementId");
+        // //    在redis中查不到对应id用户,那么就新建用户
+        // String newKey = "User:" + userId;
+        // try {
+        //     while (tryCount < 10) {
+        //         String newUUID = NanoIdUtils.randomNanoId(30);
+        //         if (!RedisDBOperation.checkKeyExist("User:" + newUUID)) {
+        //
+        //             UserData newUserData = createDefaultUserData(userId, newUUID, gameVersion);
+        //
+        //             //向数据库里插入用户数据
+        //             // userDataVOService.insertUser(newUserData);// TODO 取消游戏服务器用户数据的创建
+        //
+        //             log.info("userData:{}", newUserData);
+        //
+        //             RedisDBOperation.insertUserData(newUserData);
+        //
+        //             return newUserData;
+        //         }
+        //         tryCount++;
+        //     }
+        //
+        //     throw new BusinessException("无法创建新用户,因为生成的所有uuid都被占用了");
+        // } catch (BusinessException e) {
+        //     // redisTemplate.delete(newKey);
+        //     codisService.del(newKey);
+        //     throw new BusinessException(e.getMessage());
+        // }
     }
 
     /**
@@ -991,7 +1001,8 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
 //
 //            }
 
-            GunReward gunReward = new GunReward(gunId, (int) Math.ceil(gunCount * (1 + additionValue)));
+            // GunReward gunReward = new GunReward(gunId, (int) Math.ceil(gunCount * (1 + additionValue)));
+            GunReward gunReward = new GunReward(gunId, (int) Math.floor(gunCount * (1 + additionValue) + 0.5f));
             gunIdCountData.add(gunReward);
         }
 
@@ -1037,7 +1048,8 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
             int gunId = gunsId.get(i);
             int gunCount = gunsCount.get(i);
             allGunsId.add(gunId);
-            allGunsCount.add((int) Math.ceil(gunCount * (1 + additionValue)));
+            // allGunsCount.add((int) Math.ceil(gunCount * (1 + additionValue)));
+            allGunsCount.add((int) Math.floor(gunCount * (1 + additionValue) + 0.5f));
         }
 
         chestOpenResult.setGunRewards(new ArrayList<>());
@@ -1059,7 +1071,8 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
             Integer gunId = entry.getKey();
             Integer gunCount = entry.getValue();
 
-            Integer countValue = chestOpenResultGunCountMap.getOrDefault(gunId, 0) + (int) Math.ceil(gunCount * (1 + additionValue));
+            // Integer countValue = chestOpenResultGunCountMap.getOrDefault(gunId, 0) + (int) Math.ceil(gunCount * (1 + additionValue));
+            Integer countValue = chestOpenResultGunCountMap.getOrDefault(gunId, 0) + (int) Math.floor(gunCount * (1 + additionValue) + 0.5f);
             chestOpenResultGunCountMap.put(gunId, countValue);
         }
         chestOpenResult.setGunRewards(CommonUtils.convertGunCountMapToGunCountArray(chestOpenResultGunCountMap));

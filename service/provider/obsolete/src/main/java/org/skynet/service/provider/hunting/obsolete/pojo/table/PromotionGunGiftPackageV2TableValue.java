@@ -42,6 +42,9 @@ public class PromotionGunGiftPackageV2TableValue implements Serializable {
     private List<Integer> rewardGunId;
     @ApiModelProperty("奖励枪械数量")
     private List<Integer> rewardGunCount;
+
+    @ApiModelProperty("奖励枪械库类型")
+    private List<Integer> rewardGunLibraryTypes;
     @ApiModelProperty("红色Epic枪卡数量（UI显示用）")
     private Integer epicGunCardCount;
     @ApiModelProperty("橙色Rare枪卡数量（UI显示用）")

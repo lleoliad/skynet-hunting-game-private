@@ -165,4 +165,7 @@ public class ClientUserData implements Serializable {
 
     @ApiModelProperty(value = "玩家锦标赛徽章信息")
     private List<Object> championshipBadgeData;
+
+    @ApiModelProperty(value = "玩家锦-每个难度对应的难度段位")
+    private List<Integer> championshipDifficultyGrades;
 }

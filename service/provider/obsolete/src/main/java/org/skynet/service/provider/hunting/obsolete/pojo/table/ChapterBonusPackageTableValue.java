@@ -46,6 +46,9 @@ public class ChapterBonusPackageTableValue implements Serializable {
     @ApiModelProperty("枪械奖励数量")
     private List<Integer> rewardGunCounts;
 
+    @ApiModelProperty("奖励枪械库类型")
+    private List<Integer> rewardGunLibraryTypes;
+
     @ApiModelProperty("价格")
     private Double price;
 

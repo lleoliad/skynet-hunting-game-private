@@ -34,6 +34,9 @@ public class FifthDayGunGiftPackageTableValue implements Serializable {
     private List<Integer> rewardBulletCount;
     @ApiModelProperty("奖励枪械id")
     private List<Integer> rewardGunId;
+
+    @ApiModelProperty("奖励枪械库类型")
+    private List<Integer> rewardGunLibraryTypes;
     @ApiModelProperty("奖励枪械数量")
     private List<Integer> rewardGunCount;
     @ApiModelProperty("红色Epic枪卡数量")
