@@ -179,26 +179,26 @@ public class LoginServiceImpl implements LoginService {
         if (rankLeagueLoginResult.failed()) {
             return rankLeagueLoginResult.build();
         }
+        clientUserData.setPlayerRankData(rankLeagueLoginResult.getData());
 
-        // Result<?> championshipLoginResult = championshipFeignService.playerLogin(org.skynet.components.hunting.championship.query.PlayerLoginQuery.builder()
-        //         .version(loginQuery.getGameVersion())
-        //         .userId(loginUserUid)
-        //         .nickname(loginUserData.getName())
-        //         .headPic(null)
-        //         .trophyCount(loginUserData.getTrophy())
-        //         .build());
-        //
-        // if (championshipLoginResult.failed()) {
-        //     return championshipLoginResult.build();
-        // }
+        Result<?> championshipLoginResult = championshipFeignService.playerLogin(org.skynet.components.hunting.championship.query.PlayerLoginQuery.builder()
+                .version(loginQuery.getGameVersion())
+                .userId(loginUserUid)
+                .nickname(loginUserData.getName())
+                .headPic(null)
+                .trophyCount(loginUserData.getTrophy())
+                .build());
+
+        if (championshipLoginResult.failed()) {
+            return championshipLoginResult.build();
+        }
+
+        clientUserData.setPlayerChampionshipData(championshipLoginResult.get("playerChampionshipData"));
+        clientUserData.setChampionshipBadgeData(championshipLoginResult.get("championshipBadgeData"));
 
         if (updateUserData) {
             RedisDBOperation.insertUserData(loginUserData);
         }
-
-        clientUserData.setPlayerRankData(rankLeagueLoginResult.getData());
-        // clientUserData.setPlayerChampionshipData(championshipLoginResult.get("playerChampionshipData"));
-        // clientUserData.setChampionshipBadgeData(championshipLoginResult.get("championshipBadgeData"));
 
         LoginVO loginVO = LoginVO.builder()
                 .userData(clientUserData)
