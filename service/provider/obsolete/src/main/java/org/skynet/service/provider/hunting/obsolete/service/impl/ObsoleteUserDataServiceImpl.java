@@ -1,11 +1,14 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
+import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.common.base.Charsets;
+import com.google.common.primitives.Bytes;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.user.dao.entity.UserData;
@@ -38,6 +41,12 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.xml.bind.DatatypeConverter;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -181,7 +190,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
         FreeChestData[] freeChestDataList = new FreeChestData[2];
         freeChestDataList[0] = null;
         freeChestDataList[1] = null;
-        LinkedAuthProviderData linkedAuthProviderData = new LinkedAuthProviderData("", "");
+        LinkedAuthProviderData linkedAuthProviderData = new LinkedAuthProviderData("", "", "");
 
         // UserData userData = new UserData(
         //         null,
@@ -387,7 +396,7 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
         }
 
         if (userData.getLinkedAuthProviderData() == null) {
-            userData.setLinkedAuthProviderData(new LinkedAuthProviderData("", ""));
+            userData.setLinkedAuthProviderData(new LinkedAuthProviderData("", "", ""));
         }
 
         upgradePlayerHistoryData(userData);
@@ -1575,6 +1584,43 @@ public class ObsoleteUserDataServiceImpl implements ObsoleteUserDataService {
 
         log.info("google登录鉴权成功" + JSONObject.toJSONString(payLoad));
         return payLoad;
+    }
+
+    @Override
+    public void gameCenterAuthenticationValidate(String playerId, String idToken) {
+
+        JSONObject jsonObject = JSONObject.parseObject(idToken);
+        String mySignature = jsonObject.getString("signature");
+        String salt = jsonObject.getString("salt");
+        String publicKeyUrl = jsonObject.getString("publicKeyUrl");
+        long timeStamp = jsonObject.getLongValue("timeStamp");
+        String bundleId = jsonObject.getString("bundleId");
+
+        byte[] signBytes = Base64.decode(mySignature);
+
+        byte[] buffer = ByteBuffer.allocate(Long.BYTES).putLong(timeStamp).array();
+
+        byte[] content = Bytes.concat(playerId.getBytes(Charsets.UTF_8), bundleId.getBytes(Charsets.UTF_8), buffer, Base64.decode(salt));
+
+        InputStream publicKeyInputStream = HttpUtil.getInputStream(publicKeyUrl);
+
+        boolean result = false;
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("x.509");
+            X509Certificate cer = (X509Certificate) cf.generateCertificate(publicKeyInputStream);
+            cer.checkValidity();
+            PublicKey publicKey = cer.getPublicKey();
+            Signature signature = Signature.getInstance(cer.getSigAlgName());
+            signature.initVerify(publicKey);
+            signature.update(content);
+            result = signature.verify(signBytes);
+            if (!result) {
+                throw new BusinessException("gamecenter登陆失败" + result);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException("gamecenter登陆失败" + result);
+        }
     }
 
     @Override

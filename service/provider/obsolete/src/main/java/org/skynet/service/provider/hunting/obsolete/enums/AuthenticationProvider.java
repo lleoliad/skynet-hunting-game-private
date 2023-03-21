@@ -10,4 +10,5 @@ public enum AuthenticationProvider {
     Unknown,
     Google,
     Facebook,
+    GameCenter,
 }

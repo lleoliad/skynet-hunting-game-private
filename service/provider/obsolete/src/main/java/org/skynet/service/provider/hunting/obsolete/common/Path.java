@@ -202,12 +202,7 @@ public class Path {
         int internalVersion = getPlayerControlRecordInternalVersion(gameVersion);
         String path = "MatchRoundControlRecordsArchived_" + internalVersion;
         String gap = ":";
-        String key = path + gap +
-                "animalId" + animalId + gap +
-                "animalRouteUid" + animalRouteUid + gap +
-                "gunId" + gunId + gap +
-                "gunLevel" + gunLevel + gap +
-                "bulletId" + bulletId;
+        String key = path + gap + "animalId" + animalId + gap + "animalRouteUid" + animalRouteUid + gap + "gunId" + gunId + gap + "gunLevel" + gunLevel + gap + "bulletId" + bulletId;
         return key;
     }
 
@@ -217,13 +212,7 @@ public class Path {
         int internalVersion = getPlayerControlRecordInternalVersion(gameVersion);
         String path = "MatchRoundControlRecordsArchived_" + internalVersion;
         String gap = ":";
-        String key = path + gap +
-                "animalId" + animalId + gap +
-                "animalRouteUid" + animalRouteUid + gap +
-                "gunId" + gunId + gap +
-                "gunLevel" + gunLevel + gap +
-                "bulletId" + bulletId + gap +
-                "windId" + windId;
+        String key = path + gap + "animalId" + animalId + gap + "animalRouteUid" + animalRouteUid + gap + "gunId" + gunId + gap + "gunLevel" + gunLevel + gap + "bulletId" + bulletId + gap + "windId" + windId;
         return key;
     }
 
@@ -235,14 +224,7 @@ public class Path {
         int precisionVersion = getPrecisionVersionByAverageShowPrecision(averageShowPrecision);
         String path = "MatchRoundControlRecordsArchived_" + internalVersion;
         String gap = ":";
-        String key = path + gap +
-                "animalId" + animalId + gap +
-                "animalRouteUid" + animalRouteUid + gap +
-                "gunId" + gunId + gap +
-                "gunLevel" + gunLevel + gap +
-                "bulletId" + bulletId + gap +
-                "windId" + windId + gap +
-                "averageShowPrecision" + precisionVersion;
+        String key = path + gap + "animalId" + animalId + gap + "animalRouteUid" + animalRouteUid + gap + "gunId" + gunId + gap + "gunLevel" + gunLevel + gap + "bulletId" + bulletId + gap + "windId" + windId + gap + "averageShowPrecision" + precisionVersion;
         return key;
     }
 
@@ -290,12 +272,7 @@ public class Path {
         int internalVersion = getPlayerControlRecordInternalVersion(gameVersion);
         String path = "MatchSingleRoundControlRecordsArchived_" + internalVersion;
         String gap = ":";
-        String key = path + gap +
-                "animalId" + animalId + gap +
-                "animalRouteUid" + animalRouteUid + gap +
-                "gunId" + gunId + gap +
-                "gunLevel" + gunLevel + gap +
-                "bulletId" + bulletId;
+        String key = path + gap + "animalId" + animalId + gap + "animalRouteUid" + animalRouteUid + gap + "gunId" + gunId + gap + "gunLevel" + gunLevel + gap + "bulletId" + bulletId;
         return key;
     }
 
@@ -305,13 +282,7 @@ public class Path {
         int internalVersion = getPlayerControlRecordInternalVersion(gameVersion);
         String path = "MatchSingleRoundControlRecordsArchived_" + internalVersion;
         String gap = ":";
-        String key = path + gap +
-                "animalId" + animalId + gap +
-                "animalRouteUid" + animalRouteUid + gap +
-                "gunId" + gunId + gap +
-                "gunLevel" + gunLevel + gap +
-                "bulletId" + bulletId + gap +
-                "windId" + windId;
+        String key = path + gap + "animalId" + animalId + gap + "animalRouteUid" + animalRouteUid + gap + "gunId" + gunId + gap + "gunLevel" + gunLevel + gap + "bulletId" + bulletId + gap + "windId" + windId;
         return key;
     }
 
@@ -322,14 +293,7 @@ public class Path {
         int precisionVersion = getPrecisionVersionByAverageShowPrecision(averageShowPrecision);
         String path = "MatchSingleRoundControlRecordsArchived_" + internalVersion;
         String gap = ":";
-        String key = path + gap +
-                "animalId" + animalId + gap +
-                "animalRouteUid" + animalRouteUid + gap +
-                "gunId" + gunId + gap +
-                "gunLevel" + gunLevel + gap +
-                "bulletId" + bulletId + gap +
-                "windId" + windId + gap +
-                "averageShowPrecision" + precisionVersion;
+        String key = path + gap + "animalId" + animalId + gap + "animalRouteUid" + animalRouteUid + gap + "gunId" + gunId + gap + "gunLevel" + gunLevel + gap + "bulletId" + bulletId + gap + "windId" + windId + gap + "averageShowPrecision" + precisionVersion;
         return key;
     }
 
@@ -339,14 +303,7 @@ public class Path {
         int internalVersion = getPlayerControlRecordInternalVersion(gameVersion);
         String path = "MatchSingleRoundControlRecordsArchived_" + internalVersion;
         String gap = ":";
-        String key = path + gap +
-                "animalId" + animalId + gap +
-                "animalRouteUid" + animalRouteUid + gap +
-                "gunId" + gunId + gap +
-                "gunLevel" + gunLevel + gap +
-                "bulletId" + bulletId + gap +
-                "windId" + windId + gap +
-                "averageShowPrecision" + precisionVersion;
+        String key = path + gap + "animalId" + animalId + gap + "animalRouteUid" + animalRouteUid + gap + "gunId" + gunId + gap + "gunLevel" + gunLevel + gap + "bulletId" + bulletId + gap + "windId" + windId + gap + "averageShowPrecision" + precisionVersion;
         return key;
     }
 
@@ -399,6 +356,14 @@ public class Path {
         return "FacebookAccountMap";
     }
 
+    /**
+     * gameCenter账号map数据集合路径
+     *
+     * @return
+     */
+    public static String getGameCenterAccountMapDataCollectionPath() {
+        return "GameCenterAccountMap";
+    }
 
     /**
      * 用户头像路径

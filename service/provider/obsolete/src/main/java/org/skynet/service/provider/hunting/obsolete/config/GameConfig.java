@@ -1,9 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.config;
 
-import org.skynet.service.provider.hunting.obsolete.common.util.RangeFloat;
-import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.skynet.service.provider.hunting.obsolete.common.util.RangeFloat;
+import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 
 
 @ApiModel(value = "GameConfig对象", description = "游戏的默认配置")
@@ -13,7 +13,7 @@ public class GameConfig {
     public static final ClientGameVersion latestClientGameVersion_Android = ClientGameVersion._1_1_0_;
 
     @ApiModelProperty(value = "最新的IOS客户端版本")
-    public static final ClientGameVersion latestClientGameVersion_IOS = null;
+    public static final ClientGameVersion latestClientGameVersion_IOS = ClientGameVersion._1_1_0_;
 
     @ApiModelProperty(value = "初始金币数量")
     public static final Long defaultCoinAmount = 1000L;

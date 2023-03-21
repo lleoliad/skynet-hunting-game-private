@@ -3,6 +3,10 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.api.client.util.Strings;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
@@ -15,6 +19,7 @@ import org.skynet.service.provider.hunting.obsolete.common.util.NanoIdUtils;
 import org.skynet.service.provider.hunting.obsolete.common.util.thread.ThreadLocalUtil;
 import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfig;
 import org.skynet.service.provider.hunting.obsolete.dao.entity.TopUpOrder;
+import org.skynet.service.provider.hunting.obsolete.dao.service.TopUpOrderService;
 import org.skynet.service.provider.hunting.obsolete.enums.OrderState;
 import org.skynet.service.provider.hunting.obsolete.enums.PlatformName;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
@@ -22,15 +27,13 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateD
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PreparePurchaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.RemoveFailureDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.SyncPendingDTO;
+import org.skynet.service.provider.hunting.obsolete.pojo.entity.IAPPurchaseReward;
+import org.skynet.service.provider.hunting.obsolete.pojo.entity.ReceiptValidateResult;
+import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
 import org.skynet.service.provider.hunting.obsolete.service.IAPService;
-import org.skynet.service.provider.hunting.obsolete.dao.service.TopUpOrderService;
 import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -116,6 +119,7 @@ public class IAPController {
             topUpOrder.setOrderState(OrderState.Place.getType());
             topUpOrder.setOrderDate(LocalDateTime.now());
             topUpOrder.setProductName(request.getProductName());
+            topUpOrder.setMoney(request.getMoney());
             topUpOrder.setGoodCount(1);
             topUpOrder.setOrderType(0);
             topUpOrderService.save(topUpOrder);
@@ -198,13 +202,21 @@ public class IAPController {
                 if (!pendingCustomOrder.getPlayerUid().equals(request.getUserUid())) {
                     throw new BusinessException("获取内部订单号" + request.getCustomOrderId() + "不属于该玩家");
                 }
-                QueryWrapper<TopUpOrder> queryWrapper = new QueryWrapper<TopUpOrder>();
-                queryWrapper.eq("order_number", request.getCustomOrderId());
-                TopUpOrder topUpOrder = topUpOrderService.getOne(queryWrapper);
-                topUpOrder.setReceiptValidateResult(request.getReceipt());
-                topUpOrder.setOrderState(OrderState.Verifying.getType());
-                topUpOrderService.updateById(topUpOrder);
-                log.warn("订单更新到mysql成功");
+
+                String customOrderId = request.getCustomOrderId();
+
+                if (!Strings.isNullOrEmpty(customOrderId)) {
+                    QueryWrapper<TopUpOrder> queryWrapper = new QueryWrapper<TopUpOrder>();
+                    queryWrapper.eq("order_number", customOrderId);
+                    TopUpOrder topUpOrder = topUpOrderService.getOne(queryWrapper);
+
+                    if (Objects.nonNull(topUpOrder) && !topUpOrder.getOrderState().equals(OrderState.Completed.getType())) {
+                        topUpOrder.setReceiptValidateResult(request.getReceipt());
+                        topUpOrder.setOrderState(OrderState.Verifying.getType());
+                        topUpOrderService.updateById(topUpOrder);
+                        log.warn("订单更新到mysql成功");
+                    }
+                }
 
                 if (request.getCmd() == null) {
                     log.warn("request.getCmd()参数为空，应该通过其他方式获取");
@@ -216,8 +228,7 @@ public class IAPController {
                     validateResult = iapService.googlePlayReceiptValidate(request);
 
                 } else if (request.getPlatform().equals(PlatformName.IOS.getPlatform())) {
-                    //TODO ios订单验证
-                    log.info("ios充值");
+                    validateResult = iapService.appStoreReceiptValidate(request);
                 }
             }
 

@@ -216,18 +216,46 @@ public class IAPServiceImpl implements IAPService {
             QueryWrapper<TopUpOrder> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("order_number", receiptValidateDTO.getCustomOrderId());
             TopUpOrder topUpOrder = topUpOrderService.getOne(queryWrapper);
-            if (topUpOrder == null) {
-                throw new BusinessException("mysql数据库中不存在的订单");
-            }
-            topUpOrder.setPayMode("GooglePay");
+//            if (topUpOrder == null){
+//                throw new BusinessException("mysql数据库中不存在的订单");
+//            }
             if (0 != purchase.getPurchaseState()) {
                 log.warn("充值失败,谷歌返回订单状态:{}", purchase.getPurchaseState());
                 //订单校验失败
-                topUpOrder.setOrderState(OrderState.VerifyFailed.getType());
+                if (topUpOrder != null) {
+                    topUpOrder.setPayMode("GooglePay");
+                    topUpOrder.setOrderState(OrderState.VerifyFailed.getType());
+                    topUpOrderService.updateById(topUpOrder);
+                }
                 throw new BusinessException("验证内购订单失败" + purchase.toString());
             } else {
+                if (topUpOrder == null) {
+                    //避免重复插入调单数据
+                    QueryWrapper<TopUpOrder> queryWrapper2 = new QueryWrapper<>();
+                    queryWrapper2.eq("platform_order_number", purchase.getOrderId());
+                    TopUpOrder topUpOrder2 = topUpOrderService.getOne(queryWrapper2);
+                    if (topUpOrder2 == null) {
+                        String customOrderId = NanoIdUtils.randomNanoId(30);
+                        topUpOrder = new TopUpOrder();
+                        topUpOrder.setOrderNumber(customOrderId);
+                        topUpOrder.setPlatformOrderNumber(purchase.getOrderId());
+                        topUpOrder.setProductName(purchase.getProductId());
+                        topUpOrder.setUserInfo(receiptValidateDTO.getUserUid());
+                        topUpOrder.setOrderState(OrderState.Place.getType());
+                        topUpOrder.setOrderDate(LocalDateTime.now());
+                        topUpOrder.setGoodCount(1);
+                        topUpOrder.setOrderType(0);
+                        topUpOrder.setOrderOmitState(OmitState.Omit.getType());
+                        topUpOrder.setPayMode("GooglePay");
+                        topUpOrderService.save(topUpOrder);
+                    }
+                    throw new BusinessException("mysql数据库中不存在的订单");
+                }
+                topUpOrder.setPayMode("GooglePay");
+                topUpOrder.setPlatformOrderNumber(purchase.getOrderId());
                 topUpOrder.setOrderState(OrderState.VerifySuccess.getType());
                 log.warn("验证内购订单完成" + purchase.toString());
+                topUpOrderService.updateById(topUpOrder);
             }
 
             String resultOrderId = purchase.getOrderId();
@@ -235,6 +263,7 @@ public class IAPServiceImpl implements IAPService {
             if (!orderId.equals(resultOrderId)) {
                 log.warn("验证内购订单 订单号不一致. user give" + orderId + "validate result: " + resultOrderId + ", raw" + JSONObject.toJSONString(purchase));
                 topUpOrder.setOrderState(OrderState.VerifyFailed.getType());
+                topUpOrderService.updateById(topUpOrder);
                 throw new BusinessException("验证内购订单 订单号不一致");
             }
 
@@ -249,6 +278,171 @@ public class IAPServiceImpl implements IAPService {
             );
 
         } catch (IOException | GeneralSecurityException e) {
+            log.warn("验证内购订单报错===================================");
+            e.printStackTrace();
+            log.warn("===================================验证内购订单报错");
+        }
+
+        return null;
+    }
+
+    public static void main(String[] args) {
+        String payload = "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";
+        String sandboxUrl = "https://sandbox.itunes.apple.com/verifyReceipt";
+        JSONObject data = new JSONObject();
+        data.put("receipt-data", payload);
+        String result = HttpUtil.post(sandboxUrl, data.toJSONString());
+        JSONObject jsondata = JSONObject.parseObject(result);
+        log.warn("ios returnStr:{}", jsondata.toString());
+    }
+
+    @Override
+    public ReceiptValidateResult appStoreReceiptValidate(IapReceiptValidateDTO receiptValidateDTO) {
+        String receipt = receiptValidateDTO.getReceipt();
+        //这是按照H5服务器端写的
+        log.warn("已经进入验证内购订单service");
+
+        JSONObject params = JSONObject.parseObject(receipt);
+        if (params == null) {
+            log.warn("验证内购订单时，传入的参数null");
+            throw new BusinessException("验证内购订单时，传入的参数nul");
+        } else {
+            log.warn("传入的参数不是null，传入的参数为{}", JSONUtil.toJsonStr(params));
+        }
+        String payload = params.getString("Payload");
+        if (payload == null) {
+            log.warn("验证内购订单时，appstoreParam为null");
+            throw new BusinessException("验证内购订单时，传入的参数nul");
+        } else {
+            log.warn("appstoreParam参数不是null，appstoreParam的参数为{}", payload);
+        }
+
+        String orderId = params.getString("customOrderId");
+        //在已完成订单中寻找
+        TopUpOrder completedOrder = checkIsOrderExist(orderId);
+
+        if (completedOrder != null) {
+            log.info("验证内购订单,该订单号已经存在且完成, order id:" + orderId);
+
+            return new ReceiptValidateResult(
+                    true,
+                    false,
+                    "",
+                    orderId,
+                    null
+            );
+        }
+
+        try {
+
+            String sandboxUrl = "https://sandbox.itunes.apple.com/verifyReceipt";
+            String productUrl = "https://buy.itunes.apple.com/verifyReceipt";
+
+//            if(isSandbox) {
+//                log.warn("[沙盒模式下]!!!!!充值开始!");
+//            }
+
+            JSONObject data = new JSONObject();
+            data.put("receipt-data", payload);
+
+            log.warn("【正在向AppStore API发请求，请稍后...】");
+            String result = HttpUtil.post(productUrl, data.toJSONString());
+            log.warn("ios returnStr:{}", result);
+            JSONObject resultData = JSONObject.parseObject(result);
+
+            String status = resultData.getString("status");
+            if (status.equals("21007")) {
+                log.warn("[沙盒模式下]!!!!!充值开始!");
+                result = HttpUtil.post(sandboxUrl, data.toJSONString());
+                log.warn("ios returnStr:{}", result);
+                resultData = JSONObject.parseObject(result);
+                status = resultData.getString("status");
+            }
+
+            if (!resultData.containsKey("receipt")) {
+                log.warn("验证ios内购订单失败");
+                throw new BusinessException("验证ios内购订单失败");
+            }
+            String bid = resultData.getJSONObject("receipt").getString("bundle_id");
+            log.warn("验证ios bid：{}", bid);
+            log.warn("验证ios AppStoreConfig：{}", String.join(",", AppStoreConfig.BUNDLE_IDS));
+            if (!Arrays.asList(AppStoreConfig.BUNDLE_IDS).contains(bid)) {
+                log.warn("验证ios内购订单失败，应用不合法");
+                throw new BusinessException("验证ios内购订单失败，应用不合法");
+            }
+
+            String productId = resultData.getJSONObject("receipt").getJSONArray("in_app").getJSONObject(0).getString("product_id");
+            String platformOrderId = resultData.getJSONObject("receipt").getJSONArray("in_app").getJSONObject(0).getString("original_transaction_id");
+
+            {
+                QueryWrapper<TopUpOrder> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("platform_order_number", platformOrderId);
+                TopUpOrder topUpOrder = topUpOrderService.getOne(queryWrapper);
+                if (Objects.nonNull(topUpOrder) && topUpOrder.getOrderState() == OrderState.Completed.getType()) {
+                    log.warn("ios内购订单已发货");
+                    return new ReceiptValidateResult(
+                            true,
+                            false,
+                            productId,
+                            orderId,
+                            null
+                    );
+                }
+            }
+
+            QueryWrapper<TopUpOrder> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("order_number", receiptValidateDTO.getCustomOrderId());
+            TopUpOrder topUpOrder = topUpOrderService.getOne(queryWrapper);
+            if (!status.equals("0")) {
+                log.warn("充值失败,appstore返回订单状态:{}", status);
+                //订单校验失败
+                if (Objects.nonNull(topUpOrder)) {
+                    topUpOrder.setOrderState(OrderState.VerifyFailed.getType());
+                    topUpOrder.setPayMode("AppStore");
+                    topUpOrderService.updateById(topUpOrder);
+                }
+                throw new BusinessException("验证内购订单失败");
+            } else {
+
+                if (topUpOrder == null) {
+                    //避免重复插入调单数据
+                    QueryWrapper<TopUpOrder> queryWrapper2 = new QueryWrapper<>();
+                    queryWrapper2.eq("platform_order_number", platformOrderId);
+                    TopUpOrder topUpOrder2 = topUpOrderService.getOne(queryWrapper2);
+                    if (topUpOrder2 == null) {
+                        String customOrderId = NanoIdUtils.randomNanoId(30);
+                        topUpOrder = new TopUpOrder();
+                        topUpOrder.setOrderNumber(customOrderId);
+                        topUpOrder.setPlatformOrderNumber(platformOrderId);
+                        topUpOrder.setProductName(productId);
+                        topUpOrder.setUserInfo(receiptValidateDTO.getUserUid());
+                        topUpOrder.setOrderState(OrderState.Place.getType());
+                        topUpOrder.setOrderDate(LocalDateTime.now());
+                        topUpOrder.setGoodCount(1);
+                        topUpOrder.setOrderType(0);
+                        topUpOrder.setOrderOmitState(OmitState.Omit.getType());
+                        topUpOrder.setPayMode("AppStore");
+                        topUpOrderService.save(topUpOrder);
+                    }
+                    throw new BusinessException("mysql数据库中不存在的订单");
+                }
+
+                topUpOrder.setPayMode("AppStore");
+                topUpOrder.setPlatformOrderNumber(platformOrderId);
+                topUpOrder.setOrderState(OrderState.VerifySuccess.getType());
+                log.warn("验证内购订单完成" + resultData.toString());
+            }
+
+            topUpOrderService.updateById(topUpOrder);
+
+            return new ReceiptValidateResult(
+                    false,
+                    true,
+                    productId,
+                    orderId,
+                    result
+            );
+        } catch (Exception e) {
             log.warn("验证内购订单报错===================================");
             e.printStackTrace();
             log.warn("===================================验证内购订单报错");

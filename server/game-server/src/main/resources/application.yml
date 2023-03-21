@@ -50,5 +50,7 @@ google:
     tokenUri: https://oauth2.googleapis.com/token
     authProviderX509CertUrl: https://www.googleapis.com/oauth2/v1/certs
     clientX509CertUrl: https://www.googleapis.com/robot/v1/metadata/x509/hunting-sniper%40pc-api-7271145507751356136-749.iam.gserviceaccount.com
-
+appstore:
+  config:
+    bundleIds: ["com.huntingfly.huntingsniper"]
 

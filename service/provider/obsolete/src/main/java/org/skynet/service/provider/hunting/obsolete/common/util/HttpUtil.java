@@ -3,19 +3,24 @@ package org.skynet.service.provider.hunting.obsolete.common.util;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.google.common.base.Charsets;
+import com.google.common.primitives.Bytes;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DownloadDataDTO;
-import org.skynet.components.hunting.user.dao.entity.UserData;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 @Slf4j
@@ -475,6 +480,101 @@ public class HttpUtil {
             return lineBuffer.toString();
         } catch (Exception e) {
             throw new BusinessException("传输错误", -1);
+        }
+    }
+
+    /**
+     * 发送get请求
+     *
+     * @param url
+     * @return
+     */
+    public static InputStream getInputStream(String url) {
+
+        try {
+            HttpURLConnection httpURLConnection = HttpUtil.HttpConnectionByGet(new URL(url));
+
+            httpURLConnection.connect();
+
+            return httpURLConnection.getInputStream();
+        } catch (Exception e) {
+            throw new BusinessException("传输错误", -1);
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            String mySignature = "Ln7lH0papLSJATgVW4TLN+t8wN+fe5tOx5YimF124i6CZt5hB9BbNdr8Ja6hgZtNs891fayVHPOk5QMdTrH0UlZ8e9fA/4wXYdpjXjuskPvbmrsSqKMRQJTrRxm8epnz0o+DTnpLQptXKnwddH3tVIfz7HsG648w625jYyo/E7cqrQEFxZG9h1xCc36iKheEsToJjuUyD3maH2om8uwUTXa1HBeI8JBQs89OytF3rCBEtZLGNNFpcb6qEKZp4lm7Al/PNoCxt7NnRMhnrzF9QVb9Yub89QOjM8EDLhuOKjldJlj2MgxRZC4fnuwZDmlIi06+T2HFpO5G8Dj1hCwTzab4H5ZFFrWzJl6QO7re6SpTEF20vTLKqZeg3Undjvmff1WH/chreB/lBFIubwL4HwD4CwibAe2r2uVqs5TeQVOahe/nPYyLb7lTaYwAkhi2A0ZpTK72clkkh1LiymA5JLU5/l1wXklEH6DKNbOfb+o4yg0Cfn4yLZ2QBk6hhgliUoXR1+HF1f2s4fC14+biv1xTkYmyrE7CKmKa9QCNmMRqt9IlkPvE3q8Li1FjDgrBlij1pbh+qRWkyCalUSxGWcxviL2B4Chvl3a2uvu426X1rEbIaugyIOySaWvXo1sWf+xC5COi9s0+yQjJTzZpcSP7FPlfwzth6mD4HbN6OAw=";
+//            mySignature = mySignature.replace("+", "%2B").replace("\t", "").replace(" ", "+").replace("+=+", " = ");
+//            mySignature = URLDecoder.decode(mySignature, "utf-8");
+            String salt = "WYS69Q==";
+//            salt = salt.replace("+", "%2B").replace("\t", "").replace(" ", "+").replace("+=+", " = ");
+//            salt = URLDecoder.decode(salt, "utf-8");
+            String publicKeyUrl = "https://static.gc.apple.com/public-key/gc-prod-8.cer";
+            long timeStamp = 1679126717109l;
+            String bundleId = "com.huntingfly.huntingsniper";
+            String playerId = "T:_121a9f5ab67486b086518fe7257a0cf2";
+
+            byte[] signBytes = Base64.decodeBase64(mySignature);
+
+            byte[] buffer = ByteBuffer.allocate(Long.BYTES).putLong(timeStamp).array();
+//            byte[] buffer = byteBuffer.array();
+
+//            byte[] buffer = new byte[8];
+//            for (int i = 0; i < 8; i++) {
+//                buffer[7 - i] = (byte)(timeStamp & 0xff);
+//                timeStamp = timeStamp >> 8;
+//            }
+
+            byte[] saltBytes = Base64.decodeBase64(salt);
+            byte[] content = Bytes.concat(playerId.getBytes(Charsets.UTF_8), bundleId.getBytes(Charsets.UTF_8), buffer, saltBytes);
+//            byte[] content = String.format("%s%s%s%s", playerId, bundleId, timeStamp, salt).getBytes(StandardCharsets.UTF_8);
+
+//            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//            digest.update(content);
+//            content = digest.digest();
+
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(publicKeyUrl).openConnection();
+//                connection.setRequestMethod("GET");
+
+            } catch (IOException e) {
+                System.err.println("连接错误");
+            } finally {
+                if (null != connection) {
+                    connection.disconnect();
+                }
+            }
+
+            connection.connect();
+
+            InputStream publicKeyInputStream = connection.getInputStream();
+
+//            String publicKey = HttpUtil.getString(publicKeyUrl);
+//            final byte[] keyBytes = IoUtil.readBytes(publicKeyInputStream);
+
+            boolean result = false;
+            try {
+                CertificateFactory cf = CertificateFactory.getInstance("x.509");
+                X509Certificate cer = (X509Certificate) cf.generateCertificate(publicKeyInputStream);
+                cer.checkValidity();
+                PublicKey publicKey = cer.getPublicKey();
+                Signature signature = Signature.getInstance(cer.getSigAlgName());
+                signature.initVerify(publicKey);
+                signature.update(content);
+                result = signature.verify(signBytes);
+
+                if (!result) {
+                    System.out.println("gamecenter登陆失败" + result);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("gamecenter登陆失败" + result);
+            }
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

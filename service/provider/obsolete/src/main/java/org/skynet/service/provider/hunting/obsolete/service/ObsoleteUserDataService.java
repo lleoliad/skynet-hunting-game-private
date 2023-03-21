@@ -1,5 +1,6 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;
@@ -7,7 +8,6 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.BaseDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.DeleteGUNDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.UpdateGUNDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.UpdatePropDTO;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 
 import java.io.IOException;
@@ -45,6 +45,15 @@ public interface ObsoleteUserDataService {
      * @return
      */
     GoogleIdToken.Payload googleAuthenticationValidate(String userId, String idToken) throws GeneralSecurityException, IOException;
+
+    /**
+     * gameCenter 验证
+     *
+     * @param userUid
+     * @param idToken
+     * @return
+     */
+    void gameCenterAuthenticationValidate(String userUid, String idToken);
 
     /**
      * 通过时间获取指定范围得的邮件

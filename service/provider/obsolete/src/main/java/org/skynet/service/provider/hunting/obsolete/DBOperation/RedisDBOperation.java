@@ -2,12 +2,16 @@ package org.skynet.service.provider.hunting.obsolete.DBOperation;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.skynet.commons.context.exception.SkynetException;
+import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.query.UserDataLandQuery;
 import org.skynet.components.hunting.user.query.UserDataUpdateQuery;
 import org.skynet.components.hunting.user.service.UserFeignService;
-import org.skynet.commons.lang.common.Result;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
 import org.skynet.service.provider.hunting.obsolete.common.util.ApplicationContextUtil;
@@ -17,10 +21,6 @@ import org.skynet.service.provider.hunting.obsolete.config.SystemPropertiesConfi
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.CloudUserDataDto;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.skynet.starter.codis.service.CodisService;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -720,6 +723,7 @@ public class RedisDBOperation {
         // redisDBOperation.redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
         redisDBOperation.codisService.set(key, value, timeout, TimeUnit.MILLISECONDS);
     }
+
     public static String getCacheObject(final String key) {
         // return (String) redisDBOperation.redisTemplate.opsForValue().get(key);
         return redisDBOperation.codisService.get(key);
@@ -984,9 +988,33 @@ public class RedisDBOperation {
         redisDBOperation.codisService.hset(key, providerUserId, jsonString);
     }
 
+    /*
+        ----------
+        gamecenter绑定账号
+        ----------
+     */
+    public static void insertGameCenterAccountMapData(String providerUserId, AccountMapData accountMapData) {
+
+        String key = Path.getGameCenterAccountMapDataCollectionPath();
+        String jsonString = JSONObject.toJSONString(accountMapData);
+
+        // redisDBOperation.redisTemplate.opsForHash().put(key,providerUserId,jsonString);
+        redisDBOperation.codisService.hset(key, providerUserId, jsonString);
+    }
+
     public static AccountMapData selectFacebookAccountMapData(String providerUserId) {
 
         String key = Path.getFacebookAccountMapDataCollectionPath();
+        // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, providerUserId);
+        String jsonString = redisDBOperation.codisService.hget(key, providerUserId);
+        if (jsonString == null)
+            return null;
+        return JSONObject.parseObject(jsonString, AccountMapData.class);
+    }
+
+    public static AccountMapData selectGameCenterAccountMapData(String providerUserId) {
+
+        String key = Path.getGameCenterAccountMapDataCollectionPath();
         // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, providerUserId);
         String jsonString = redisDBOperation.codisService.hget(key, providerUserId);
         if (jsonString == null)

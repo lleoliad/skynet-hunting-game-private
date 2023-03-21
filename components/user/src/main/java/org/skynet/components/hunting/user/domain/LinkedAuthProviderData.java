@@ -23,4 +23,7 @@ public class LinkedAuthProviderData implements Serializable {
 
     @ApiModelProperty("facebook玩家ID")
     private String facebookUserId;
+
+    @ApiModelProperty("gameCenter玩家ID")
+    private String gameCenterUserId;
 }
