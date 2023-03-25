@@ -12,8 +12,9 @@ import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.skynet.commons.lang.common.Result;
-import org.skynet.components.hunting.battle.data.BattleCompleteInfoCVO;
-import org.skynet.components.hunting.battle.data.BattleMatchingInfoCVO;
+import org.skynet.components.hunting.battle.data.MatchInfoBO;
+import org.skynet.components.hunting.battle.data.cvo.BattleCompleteInfoCVO;
+import org.skynet.components.hunting.battle.data.cvo.BattleMatchingInfoCVO;
 import org.skynet.components.hunting.battle.domain.MatchPlayerInfo;
 import org.skynet.components.hunting.battle.enums.BattleMode;
 import org.skynet.components.hunting.battle.query.CompleteQuery;
@@ -667,7 +668,7 @@ public class HuntingMatchController {
 //            http://192.168.2.199:9301
             //47.88.90.222
             // Map<String, Object> fightInfo = HttpUtil.getFightInfo(fightUrl + "/battle/matching", matchDto);
-            Result<BattleMatchingInfoCVO> matchingResult = battleFeignService.matching(MatchingQuery.builder()
+            Result<MatchInfoBO> matchingResult = battleFeignService.matching(MatchingQuery.builder()
                     .version(request.getGameVersion())
                     .userId(request.getUserUid())
                     .chapterId(playerSelectChapterId)
@@ -692,13 +693,13 @@ public class HuntingMatchController {
 
             //玩家的武器
             // JSONObject data = JSONObject.parseObject(fightInfo.get("data").toString());
-            BattleMatchingInfoCVO battleMatchingInfoCVO = matchingResult.getData();
+            MatchInfoBO matchInfoBO = matchingResult.getData();
 //            MatchInfo matchInfo = JSONUtil.toBean(data.get("matchInfo").toString(), MatchInfo.class);
-            MatchPlayerInfo attacker = battleMatchingInfoCVO.getAttacker();
+            MatchPlayerInfo attacker = matchInfoBO.getAttacker();
             localPlayerWeaponInfo = new PlayerWeaponInfo(attacker.getGunId(), attacker.getGunLevel(), attacker.getBulletId());
 
             //todo 需要战斗服传matchId
-            matchId = battleMatchingInfoCVO.getMatchId(); //(Integer) data.get("matchId");
+            matchId = matchInfoBO.getMatchId(); //(Integer) data.get("matchId");
 
 //            localPlayerWeaponInfo = huntingMatchService.generateLocalPlayerWeaponInfo(userData,request.getGameVersion());
 
@@ -769,10 +770,10 @@ public class HuntingMatchController {
 //            }
 
             //todo 需要战斗服传的,是否是玩家先手
-            isLocalPlayerFirst = BooleanUtil.isTrue(battleMatchingInfoCVO.getIsLocalPlayerFirst());// data.get("isLocalPlayerFirst") == null || (boolean) data.get("isLocalPlayerFirst");
+            isLocalPlayerFirst = BooleanUtil.isTrue(matchInfoBO.getIsLocalPlayerFirst());// data.get("isLocalPlayerFirst") == null || (boolean) data.get("isLocalPlayerFirst");
 
             // Defender defender = JSONUtil.toBean(data.get("defender").toString(), Defender.class);
-            MatchPlayerInfo defender = battleMatchingInfoCVO.getDefender();
+            MatchPlayerInfo defender = matchInfoBO.getDefender();
             opponentPlayerWeaponInfo = new PlayerWeaponInfo(defender.getGunId(), defender.getGunLevel(), defender.getBulletId());
             //使用子弹
             if (recordModeData == null) {

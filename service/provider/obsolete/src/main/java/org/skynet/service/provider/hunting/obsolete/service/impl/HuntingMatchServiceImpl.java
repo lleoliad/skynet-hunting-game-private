@@ -285,7 +285,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
 
         Result<Integer> playerRankResult = rankLeagueFeignService.getPlayerRank(GetPlayerRankQuery.builder().userId(userData.getUuid()).build());
         if (playerRankResult.isSuccess()) {
-            Result<RobotPlayerBasicInfoBO> robotPlayerBasicInfoBOResult = robotFactoryFeignService.randomGet(RobotsQuery.builder().rank(playerRankResult.getData()).build());
+            Result<RobotPlayerBasicInfoBO> robotPlayerBasicInfoBOResult = robotFactoryFeignService.randomGet(RobotsQuery.builder().rank(playerRankResult.getData()).count(1).build());
             if (robotPlayerBasicInfoBOResult.isSuccess()) {
                 RobotPlayerBasicInfoBO robotPlayerBasicInfoBO = robotPlayerBasicInfoBOResult.getData();
                 opponentPlayerInfo.setName(robotPlayerBasicInfoBO.getNickname());

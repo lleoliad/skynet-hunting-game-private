@@ -7,7 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.commons.lang.common.Result;
-import org.skynet.components.hunting.battle.data.BattleStartInfoCVO;
+import org.skynet.components.hunting.battle.data.cvo.BattleStartInfoCVO;
 import org.skynet.components.hunting.battle.query.StartQuery;
 import org.skynet.components.hunting.battle.service.BattleFeignService;
 import org.skynet.components.hunting.user.dao.entity.UserData;

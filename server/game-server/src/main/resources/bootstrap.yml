@@ -32,7 +32,7 @@ skynet:
       username: root
       password: 4KowHp6kmd9Xgffe
     mongodb:
-      host: mongodb.hunting.${skynet.domain-name}
+      host: mongodb.${skynet.domain-name}
       port: 27017
       database: hunting_game
       username: user
