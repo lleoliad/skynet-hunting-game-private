@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.skynet.components.hunting.robot.data.RobotPlayerBasicInfoBO;
+import org.skynet.components.hunting.robot.data.RobotPlayerHeadPicBO;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.GetPlayerRankQuery;
@@ -281,17 +282,18 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
     public OpponentPlayerInfo generateOpponentPlayerInfo(UserData userData, Integer chapterId, Integer opponentTrophyCount, String gameVersion) {
 
         final double aiProfileCount = 1071d;
-        OpponentPlayerInfo opponentPlayerInfo = new OpponentPlayerInfo(null, null, null, null);
+        OpponentPlayerInfo opponentPlayerInfo = new OpponentPlayerInfo(null, null, null, null, null);
 
         Result<Integer> playerRankResult = rankLeagueFeignService.getPlayerRank(GetPlayerRankQuery.builder().userId(userData.getUuid()).build());
         if (playerRankResult.isSuccess()) {
-            Result<RobotPlayerBasicInfoBO> robotPlayerBasicInfoBOResult = robotFactoryFeignService.randomGet(RobotsQuery.builder().rank(playerRankResult.getData()).count(1).build());
+            Result<RobotPlayerBasicInfoBO> robotPlayerBasicInfoBOResult = robotFactoryFeignService.randomGet(RobotsQuery.builder().rank(playerRankResult.getData()).randomHead(true).count(1).build());
             if (robotPlayerBasicInfoBOResult.isSuccess()) {
                 RobotPlayerBasicInfoBO robotPlayerBasicInfoBO = robotPlayerBasicInfoBOResult.getData();
                 opponentPlayerInfo.setName(robotPlayerBasicInfoBO.getNickname());
-                opponentPlayerInfo.setIcon_base64(robotPlayerBasicInfoBO.getHeadPic());
+                // opponentPlayerInfo.setIcon_base64(robotPlayerBasicInfoBO.getHeadPic());
+                opponentPlayerInfo.setHeadPic(robotPlayerBasicInfoBO.getHeadPic());
                 opponentPlayerInfo.setTrophy(opponentTrophyCount);
-                opponentPlayerInfo.setUseDefaultIcon(false);
+                opponentPlayerInfo.setUseDefaultIcon(StringUtils.isBlank(robotPlayerBasicInfoBO.getHeadPic()));
                 // return opponentPlayerInfo;
             }
         }
@@ -315,11 +317,19 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
             log.info("直接设置对手奖杯数:" + opponentTrophyCount);
         }
 
+        if (gameVersion.compareTo("1.1.0") < 0) {
+            Result<RobotPlayerHeadPicBO> robotPlayerHeadPicBOResult = robotFactoryFeignService.randomHeadPic(RobotsQuery.builder().rank(playerRankResult.getData()).count(1).build());
+            if (robotPlayerHeadPicBOResult.failed() || StringUtils.isBlank(robotPlayerHeadPicBOResult.getData().getImageBase64())) {
+                opponentPlayerInfo.setUseDefaultIcon(true);
+            } else {
+                opponentPlayerInfo.setIcon_base64(robotPlayerHeadPicBOResult.getData().getImageBase64());
+            }
+        }
+
         // boolean useTotalRandomAiProfile = NumberUtils.randomFloat(0d, 1d) <= GameConfig.randomNameAiRatioInPlayerMatching;
         //
         // //如果是第一章前三局,那么都是随机玩家信息
         // if (chapterId == 1) {
-        //
         //     Integer firstChapterEnteredCount = 0;
         //     if (userData.getChapterEnteredCountMap().containsKey(1)) {
         //         firstChapterEnteredCount = userData.getChapterEnteredCountMap().get(1);
@@ -368,8 +378,6 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
         //     opponentPlayerInfo.setIcon_base64(opponentProfile.getIcon_base64());
         //     opponentPlayerInfo.setUseDefaultIcon(opponentProfile.getUseDefaultIcon());
         // }
-
-
         return opponentPlayerInfo;
     }
 

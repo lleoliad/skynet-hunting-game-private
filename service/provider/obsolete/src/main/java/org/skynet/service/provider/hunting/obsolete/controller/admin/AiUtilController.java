@@ -124,7 +124,7 @@ public class AiUtilController {
                                                          String gameVersion) {
 
         final double aiProfileCount = 1071d;
-        OpponentPlayerInfo opponentPlayerInfo = new OpponentPlayerInfo(null, null, null, null);
+        OpponentPlayerInfo opponentPlayerInfo = new OpponentPlayerInfo(null, null, null, null, null);
 
         Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(gameVersion);
         //对手奖杯根据玩家变化

@@ -24,6 +24,9 @@ public class OpponentPlayerInfo implements Serializable {
     @ApiModelProperty(value = "照片")
     String icon_base64;
 
+    @ApiModelProperty(value = "头像", name = "cdn 文件名")
+    String headPic;
+
     @ApiModelProperty(value = "默认照片")
     Boolean useDefaultIcon;
 
