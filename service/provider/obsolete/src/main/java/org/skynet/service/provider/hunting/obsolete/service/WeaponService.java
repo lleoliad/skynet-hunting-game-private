@@ -1,7 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.GunReward;
+import org.skynet.components.hunting.game.data.BulletReward;
+import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 
 import java.util.List;

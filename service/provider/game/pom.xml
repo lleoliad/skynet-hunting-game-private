@@ -18,21 +18,16 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.skynet.cloud</groupId>
-            <artifactId>skynet-hunting-service-provider-obsolete</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.skynet.cloud</groupId>
-            <artifactId>skynet-hunting-game-components-game</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>org.skynet.cloud</groupId>
             <artifactId>skynet-hunting-game-components-user</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.skynet.cloud</groupId>
+            <artifactId>skynet-hunting-service-provider-obsolete</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

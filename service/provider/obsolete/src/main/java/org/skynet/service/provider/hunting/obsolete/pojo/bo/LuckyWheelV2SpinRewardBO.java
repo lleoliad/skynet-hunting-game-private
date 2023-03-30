@@ -1,7 +1,7 @@
 package org.skynet.service.provider.hunting.obsolete.pojo.bo;
 
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.ChestOpenResult;
+import org.skynet.components.hunting.game.data.BulletReward;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.RewardGunInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;

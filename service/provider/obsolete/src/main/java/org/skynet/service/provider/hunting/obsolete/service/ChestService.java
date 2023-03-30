@@ -1,5 +1,6 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
+import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 import org.skynet.components.hunting.user.domain.ChestData;

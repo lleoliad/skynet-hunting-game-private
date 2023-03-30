@@ -1,6 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import org.skynet.components.hunting.game.data.BulletReward;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
+import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.ChestData;
 import org.skynet.components.hunting.user.domain.LuckyWheelData;

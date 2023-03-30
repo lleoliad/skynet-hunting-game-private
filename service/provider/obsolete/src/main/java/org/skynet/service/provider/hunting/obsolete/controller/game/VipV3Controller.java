@@ -13,7 +13,7 @@ import org.skynet.service.provider.hunting.obsolete.config.VipV3Config;
 import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
 import org.skynet.service.provider.hunting.obsolete.idempotence.RepeatSubmit;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.VipDTO;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.BulletReward;
+import org.skynet.components.hunting.game.data.BulletReward;
 import org.skynet.components.hunting.user.domain.PlayerVipV3Data;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;

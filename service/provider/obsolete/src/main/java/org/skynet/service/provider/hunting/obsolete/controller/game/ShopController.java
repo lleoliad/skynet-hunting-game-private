@@ -16,7 +16,7 @@ import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseBulletDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseChestDTO;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.PurchaseCoinPackageDTO;
 import org.skynet.components.hunting.user.domain.ChestData;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.ChestOpenResult;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.UserDataSendToClient;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;

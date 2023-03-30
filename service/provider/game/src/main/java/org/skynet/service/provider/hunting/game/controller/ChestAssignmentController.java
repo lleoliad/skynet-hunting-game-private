@@ -5,6 +5,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
+import org.skynet.components.hunting.game.data.OpenChestBO;
+import org.skynet.components.hunting.game.query.GunChestQuery;
 import org.skynet.components.hunting.game.query.WinChestQuery;
 import org.skynet.components.hunting.user.data.ClientUserData;
 import org.skynet.commons.lang.common.Result;
@@ -29,7 +32,7 @@ public class ChestAssignmentController {
     @ApiOperation(value = "玩家登录", notes = "")
     @PostMapping(value = "/open")
     @ResponseBody
-    public Result<ClientUserData> open(@ApiParam(name = "openChestQuery", value = "开宝箱参数", required = true) @RequestBody OpenChestQuery openChestQuery, HttpServletRequest request) {
+    public Result<OpenChestBO> open(@ApiParam(name = "openChestQuery", value = "开宝箱参数", required = true) @RequestBody OpenChestQuery openChestQuery, HttpServletRequest request) {
         return chestAssignmentService.open(openChestQuery);
     }
 
@@ -38,5 +41,12 @@ public class ChestAssignmentController {
     @ResponseBody
     public Result<ChapterWinChestData> winChest(@ApiParam(name = "winChestQuery", value = "胜利宝箱参数", required = true) @RequestBody WinChestQuery winChestQuery, HttpServletRequest request) {
         return chestAssignmentService.winChest(winChestQuery);
+    }
+
+    @ApiOperation(value = "枪械宝箱", notes = "")
+    @PostMapping(value = "/gunChest")
+    @ResponseBody
+    public Result<ChestOpenResult> gunChest(@ApiParam(name = "gunChestQuery", value = "枪械宝箱参数", required = true) @RequestBody GunChestQuery gunChestQuery, HttpServletRequest request) {
+        return chestAssignmentService.gunChest(gunChestQuery);
     }
 }

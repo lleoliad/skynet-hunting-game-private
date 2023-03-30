@@ -4,7 +4,7 @@ import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.PromotionEventPackageData;
 import org.skynet.components.hunting.user.domain.UserPendingPurchaseData;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateDTO;
-import org.skynet.service.provider.hunting.obsolete.pojo.entity.ChestOpenResult;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.IAPPurchaseReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.ReceiptValidateResult;
 import org.skynet.service.provider.hunting.obsolete.pojo.table.PendingPurchaseOrder;

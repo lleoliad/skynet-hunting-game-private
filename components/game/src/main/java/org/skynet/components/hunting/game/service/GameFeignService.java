@@ -3,6 +3,8 @@ package org.skynet.components.hunting.game.service;
 import com.alibaba.fastjson2.JSONObject;
 import io.swagger.annotations.ApiParam;
 import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
+import org.skynet.components.hunting.game.query.GunChestQuery;
 import org.skynet.components.hunting.game.query.OpenChestQuery;
 import org.skynet.components.hunting.game.query.WinChestQuery;
 import org.skynet.components.hunting.user.data.ClientUserData;
@@ -20,5 +22,8 @@ public interface GameFeignService {
 
     @PostMapping(value = "chest/winChest")
     Result<ChapterWinChestData> winChest(@ApiParam(name = "winChestQuery", value = "胜利宝箱参数", required = true) @RequestBody WinChestQuery winChestQuery);
+
+    @PostMapping(value = "chest/gunChest")
+    Result<ChestOpenResult> gunChest(@ApiParam(name = "gunChestQuery", value = "枪械宝箱参数", required = true) @RequestBody GunChestQuery gunChestQuery);
 
 }

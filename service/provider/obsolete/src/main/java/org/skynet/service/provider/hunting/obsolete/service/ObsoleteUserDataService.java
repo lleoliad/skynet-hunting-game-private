@@ -1,6 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import org.skynet.components.hunting.game.data.BulletReward;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
+import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.pojo.bo.InitUserDataBO;

@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.obsolete.pojo.entity;
+package org.skynet.components.hunting.game.data;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

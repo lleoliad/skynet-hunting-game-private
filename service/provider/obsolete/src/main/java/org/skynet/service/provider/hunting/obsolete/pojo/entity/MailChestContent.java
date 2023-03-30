@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.skynet.components.hunting.game.data.BulletReward;
+import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.components.hunting.user.domain.ChestData;
 
 import java.io.Serializable;

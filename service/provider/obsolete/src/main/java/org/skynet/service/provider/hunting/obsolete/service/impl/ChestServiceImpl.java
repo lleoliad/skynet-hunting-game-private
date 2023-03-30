@@ -3,6 +3,9 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.skynet.components.hunting.game.data.BulletReward;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
+import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 import org.skynet.components.hunting.user.domain.ChestData;
@@ -404,6 +407,7 @@ public class ChestServiceImpl implements ChestService {
         if (chestContentMapTableValue.getRareGunCount() > 0) {
             gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Rare, chestData.getLevel(), chestContentMapTableValue.getRareGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap, additionValue);
         }
+
         if (chestContentMapTableValue.getRandomGunCount() > 0) {
             gunRewardMap = extractGunRewardsFromGunLibrary(userData, GunLibraryType.Random, chestData.getLevel(), chestContentMapTableValue.getRandomGunCount(), gameVersion, enableDrawCountRequires, gunRewardMap, additionValue);
         }

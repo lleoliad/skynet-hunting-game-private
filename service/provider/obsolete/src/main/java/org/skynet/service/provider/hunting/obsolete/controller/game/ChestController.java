@@ -3,6 +3,7 @@ package org.skynet.service.provider.hunting.obsolete.controller.game;
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.skynet.commons.lang.common.Result;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.components.hunting.rank.league.query.GetRankAdditionQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.components.hunting.user.dao.entity.UserData;
