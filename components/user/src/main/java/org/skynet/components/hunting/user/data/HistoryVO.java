@@ -64,5 +64,13 @@ public class HistoryVO implements Serializable {
     @ApiModelProperty(value = "付费次数")
     private Integer moneyPaidCount = 0;
 
+    @ApiModelProperty(value = "总比赛次数")
+    private Integer totalMatchCount;
+
+    @ApiModelProperty(value = "比赛胜利次数")
+    private Integer wonMatchCount;
+
+    @ApiModelProperty(value = "比赛胜率（范围0-1）")
+    private Float matchWonPercentage;
 
 }

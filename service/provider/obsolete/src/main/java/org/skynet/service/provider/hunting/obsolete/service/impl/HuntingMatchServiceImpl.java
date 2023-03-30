@@ -3,15 +3,14 @@ package org.skynet.service.provider.hunting.obsolete.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.skynet.components.hunting.robot.data.RobotPlayerBasicInfoBO;
-import org.skynet.components.hunting.robot.data.RobotPlayerHeadPicBO;
-import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.rank.league.query.GetPlayerRankQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
-import org.skynet.components.hunting.robot.data.RobotPlayerInfoBO;
+import org.skynet.components.hunting.robot.data.RobotPlayerBasicInfoBO;
+import org.skynet.components.hunting.robot.data.RobotPlayerHeadPicBO;
 import org.skynet.components.hunting.robot.query.RobotsQuery;
 import org.skynet.components.hunting.robot.service.RobotFactoryFeignService;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.History;
 import org.skynet.components.hunting.user.domain.PlayerRecordModeData;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
@@ -441,6 +440,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
                                 round,
                                 hitFireAtomControlData.getHitShowPrecision(),
                                 isPerfectShot,
+                                recordData.getAnimalId(),
                                 isLastSegment && recordData.getIsAnimalKill(),
                                 isPerfectShot && isHitCriticalPart && hitCriticalPartIndex == 0,
                                 isPerfectShot && isHitCriticalPart && hitCriticalPartIndex == 1);
@@ -495,9 +495,12 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
 
     @Override
     public void recordChapterComplete(String uuid, ChapterTableValue chapterTableValue, Integer matchId, List<PlayerFireDetails> playerFireDetails, Boolean isWin, String gameVersion, List<PlayerControlRecordData> allPlayerControlRecordsData) {
-
         UserData userData = GameEnvironment.userDataMap.get(uuid);
+        recordChapterComplete(userData, chapterTableValue, matchId, playerFireDetails, isWin, gameVersion, allPlayerControlRecordsData);
+    }
 
+    @Override
+    public void recordChapterComplete(UserData userData, ChapterTableValue chapterTableValue, Integer matchId, List<PlayerFireDetails> playerFireDetails, Boolean isWin, String gameVersion, List<PlayerControlRecordData> allPlayerControlRecordsData) {
         Map<Integer, Integer> chapterCompletedCountMap = userData.getChapterCompletedCountMap();
         if (!chapterCompletedCountMap.containsKey(chapterTableValue.getId())) {
             chapterCompletedCountMap.put(chapterTableValue.getId(), 1);
@@ -517,7 +520,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
                 chapterWinCountMap.put(chapterTableValue.getId(), count);
             }
         }
-        achievementService.updateMatchDoneAchievementData(uuid, chapterTableValue.getId(), gameVersion);
+        achievementService.updateMatchDoneAchievementData(userData, chapterTableValue.getId(), gameVersion);
     }
 
     @Override
@@ -525,21 +528,29 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
 
         UserData userData = GameEnvironment.userDataMap.get(uuid);
 
+        refreshPlayerHistoryData(userData, chapterTableValue.getId(), isWin, playerFireDetails, gameVersion);
+
+    }
+
+    @Override
+    public void refreshPlayerHistoryData(UserData userData, Integer chapterId, Boolean isWin, List<PlayerFireDetails> playerFireDetails, String gameVersion) {
+
         History history = userData.getHistory();
 
         //本场胜利,且有连胜记录,说明是连胜
         boolean isWinStreak = isWin && userData.getHistory().getCurrentMatchWinStreak() > 0;
 
-        achievementService.updateMatchWinStreakInChapterOrAbove(userData, chapterTableValue.getId(), isWinStreak, gameVersion);
+        achievementService.updateMatchWinStreakInChapterOrAbove(userData, chapterId, isWinStreak, gameVersion);
 
         if (isWin) {
-
             //增加连胜
             history.setCurrentMatchWinStreak(history.getCurrentMatchWinStreak() + 1);
             history.setCurrentMatchLoseStreak(0);
             if (history.getCurrentMatchWinStreak() > history.getBestMatchWinStreak()) {
                 history.setBestMatchWinStreak(history.getCurrentMatchWinStreak());
             }
+
+            history.setWonMatchCount(history.getWonMatchCount() + 1);
         } else {
 
             history.setCurrentMatchWinStreak(0);
@@ -547,7 +558,6 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
         }
 
         for (PlayerFireDetails fireDetail : playerFireDetails) {
-
             history.setServer_only_matchTotalShots(history.getServer_only_matchTotalShots() + 1);
             double count = history.getServer_only_matchAllShotsPrecisionAccumulation() + fireDetail.getShowPrecision();
             history.setServer_only_matchAllShotsPrecisionAccumulation(count);

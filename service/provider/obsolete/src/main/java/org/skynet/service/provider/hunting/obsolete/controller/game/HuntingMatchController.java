@@ -23,6 +23,7 @@ import org.skynet.components.hunting.battle.service.BattleFeignService;
 import org.skynet.components.hunting.rank.league.message.AddCoinMessage;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
+import org.skynet.components.hunting.user.domain.History;
 import org.skynet.components.hunting.user.domain.PlayerRecordModeData;
 import org.skynet.service.provider.hunting.obsolete.common.Path;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -650,6 +651,9 @@ public class HuntingMatchController {
             chapterEnteredCount += 1;
             chapterEnteredCountMap.put(realChapterId, chapterEnteredCount);
             userDataSendToClient.setChapterEnteredCountMap(userData.getChapterEnteredCountMap());
+
+            History history = userData.getHistory();
+            history.setWonMatchCount(history.getWonMatchCount() + 1);
 
             //确定进入哪场比赛和动物
             //因为上面章节进入次数已经+1了，这里-1

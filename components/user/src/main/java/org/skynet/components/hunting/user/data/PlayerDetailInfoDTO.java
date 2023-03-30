@@ -44,13 +44,25 @@ public class PlayerDetailInfoDTO implements Serializable {
     private Long totalEarnedCoin;
 
     @ApiModelProperty(value = "累计比赛总次数")
+    @Deprecated
     private Integer totalBattleCount;
 
     @ApiModelProperty(value = "累计获胜比赛总次数")
+    @Deprecated
     private Integer totalWinCount;
 
     @ApiModelProperty(value = "平均胜率（累计获胜比赛总次数/累计比赛总次数）")
+    @Deprecated
     private Float winningPercentage;
+
+    @ApiModelProperty(value = "总比赛次数")
+    private Integer totalMatchCount;
+
+    @ApiModelProperty(value = "比赛胜利次数")
+    private Integer wonMatchCount;
+
+    @ApiModelProperty(value = "比赛胜率（范围0-1）")
+    private Float matchWonPercentage;
 
     @ApiModelProperty(value = "当前连胜次数，一旦失败则变为0")
     private Integer winningStreak;

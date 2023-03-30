@@ -47,6 +47,7 @@ public interface AchievementService {
      * @param gameVersion
      */
     void updateMatchDoneAchievementData(String uuid, Integer chapterId, String gameVersion);
+    void updateMatchDoneAchievementData(UserData userData, Integer chapterId, String gameVersion);
 
     /**
      * 更新动物击杀
@@ -58,6 +59,7 @@ public interface AchievementService {
      * @param gameVersion
      */
     void updateAnimalKillAchievementData(String uuid, Integer chapterId, List<PlayerFireDetails> playerFireDetails, String gameVersion, List<PlayerControlRecordData> playerControlRecordDataList);
+    void updateAnimalKillAchievementData(UserData userData, Integer chapterId, List<PlayerFireDetails> playerFireDetails, String gameVersion, List<PlayerControlRecordData> playerControlRecordDataList);
 
     /**
      * 更新在某个章节及以上连胜成就

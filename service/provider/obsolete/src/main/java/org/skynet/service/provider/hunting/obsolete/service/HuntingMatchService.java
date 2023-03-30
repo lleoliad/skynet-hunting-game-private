@@ -150,6 +150,7 @@ public interface HuntingMatchService {
      * @param allPlayerControlRecordsData
      */
     void recordChapterComplete(String uuid, ChapterTableValue chapterTableValue, Integer matchId, List<PlayerFireDetails> playerFireDetails, Boolean isWin, String gameVersion, List<PlayerControlRecordData> allPlayerControlRecordsData);
+    void recordChapterComplete(UserData userData, ChapterTableValue chapterTableValue, Integer matchId, List<PlayerFireDetails> playerFireDetails, Boolean isWin, String gameVersion, List<PlayerControlRecordData> allPlayerControlRecordsData);
 
     /**
      * 刷新玩家历史数据
@@ -161,6 +162,7 @@ public interface HuntingMatchService {
      * @param gameVersion
      */
     void refreshPlayerHistoryData(String uuid, ChapterTableValue chapterTableValue, Boolean isWin, List<PlayerFireDetails> playerFireDetails, String gameVersion);
+    void refreshPlayerHistoryData(UserData userData, Integer chapterId, Boolean isWin, List<PlayerFireDetails> playerFireDetails, String gameVersion);
 
     /**
      * 确定AI录像查找模式

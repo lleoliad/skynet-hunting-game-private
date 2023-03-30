@@ -69,5 +69,13 @@ public class History implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Double server_only_matchAllShotsPrecisionAccumulation = 0D;
 
+    @ApiModelProperty(value = "总比赛次数")
+    private Integer totalMatchCount;
+
+    @ApiModelProperty(value = "比赛胜利次数")
+    private Integer wonMatchCount;
+
+    @ApiModelProperty(value = "比赛胜率（范围0-1）")
+    private Float matchWonPercentage;
 
 }

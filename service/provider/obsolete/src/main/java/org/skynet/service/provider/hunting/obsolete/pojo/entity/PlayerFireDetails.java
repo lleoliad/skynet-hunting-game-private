@@ -27,6 +27,9 @@ public class PlayerFireDetails implements Serializable {
     @ApiModelProperty(value = "是否完美击杀")
     private Boolean isPerfect;
 
+    @ApiModelProperty(value = "怪物id")
+    private Integer animalId;
+
     @ApiModelProperty(value = "是否杀的怪物")
     private Boolean isKillAnimal;
 

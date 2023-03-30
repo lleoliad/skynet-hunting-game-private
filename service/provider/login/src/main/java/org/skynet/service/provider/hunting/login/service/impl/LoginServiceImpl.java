@@ -13,6 +13,7 @@ import org.skynet.components.hunting.rank.league.query.PlayerLoginQuery;
 import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.data.ClientUserData;
+import org.skynet.components.hunting.user.domain.History;
 import org.skynet.components.hunting.user.domain.PlayerVipV3Data;
 import org.skynet.components.hunting.user.enums.ABTestGroup;
 import org.skynet.service.provider.hunting.login.data.LoginVO;
@@ -154,6 +155,24 @@ public class LoginServiceImpl implements LoginService {
             }
 
             loginUserData.setIsCreateBattleInfo(true);
+            updateUserData = true;
+        }
+
+        History history = loginUserData.getHistory();
+        if (null == history.getTotalMatchCount()) {
+            Integer totalBattleCount = 0;
+            for (Map.Entry<Integer, Integer> entry : loginUserData.getChapterEnteredCountMap().entrySet()) {
+                totalBattleCount += entry.getValue();
+            }
+
+            Integer totalWinCount = 0;
+            for (Map.Entry<Integer, Integer> entry : loginUserData.getChapterWinCountMap().entrySet()) {
+                totalWinCount += entry.getValue();
+            }
+
+            history.setTotalMatchCount(totalBattleCount);
+            history.setWonMatchCount(totalWinCount);
+            history.setMatchWonPercentage(totalBattleCount.floatValue() > 0 ? totalWinCount.floatValue() / totalBattleCount.floatValue() : 0f);
             updateUserData = true;
         }
 

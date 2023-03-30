@@ -101,6 +101,12 @@ public class AchievementServiceImpl implements AchievementService {
 
         UserData userData = GameEnvironment.userDataMap.get(uuid);
 
+        updateMatchDoneAchievementData(userData, chapterId, gameVersion);
+    }
+
+    @Override
+    public void updateMatchDoneAchievementData(UserData userData, Integer chapterId, String gameVersion) {
+
         Map<String, AchievementTableValue> achievementTable = GameEnvironment.achievementTableMap.get(gameVersion);
 
         AchievementData achievementData = getAchievementDataFromUserData(userData, AchievementType.completeChapterOrAboveMatch, gameVersion);
@@ -112,9 +118,7 @@ public class AchievementServiceImpl implements AchievementService {
         AchievementTableValue tableValue = achievementTable.get(String.valueOf(achievementData.getAchievementId()));
 
         if (chapterId >= tableValue.getCondition()) {
-
             achievementData.setCurrentProgress(achievementData.getCurrentProgress() + 1);
-
         }
     }
 
@@ -122,16 +126,19 @@ public class AchievementServiceImpl implements AchievementService {
     public void updateAnimalKillAchievementData(String uuid, Integer chapterId, List<PlayerFireDetails> playerFireDetails, String gameVersion, List<PlayerControlRecordData> allPlayerControlRecordData) {
 
         UserData userData = GameEnvironment.userDataMap.get(uuid);
+        updateAnimalKillAchievementData(userData, chapterId, playerFireDetails, gameVersion, allPlayerControlRecordData);
+    }
 
+    @Override
+    public void updateAnimalKillAchievementData(UserData userData, Integer chapterId, List<PlayerFireDetails> playerFireDetails, String gameVersion, List<PlayerControlRecordData> allPlayerControlRecordData) {
         if (playerFireDetails == null || playerFireDetails.size() == 0) {
-
             return;
         }
 
-        Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(gameVersion);
+        // Map<String, ChapterTableValue> chapterTable = GameEnvironment.chapterTableMap.get(gameVersion);
         Map<String, AnimalTableValue> animalTable = GameEnvironment.animalTableMap.get(gameVersion);
         Map<String, AchievementTableValue> achievementTable = GameEnvironment.achievementTableMap.get(gameVersion);
-        ChapterTableValue chapterTableValue = chapterTable.get(String.valueOf(chapterId));
+        // ChapterTableValue chapterTableValue = chapterTable.get(String.valueOf(chapterId));
 
 
         for (PlayerFireDetails detail : playerFireDetails) {
@@ -140,14 +147,15 @@ public class AchievementServiceImpl implements AchievementService {
                 continue;
             }
 
-            int round = detail.getRound();
-            int animalIndex = round - 1;
-            if (animalIndex >= chapterTableValue.getMatchRouteAnimalSequence().size()) {
-                throw new BusinessException("animalIndex >= matchRouteAnimalSequenceArray. animalIndex " + animalIndex + ", matchRouteAnimalSequenceArray:" +
-                        JSONObject.toJSONString(chapterTableValue.getMatchRouteAnimalSequence()));
-            }
-
-            int animalId = chapterTableValue.getMatchRouteAnimalSequence().get(animalIndex);
+            // int round = detail.getRound();
+            // int animalIndex = round - 1;
+            // if (animalIndex >= chapterTableValue.getMatchRouteAnimalSequence().size()) {
+            //     throw new BusinessException("animalIndex >= matchRouteAnimalSequenceArray. animalIndex " + animalIndex + ", matchRouteAnimalSequenceArray:" +
+            //             JSONObject.toJSONString(chapterTableValue.getMatchRouteAnimalSequence()));
+            // }
+            //
+            // int animalId = chapterTableValue.getMatchRouteAnimalSequence().get(animalIndex);
+            int animalId = detail.getAnimalId();
             AnimalTableValue animalTableValue = animalTable.get(String.valueOf(animalId));
             AnimalSizeType[] values = AnimalSizeType.values();
             AnimalSizeType animalSize = values[animalTableValue.getSizeType()];
@@ -169,14 +177,13 @@ public class AchievementServiceImpl implements AchievementService {
                 }
 
                 if (achievementData == null) {
-
-                    throw new BusinessException("玩家" + uuid + "无法找到成就数据,动物类型:" + animalSize);
+                    throw new BusinessException("玩家" + userData.getUuid() + "无法找到成就数据,动物类型:" + animalSize);
                 }
 
                 if (!isAchievementFullyCompleted(achievementData)) {
 
                     AchievementTableValue achievementTableValue = achievementTable.get(String.valueOf(achievementData.getAchievementId()));
-                    if (chapterId >= achievementTableValue.getCondition()) {
+                    if (null != chapterId && chapterId >= achievementTableValue.getCondition()) {
 
                         achievementData.setCurrentProgress(achievementData.getCurrentProgress() + 1);
                         achievementData.setCurrentProgress(Math.min(achievementData.getCurrentProgress(), achievementData.getMaxProgress()));
@@ -252,6 +259,9 @@ public class AchievementServiceImpl implements AchievementService {
 
     @Override
     public void updateMatchWinStreakInChapterOrAbove(UserData userData, Integer chapterId, Boolean isWinStreak, String gameVersion) {
+        if (null == chapterId || chapterId <= 0) {
+            return;
+        }
 
         Map<String, AchievementTableValue> achievementTable = GameEnvironment.achievementTableMap.get(gameVersion);
         AchievementData achievementData = getAchievementDataFromUserData(userData, AchievementType.completeChapterOrAboveWinStreak, gameVersion);
