@@ -209,9 +209,20 @@ mybatis-plus:
 #设置 feign 客户端超时时间（OpenFeigh 默认支持 ribbon）
 ribbon:
   # 指的是建立连接所用的时间，适用于网络状况正常的情况下，两端连接所用的时间
-  ReadTimeout: 5000
+  ReadTimeout: 60000
   # 指的是建立连接后从服务器读取到可用资源所用的时间
-  ConnectTimeout: 5000
+  ConnectTimeout: 60000
+
+feign:
+  httpclient:
+    connection-timeout: 60000
+    ok-http:
+      read-timeout: 60000
+  client:
+    config:
+      default:
+        connectTimeout: 60000
+        readTimeout: 60000
 
 logging:
   level:

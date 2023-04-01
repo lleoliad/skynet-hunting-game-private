@@ -60,6 +60,8 @@ public interface ChestService {
      */
     Integer getChapterWinChestSlotInfo(String uuid);
 
+    Integer getChapterWinChestSlotInfo(UserData userData);
+
     /**
      * 创建一个章节胜利宝箱
      *

@@ -46,7 +46,7 @@ public class ChestAssignmentController {
     @ApiOperation(value = "枪械宝箱", notes = "")
     @PostMapping(value = "/gunChest")
     @ResponseBody
-    public Result<ChestOpenResult> gunChest(@ApiParam(name = "gunChestQuery", value = "枪械宝箱参数", required = true) @RequestBody GunChestQuery gunChestQuery, HttpServletRequest request) {
+    public Result<?> gunChest(@ApiParam(name = "gunChestQuery", value = "枪械宝箱参数", required = true) @RequestBody GunChestQuery gunChestQuery, HttpServletRequest request) {
         return chestAssignmentService.gunChest(gunChestQuery);
     }
 }

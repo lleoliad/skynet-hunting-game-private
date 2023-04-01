@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BusinessException extends RuntimeException {
     //extends Exception需要继续抛出或捕获
     //自定义异常必须是运行时异常
-
+    private boolean success;
     //错误码
     private Integer code;
     //错误消息

@@ -216,9 +216,13 @@ public class ChestServiceImpl implements ChestService {
      */
     @Override
     public Integer getChapterWinChestSlotInfo(String uuid) {
-
         UserData userData = GameEnvironment.userDataMap.get(uuid);
 
+        return getChapterWinChestSlotInfo(userData);
+    }
+
+    @Override
+    public Integer getChapterWinChestSlotInfo(UserData userData) {
         //找到宝箱位置
         int emptySlotIndex = -1;
 
@@ -240,7 +244,6 @@ public class ChestServiceImpl implements ChestService {
 
         }
         return emptySlotIndex;
-
     }
 
     /**

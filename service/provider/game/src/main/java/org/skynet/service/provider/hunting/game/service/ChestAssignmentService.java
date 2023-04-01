@@ -15,5 +15,5 @@ public interface ChestAssignmentService {
 
     Result<ChapterWinChestData> winChest(WinChestQuery winChestQuery);
 
-    Result<ChestOpenResult> gunChest(GunChestQuery gunChestQuery);
+    Result<?> gunChest(GunChestQuery gunChestQuery);
 }

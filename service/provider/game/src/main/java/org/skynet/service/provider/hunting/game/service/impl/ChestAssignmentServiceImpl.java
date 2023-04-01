@@ -77,13 +77,25 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
 
     @Override
     public Result<ChapterWinChestData> winChest(WinChestQuery winChestQuery) {
-        Integer emptySlotIndex = chestService.getChapterWinChestSlotInfo(winChestQuery.getUserId());
+        Result<UserData> loadUserDataResult = userFeignService.load(UserDataLandQuery.builder().version(winChestQuery.getVersion()).userId(winChestQuery.getUserId()).build());
+        if (loadUserDataResult.failed()) {
+            return loadUserDataResult.build();
+        }
+
+        UserData userData = loadUserDataResult.getData();
+
+        Integer emptySlotIndex = chestService.getChapterWinChestSlotInfo(userData);
 
         if (emptySlotIndex < 0) {
             return Result.ok();
         }
+        ChestType winChestType = null;
+        for (ChestType cType : ChestType.values()) {
+            if (cType.getType() == winChestQuery.getChestType().intValue()) {
+                winChestType = cType;
+            }
+        }
 
-        ChestType winChestType = ChestType.values()[winChestQuery.getChestType() - 1];
         int chestUnlockSeconds = ChapterWinChestConfig.getChestUnlockSeconds(winChestType);
 
         ChapterWinChestData chapterWinChestData = new ChapterWinChestData();
@@ -94,22 +106,14 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
         chapterWinChestData.setAvailableUnixTime(-1L);
         chapterWinChestData.setUnlockSecondsRequires((long) chestUnlockSeconds);
 
-        Result<UserData> userDataResult = userFeignService.load(UserDataLandQuery.builder().userId(winChestQuery.getUserId()).build());
-        if (userDataResult.failed()) {
-            return userDataResult.build();
-        }
-
-        UserData userData = userDataResult.getData();
         userData.getChapterWinChestsData().add(emptySlotIndex, chapterWinChestData);
-
         userFeignService.update(UserDataUpdateQuery.builder().userId(winChestQuery.getUserId()).userData(userData).build());
-
         // map.put("newCreateChapterWinChestData", newCreateChapterWinChestData);
         return Result.ok().put(chapterWinChestData);
     }
 
     @Override
-    public Result<ChestOpenResult> gunChest(GunChestQuery gunChestQuery) {
+    public Result<?> gunChest(GunChestQuery gunChestQuery) {
         UserData userData = gunChestQuery.getUserData();
 
         if (Objects.isNull(userData)) {
@@ -171,6 +175,15 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
             obsoleteUserDataService.addBulletToUserData(userData, rewardBulletCountMap);
         }
 
-        return Result.ok(chestOpenResult);
+        // return Result.ok(chestOpenResult);
+        return Result.ok().push("openResult", chestOpenResult)
+                .move("userData")
+                .push("coin", userData.getCoin())
+                .push("diamond", userData.getDiamond())
+                .push("bulletCountMap", userData.getBulletCountMap())
+                .push("serverOnly", userData.getServerOnly())
+                .push("gunCountMap", userData.getGunCountMap())
+                .push("gunLevelMap", userData.getGunLevelMap())
+                .build();
     }
 }

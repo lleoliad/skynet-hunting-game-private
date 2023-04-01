@@ -30,6 +30,8 @@ public class ChapterWinChestConfig {
 
     @ApiModelProperty(value = "king箱子解锁时间")
     public static final Integer KingChestUnlockSeconds = 24 * 60 * 60;
+    @ApiModelProperty(value = "Championship箱子解锁时间")
+    public static final Integer ChampionshipChestUnlockSeconds = 4 * 60 * 60;
 
     /**
      * 获取对应箱子的未解锁时间
@@ -49,6 +51,11 @@ public class ChapterWinChestConfig {
                 return PlatinumChestUnlockSeconds;
             case KING:
                 return KingChestUnlockSeconds;
+            case ROOKIE:
+            case PRO:
+            case EXPERT:
+            case MASTER:
+                return ChampionshipChestUnlockSeconds;
         }
 
         return null;

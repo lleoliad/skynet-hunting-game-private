@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.commons.lang.common.Result;
-import org.skynet.components.hunting.user.data.ClientUserData;
 import org.skynet.service.provider.hunting.login.query.LoginQuery;
 import org.skynet.service.provider.hunting.login.service.LoginService;
 import org.springframework.web.bind.annotation.*;
