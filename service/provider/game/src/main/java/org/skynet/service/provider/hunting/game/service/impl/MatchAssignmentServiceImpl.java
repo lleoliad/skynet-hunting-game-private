@@ -4,25 +4,35 @@ import cn.hutool.core.util.BooleanUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.commons.lang.common.Result;
+import org.skynet.commons.lang.common.SkynetObject;
 import org.skynet.components.hunting.data.service.DataService;
+import org.skynet.components.hunting.game.query.MatchCompleteQuery;
+import org.skynet.components.hunting.game.query.MatchConsumeBulletQuery;
 import org.skynet.components.hunting.user.dao.entity.UserData;
+import org.skynet.components.hunting.user.data.ClientUserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
-import org.skynet.service.provider.hunting.game.query.MatchCompleteQuery;
+import org.skynet.components.hunting.user.query.UserDataLandQuery;
+import org.skynet.components.hunting.user.query.UserDataUpdateQuery;
+import org.skynet.components.hunting.user.service.UserFeignService;
 import org.skynet.service.provider.hunting.game.service.MatchAssignmentService;
 import org.skynet.service.provider.hunting.obsolete.enums.ForceTutorialStepNames;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerFireDetails;
-import org.skynet.service.provider.hunting.obsolete.pojo.table.ChapterTableValue;
 import org.skynet.service.provider.hunting.obsolete.service.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
 public class MatchAssignmentServiceImpl implements MatchAssignmentService {
+
+    @Resource
+    private UserFeignService userFeignService;
+
     @Resource
     private ObsoleteUserDataService obsoleteUserDataService;
 
@@ -40,6 +50,35 @@ public class MatchAssignmentServiceImpl implements MatchAssignmentService {
 
     @Resource
     private DataService dataService;
+
+    @Override
+    public Result<?> consumeBullet(MatchConsumeBulletQuery matchConsumeBulletQuery) {
+        UserData userData = matchConsumeBulletQuery.getUserData();
+        if (Objects.isNull(userData)) {
+            Result<UserData> userDataResult = userFeignService.load(UserDataLandQuery.builder().userId(matchConsumeBulletQuery.getUserId()).build());
+            if (userDataResult.failed()) {
+                return userDataResult.build();
+            }
+
+            userData = userDataResult.getData();
+        }
+
+        huntingMatchService.consumeBullet(userData, matchConsumeBulletQuery.getBulletId(), matchConsumeBulletQuery.getVersion());
+
+        userFeignService.update(UserDataUpdateQuery.builder()
+                .userId(matchConsumeBulletQuery.getUserId())
+                .update(SkynetObject.builder()
+                        .push("bulletCountMap", userData.getBulletCountMap())
+                        .push("equippedBulletId", userData.getEquippedBulletId())
+                        .build())
+                .build());
+
+        ClientUserData clientUserData = ClientUserData.builder()
+                .bulletCountMap(userData.getBulletCountMap())
+                .equippedBulletId(userData.getEquippedBulletId())
+                .build();
+        return Result.ok(clientUserData);
+    }
 
     @Override
     public Result<?> complete(MatchCompleteQuery matchCompleteQuery) {

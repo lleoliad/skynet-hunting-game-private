@@ -1,4 +1,4 @@
-package org.skynet.service.provider.hunting.game.query;
+package org.skynet.components.hunting.game.query;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;

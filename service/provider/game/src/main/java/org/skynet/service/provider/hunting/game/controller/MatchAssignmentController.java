@@ -5,12 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.commons.lang.common.Result;
-import org.skynet.components.hunting.game.query.OpenChestQuery;
-import org.skynet.components.hunting.game.query.WinChestQuery;
-import org.skynet.components.hunting.user.data.ClientUserData;
-import org.skynet.components.hunting.user.domain.ChapterWinChestData;
-import org.skynet.service.provider.hunting.game.query.MatchCompleteQuery;
-import org.skynet.service.provider.hunting.game.service.ChestAssignmentService;
+import org.skynet.components.hunting.game.query.MatchConsumeBulletQuery;
+import org.skynet.components.hunting.game.query.MatchCompleteQuery;
 import org.skynet.service.provider.hunting.game.service.MatchAssignmentService;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +22,13 @@ public class MatchAssignmentController {
 
     @Resource
     private MatchAssignmentService matchAssignmentService;
+
+    @ApiOperation(value = "消耗子弹", notes = "")
+    @PostMapping(value = "/consumeBullet")
+    @ResponseBody
+    public Result<?> consumeBullet(@ApiParam(name = "matchConsumeBulletQuery", value = "消耗子弹参数", required = true) @RequestBody MatchConsumeBulletQuery matchConsumeBulletQuery, HttpServletRequest request) {
+        return matchAssignmentService.consumeBullet(matchConsumeBulletQuery);
+    }
 
     @ApiOperation(value = "比赛完成", notes = "")
     @PostMapping(value = "/complete")
