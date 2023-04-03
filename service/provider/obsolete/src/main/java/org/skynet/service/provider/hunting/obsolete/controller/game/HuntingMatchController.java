@@ -1071,9 +1071,9 @@ public class HuntingMatchController {
 
             boolean isPlayerWin = localPlayerFinalScore >= aiFinalScore;
             if (playerDirectChangeResult) {
-                if (request.getDirectlyWin()) {
+                if (BooleanUtil.isTrue(request.getDirectlyWin())) {
                     isPlayerWin = true;
-                } else if (request.getDirectlyLose())
+                } else if (BooleanUtil.isTrue(request.getDirectlyLose()))
                     isPlayerWin = false;
             }
 
