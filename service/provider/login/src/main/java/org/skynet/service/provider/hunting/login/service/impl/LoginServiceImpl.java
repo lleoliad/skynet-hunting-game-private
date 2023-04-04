@@ -212,7 +212,10 @@ public class LoginServiceImpl implements LoginService {
             return championshipLoginResult.build();
         }
 
-        clientUserData.setPlayerChampionshipData(championshipLoginResult.get("playerChampionshipData"));
+        // clientUserData.setPlayerChampionshipData(championshipLoginResult.get("playerChampionshipData"));
+        clientUserData.setMinorChampionshipData(championshipLoginResult.get("minorChampionshipData"));
+        clientUserData.setNormalChampionshipData(championshipLoginResult.get("normalChampionshipData"));
+        clientUserData.setWaitingObtainRewardChampionshipDataArray(championshipLoginResult.get("waitingObtainRewardChampionshipDataArray"));
         clientUserData.setChampionshipBadgeData(championshipLoginResult.get("championshipBadgeData"));
 
         if (updateUserData) {

@@ -13,7 +13,7 @@ import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 public interface ChestAssignmentService {
     Result<OpenChestBO> open(OpenChestQuery openChestQuery);
 
-    Result<ChapterWinChestData> winChest(WinChestQuery winChestQuery);
+    Result<?> winChest(WinChestQuery winChestQuery);
 
     Result<?> gunChest(GunChestQuery gunChestQuery);
 }

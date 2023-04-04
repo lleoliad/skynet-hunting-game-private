@@ -1233,6 +1233,7 @@ public class HuntingMatchController {
             sendToClientUserData.setCoin(userData.getCoin());
             sendToClientUserData.setChapterBonusPackagesData(userData.getChapterBonusPackagesData());
             sendToClientUserData.setHistory(userData.getHistory());
+            sendToClientUserData.setChapterCompletedCountMap(userData.getChapterCompletedCountMap());
 //            History history = new History();
 //            BeanUtils.copyProperties(userData.getHistory(),history);
 //            sendToClientUserData.setHistory(history);

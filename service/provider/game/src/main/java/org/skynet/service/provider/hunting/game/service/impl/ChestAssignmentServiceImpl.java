@@ -1,18 +1,18 @@
 package org.skynet.service.provider.hunting.game.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.skynet.commons.lang.common.Result;
 import org.skynet.components.hunting.game.data.BulletReward;
+import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.components.hunting.game.data.OpenChestBO;
 import org.skynet.components.hunting.game.query.GunChestQuery;
+import org.skynet.components.hunting.game.query.OpenChestQuery;
 import org.skynet.components.hunting.game.query.WinChestQuery;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.data.ClientUserData;
-import org.skynet.commons.lang.common.Result;
-import org.skynet.components.hunting.game.query.OpenChestQuery;
 import org.skynet.components.hunting.user.data.HistoryVO;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 import org.skynet.components.hunting.user.domain.ChestData;
@@ -26,7 +26,6 @@ import org.skynet.service.provider.hunting.obsolete.common.util.TimeUtils;
 import org.skynet.service.provider.hunting.obsolete.enums.ChestType;
 import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.ChapterWinChestConfig;
-import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.service.provider.hunting.obsolete.service.ChestService;
 import org.skynet.service.provider.hunting.obsolete.service.ObsoleteUserDataService;
 import org.springframework.stereotype.Service;
@@ -72,11 +71,11 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
             clientUserData.setHistory(BeanUtil.copyProperties(userData.getHistory(), HistoryVO.class));
         }
 
-        return Result.ok().push("userData", clientUserData).push("openResult", chestOpenResult);
+        return Result.ok(OpenChestBO.builder().userData(clientUserData).openResult(chestOpenResult).build());
     }
 
     @Override
-    public Result<ChapterWinChestData> winChest(WinChestQuery winChestQuery) {
+    public Result<?> winChest(WinChestQuery winChestQuery) {
         Result<UserData> loadUserDataResult = userFeignService.load(UserDataLandQuery.builder().version(winChestQuery.getVersion()).userId(winChestQuery.getUserId()).build());
         if (loadUserDataResult.failed()) {
             return loadUserDataResult.build();
@@ -109,7 +108,8 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
         userData.getChapterWinChestsData().add(emptySlotIndex, chapterWinChestData);
         userFeignService.update(UserDataUpdateQuery.builder().userId(winChestQuery.getUserId()).userData(userData).build());
         // map.put("newCreateChapterWinChestData", newCreateChapterWinChestData);
-        return Result.ok().put(chapterWinChestData);
+        // return Result.ok().put(chapterWinChestData);
+        return Result.ok().push("newCreateChapterWinChestData", chapterWinChestData).move("userData").push("chapterWinChestsData", userData.getChapterWinChestsData());
     }
 
     @Override
@@ -126,6 +126,10 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
         }
 
         ChestOpenResult chestOpenResult = new ChestOpenResult();
+        chestOpenResult.setChestData(ChestData.builder()
+                .chestType(gunChestQuery.getChestType())
+                .level(gunChestQuery.getLevel())
+                .build());
 
         if (null != gunChestQuery.getCoin()) {
             userData.setCoin(userData.getCoin() + gunChestQuery.getCoin());

@@ -22,5 +22,6 @@ public class OpenChestBO implements Serializable {
     @ApiModelProperty(value = "用户数据", notes = "")
     private ClientUserData userData;
 
-    private ChestOpenResult chestOpenResult;
+    @ApiModelProperty(value = "宝箱结果", notes = "")
+    private ChestOpenResult openResult;
 }

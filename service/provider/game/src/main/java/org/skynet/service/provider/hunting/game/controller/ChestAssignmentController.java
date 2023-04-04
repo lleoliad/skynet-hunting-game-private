@@ -39,7 +39,7 @@ public class ChestAssignmentController {
     @ApiOperation(value = "胜利宝箱", notes = "")
     @PostMapping(value = "/winChest")
     @ResponseBody
-    public Result<ChapterWinChestData> winChest(@ApiParam(name = "winChestQuery", value = "胜利宝箱参数", required = true) @RequestBody WinChestQuery winChestQuery, HttpServletRequest request) {
+    public Result<?> winChest(@ApiParam(name = "winChestQuery", value = "胜利宝箱参数", required = true) @RequestBody WinChestQuery winChestQuery, HttpServletRequest request) {
         return chestAssignmentService.winChest(winChestQuery);
     }
 
