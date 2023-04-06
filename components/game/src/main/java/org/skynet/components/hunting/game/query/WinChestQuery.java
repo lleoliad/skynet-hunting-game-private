@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 
 import java.io.Serializable;
 
@@ -28,7 +29,9 @@ public class WinChestQuery implements Serializable {
     @ApiModelProperty(value = "箱子等级")
     Integer chestLevel;
 
-    @ApiModelProperty(value = "服务次数")
+    @ApiModelProperty(value = "胜利次数")
     Integer winCount;
 
+    @ApiModelProperty(value = "玩家数据")
+    private UserData userData;
 }

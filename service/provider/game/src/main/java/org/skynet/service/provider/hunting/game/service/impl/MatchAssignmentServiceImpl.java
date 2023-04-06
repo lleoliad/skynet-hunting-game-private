@@ -1,5 +1,6 @@
 package org.skynet.service.provider.hunting.game.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.BooleanUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -10,10 +11,13 @@ import org.skynet.components.hunting.game.query.MatchCompleteQuery;
 import org.skynet.components.hunting.game.query.MatchConsumeBulletQuery;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.data.ClientUserData;
+import org.skynet.components.hunting.user.data.HistoryVO;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
+import org.skynet.components.hunting.user.domain.History;
 import org.skynet.components.hunting.user.query.UserDataLandQuery;
 import org.skynet.components.hunting.user.query.UserDataUpdateQuery;
 import org.skynet.components.hunting.user.service.UserFeignService;
+import org.skynet.service.provider.hunting.game.service.ChestAssignmentService;
 import org.skynet.service.provider.hunting.game.service.MatchAssignmentService;
 import org.skynet.service.provider.hunting.obsolete.enums.ForceTutorialStepNames;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.PlayerControlRecordData;
@@ -51,9 +55,13 @@ public class MatchAssignmentServiceImpl implements MatchAssignmentService {
     @Resource
     private DataService dataService;
 
+    @Resource
+    private ChestAssignmentService chestAssignmentService;
+
     @Override
     public Result<?> consumeBullet(MatchConsumeBulletQuery matchConsumeBulletQuery) {
         UserData userData = matchConsumeBulletQuery.getUserData();
+        boolean updateUserData = false;
         if (Objects.isNull(userData)) {
             Result<UserData> userDataResult = userFeignService.load(UserDataLandQuery.builder().userId(matchConsumeBulletQuery.getUserId()).build());
             if (userDataResult.failed()) {
@@ -61,23 +69,26 @@ public class MatchAssignmentServiceImpl implements MatchAssignmentService {
             }
 
             userData = userDataResult.getData();
+            updateUserData = true;
         }
 
         huntingMatchService.consumeBullet(userData, matchConsumeBulletQuery.getBulletId(), matchConsumeBulletQuery.getVersion());
 
-        userFeignService.update(UserDataUpdateQuery.builder()
-                .userId(matchConsumeBulletQuery.getUserId())
-                .update(SkynetObject.builder()
-                        .push("bulletCountMap", userData.getBulletCountMap())
-                        .push("equippedBulletId", userData.getEquippedBulletId())
-                        .build())
-                .build());
+        if (updateUserData) {
+            userFeignService.update(UserDataUpdateQuery.builder()
+                    .userId(matchConsumeBulletQuery.getUserId())
+                    .update(SkynetObject.builder()
+                            .push("bulletCountMap", userData.getBulletCountMap())
+                            .push("equippedBulletId", userData.getEquippedBulletId())
+                            .build())
+                    .build());
+        }
 
-        ClientUserData clientUserData = ClientUserData.builder()
-                .bulletCountMap(userData.getBulletCountMap())
-                .equippedBulletId(userData.getEquippedBulletId())
-                .build();
-        return Result.ok(clientUserData);
+        // ClientUserData clientUserData = ClientUserData.builder()
+        //         .bulletCountMap(userData.getBulletCountMap())
+        //         .equippedBulletId(userData.getEquippedBulletId())
+        //         .build();
+        return Result.ok(userData);
     }
 
     @Override
@@ -85,6 +96,8 @@ public class MatchAssignmentServiceImpl implements MatchAssignmentService {
         boolean isWin = matchCompleteQuery.getIsWin();
         boolean recordOnlyMode = BooleanUtil.isTrue(matchCompleteQuery.getRecordOnlyMode());
         UserData userData = matchCompleteQuery.getUserData();
+
+        Result<Object> ok = Result.ok();
 
         List<PlayerControlRecordData> allPlayerControlRecordsData = new ArrayList<>();
 
@@ -122,13 +135,23 @@ public class MatchAssignmentServiceImpl implements MatchAssignmentService {
 
         ChapterWinChestData newCreateChapterWinChestData = null;
         //如果胜利,且已经完成了第一次PVP匹配教学,获得一个章节胜利宝箱
-        if (isWin && obsoleteUserDataService.isForceTutorialStepComplete(userData.getUuid(), ForceTutorialStepNames.forceCompleteFirstPvPMatch.getName()) && !recordOnlyMode) {
-            newCreateChapterWinChestData = chestService.tryCreateChapterWinChest(userData.getUuid(), matchCompleteQuery.getChapterId(), matchCompleteQuery.getVersion());
+        if (isWin && !recordOnlyMode) {
+            if (null != matchCompleteQuery.getChapterId()) {
+                if (obsoleteUserDataService.isForceTutorialStepComplete(userData.getUuid(), ForceTutorialStepNames.forceCompleteFirstPvPMatch.getName())) {
+                    newCreateChapterWinChestData = chestService.tryCreateChapterWinChest(userData.getUuid(), matchCompleteQuery.getChapterId(), matchCompleteQuery.getVersion());
+                }
+            } else {
+                newCreateChapterWinChestData = chestAssignmentService.getChapterWinChestData(userData, matchCompleteQuery.getChestType(), matchCompleteQuery.getChestLevel());
+            }
+
+            if (null != newCreateChapterWinChestData) {
+                ok.push("newCreateChapterWinChestData", newCreateChapterWinChestData);
+            }
         }
 
         //刷新玩家历史数据
         huntingMatchService.refreshPlayerHistoryData(userData, matchCompleteQuery.getChapterId(), isWin, playerFireDetails, matchCompleteQuery.getVersion());
 
-        return Result.ok(userData);
+        return ok.push("userData", userData).build();
     }
 }

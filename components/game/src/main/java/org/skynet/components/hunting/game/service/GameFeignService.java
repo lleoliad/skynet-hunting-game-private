@@ -7,6 +7,7 @@ import org.skynet.commons.lang.common.SkynetObject;
 import org.skynet.components.hunting.game.data.ChestOpenResult;
 import org.skynet.components.hunting.game.data.OpenChestBO;
 import org.skynet.components.hunting.game.query.*;
+import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.data.ClientUserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -28,9 +29,9 @@ public interface GameFeignService {
     Result<SkynetObject> gunChest(@ApiParam(name = "gunChestQuery", value = "枪械宝箱参数", required = true) @RequestBody GunChestQuery gunChestQuery);
 
     @PostMapping(value = "match/consumeBullet")
-    Result<ClientUserData> consumeBullet(@ApiParam(name = "matchConsumeBulletQuery", value = "消耗子弹参数", required = true) @RequestBody MatchConsumeBulletQuery matchConsumeBulletQuery);
+    Result<UserData> consumeBullet(@ApiParam(name = "matchConsumeBulletQuery", value = "消耗子弹参数", required = true) @RequestBody MatchConsumeBulletQuery matchConsumeBulletQuery);
 
     @PostMapping(value = "match/complete")
-    Result<ClientUserData> complete(@ApiParam(name = "matchCompleteQuery", value = "比赛完成参数", required = true) @RequestBody MatchCompleteQuery matchCompleteQuery);
+    Result<SkynetObject> complete(@ApiParam(name = "matchCompleteQuery", value = "比赛完成参数", required = true) @RequestBody MatchCompleteQuery matchCompleteQuery);
 
 }

@@ -39,6 +39,15 @@ public class MatchCompleteQuery implements Serializable {
     @ApiModelProperty(value = "当前服务器是否支持录制模式")
     private Boolean recordOnlyMode;
 
+    @ApiModelProperty(value = "箱子类型")
+    Integer chestType;
+
+    @ApiModelProperty(value = "箱子等级")
+    Integer chestLevel;
+
+    @ApiModelProperty(value = "胜利次数")
+    Integer winCount;
+
     @ApiModelProperty(value = "玩家数据")
     private UserData userData;
 

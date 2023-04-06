@@ -47,6 +47,36 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
     private ObsoleteUserDataService obsoleteUserDataService;
 
     @Override
+    public ChapterWinChestData getChapterWinChestData(UserData userData, Integer chestType, Integer chestLevel) {
+        Integer emptySlotIndex = chestService.getChapterWinChestSlotInfo(userData);
+
+        if (emptySlotIndex < 0) {
+            return null;
+        }
+
+        ChestType winChestType = null;
+        for (ChestType cType : ChestType.values()) {
+            if (cType.getType() == chestType.intValue()) {
+                winChestType = cType;
+            }
+        }
+
+        int chestUnlockSeconds = ChapterWinChestConfig.getChestUnlockSeconds(winChestType);
+
+        ChapterWinChestData chapterWinChestData = new ChapterWinChestData();
+        chapterWinChestData.setUid(NanoIdUtils.randomNanoId(30));
+        chapterWinChestData.setChestType(winChestType.getType());
+        chapterWinChestData.setLevel(chestLevel);
+        chapterWinChestData.setCreateTime(TimeUtils.getUnixTimeSecond());
+        chapterWinChestData.setAvailableUnixTime(-1L);
+        chapterWinChestData.setUnlockSecondsRequires((long) chestUnlockSeconds);
+
+        userData.getChapterWinChestsData().add(emptySlotIndex, chapterWinChestData);
+
+        return chapterWinChestData;
+    }
+
+    @Override
     public Result<OpenChestBO> open(OpenChestQuery openChestQuery) {
         Result<UserData> userDataResult = userFeignService.load(UserDataLandQuery.builder().userId(openChestQuery.getUserId()).build());
         if (userDataResult.failed()) {
@@ -76,37 +106,50 @@ public class ChestAssignmentServiceImpl implements ChestAssignmentService {
 
     @Override
     public Result<?> winChest(WinChestQuery winChestQuery) {
-        Result<UserData> loadUserDataResult = userFeignService.load(UserDataLandQuery.builder().version(winChestQuery.getVersion()).userId(winChestQuery.getUserId()).build());
-        if (loadUserDataResult.failed()) {
-            return loadUserDataResult.build();
+        UserData userData = winChestQuery.getUserData();
+        boolean updateUserData = false;
+        if (Objects.isNull(userData)) {
+            Result<UserData> loadUserDataResult = userFeignService.load(UserDataLandQuery.builder().version(winChestQuery.getVersion()).userId(winChestQuery.getUserId()).build());
+            if (loadUserDataResult.failed()) {
+                return loadUserDataResult.build();
+            }
+
+            userData = loadUserDataResult.getData();
+            updateUserData = true;
         }
 
-        UserData userData = loadUserDataResult.getData();
+        // Integer emptySlotIndex = chestService.getChapterWinChestSlotInfo(userData);
+        //
+        // if (emptySlotIndex < 0) {
+        //     return Result.ok();
+        // }
+        // ChestType winChestType = null;
+        // for (ChestType cType : ChestType.values()) {
+        //     if (cType.getType() == winChestQuery.getChestType().intValue()) {
+        //         winChestType = cType;
+        //     }
+        // }
+        //
+        // int chestUnlockSeconds = ChapterWinChestConfig.getChestUnlockSeconds(winChestType);
+        //
+        // ChapterWinChestData chapterWinChestData = new ChapterWinChestData();
+        // chapterWinChestData.setUid(NanoIdUtils.randomNanoId(30));
+        // chapterWinChestData.setChestType(winChestType.getType());
+        // chapterWinChestData.setLevel(winChestQuery.getChestLevel());
+        // chapterWinChestData.setCreateTime(TimeUtils.getUnixTimeSecond());
+        // chapterWinChestData.setAvailableUnixTime(-1L);
+        // chapterWinChestData.setUnlockSecondsRequires((long) chestUnlockSeconds);
+        //
+        // userData.getChapterWinChestsData().add(emptySlotIndex, chapterWinChestData);
 
-        Integer emptySlotIndex = chestService.getChapterWinChestSlotInfo(userData);
-
-        if (emptySlotIndex < 0) {
+        ChapterWinChestData chapterWinChestData = getChapterWinChestData(userData, winChestQuery.getChestType(), winChestQuery.getChestLevel());
+        if (Objects.isNull(chapterWinChestData)) {
             return Result.ok();
         }
-        ChestType winChestType = null;
-        for (ChestType cType : ChestType.values()) {
-            if (cType.getType() == winChestQuery.getChestType().intValue()) {
-                winChestType = cType;
-            }
+
+        if (updateUserData) {
+            userFeignService.update(UserDataUpdateQuery.builder().userId(winChestQuery.getUserId()).userData(userData).build());
         }
-
-        int chestUnlockSeconds = ChapterWinChestConfig.getChestUnlockSeconds(winChestType);
-
-        ChapterWinChestData chapterWinChestData = new ChapterWinChestData();
-        chapterWinChestData.setUid(NanoIdUtils.randomNanoId(30));
-        chapterWinChestData.setChestType(winChestType.getType());
-        chapterWinChestData.setLevel(winChestQuery.getChestLevel());
-        chapterWinChestData.setCreateTime(TimeUtils.getUnixTimeSecond());
-        chapterWinChestData.setAvailableUnixTime(-1L);
-        chapterWinChestData.setUnlockSecondsRequires((long) chestUnlockSeconds);
-
-        userData.getChapterWinChestsData().add(emptySlotIndex, chapterWinChestData);
-        userFeignService.update(UserDataUpdateQuery.builder().userId(winChestQuery.getUserId()).userData(userData).build());
         // map.put("newCreateChapterWinChestData", newCreateChapterWinChestData);
         // return Result.ok().put(chapterWinChestData);
         return Result.ok().push("newCreateChapterWinChestData", chapterWinChestData).move("userData").push("chapterWinChestsData", userData.getChapterWinChestsData());

@@ -201,7 +201,7 @@ public class AchievementServiceImpl implements AchievementService {
                     if (!isAchievementFullyCompleted(achievementData)) {
 
                         AchievementTableValue achievementTableValue = achievementTable.get(String.valueOf(achievementData.getAchievementId()));
-                        if (chapterId >= achievementTableValue.getCondition()) {
+                        if (null != chapterId && chapterId >= achievementTableValue.getCondition()) {
 
                             achievementData.setCurrentProgress(achievementData.getCurrentProgress() + 1);
                             achievementData.setCurrentProgress(Math.min(achievementData.getCurrentProgress(), achievementData.getMaxProgress()));
@@ -219,7 +219,7 @@ public class AchievementServiceImpl implements AchievementService {
                     if (!isAchievementFullyCompleted(achievementData)) {
 
                         AchievementTableValue achievementTableValue = achievementTable.get(String.valueOf(achievementData.getAchievementId()));
-                        if (chapterId >= achievementTableValue.getCondition()) {
+                        if (null != chapterId && chapterId >= achievementTableValue.getCondition()) {
                             achievementData.setCurrentProgress(achievementData.getCurrentProgress() + 1);
                             achievementData.setCurrentProgress(Math.min(achievementData.getCurrentProgress(), achievementData.getMaxProgress()));
                             log.info("回合:" + detail.getRound() + "head shot 成就更新" + achievementData);
