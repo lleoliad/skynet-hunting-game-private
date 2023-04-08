@@ -300,7 +300,7 @@ public class AIController {
             Result<BattleStartInfoCVO> startResult = battleFeignService.start(StartQuery.builder()
                     .version(request.getGameVersion())
                     .userId(request.getUserUid())
-                    .playerAveragePrecision(request.getPlayerAverageShowPrecision().floatValue())
+                    .playerAveragePrecision(request.getPlayerAverageShowPrecision() == null ? 0 : request.getPlayerAverageShowPrecision().floatValue())
                     .playerScore(request.getPlayerFinalScore())
                     .round(request.getRound())
                     .animalRouteUid(request.getAnimalRouteUid())
@@ -344,7 +344,7 @@ public class AIController {
                             jsonObject.getBulletId(), //Integer.valueOf(jsonObject.get("bulletId").toString()),
                             jsonObject.getWindId(), //Integer.valueOf(jsonObject.get("windId").toString()),
                             jsonObject.getAveragePrecisionLevel()//Integer.valueOf(jsonObject.get("averagePrecisionLevel").toString())
-                            );
+                    );
 
                     Map<String, Object> aiInfo = HttpUtil.getAiInfo(aiUrl + "/huntingrival/ai-searchAiRecordData", searchAiDto);
                     if (aiInfo != null) {
