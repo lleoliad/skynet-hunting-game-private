@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.skynet.commons.context.exception.SkynetException;
 import org.skynet.commons.lang.common.Result;
@@ -888,7 +889,12 @@ public class RedisDBOperation {
 
         // String jsonString = (String) redisDBOperation.redisTemplate.boundListOps(uid).index(0);
 
-        String jsonString = redisDBOperation.codisService.lrange(uid, 0, 1).get(0);
+        List<String> lrange = redisDBOperation.codisService.lrange(uid, 0, 1);
+        if (ObjectUtils.isEmpty(lrange)) {
+            return null;
+        }
+
+        String jsonString = lrange.get(0);
 
         return JSONObject.parseObject(jsonString, ArchiveChestOpenResult.class);
     }

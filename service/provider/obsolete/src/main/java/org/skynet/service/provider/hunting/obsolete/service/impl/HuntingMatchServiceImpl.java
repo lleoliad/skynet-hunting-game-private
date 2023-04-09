@@ -556,6 +556,7 @@ public class HuntingMatchServiceImpl implements HuntingMatchService {
             history.setCurrentMatchWinStreak(0);
             history.setCurrentMatchLoseStreak(history.getCurrentMatchLoseStreak() + 1);
         }
+        history.setMatchWonPercentage(history.getWonMatchCount() / history.getTotalMatchCount().floatValue());
 
         for (PlayerFireDetails fireDetail : playerFireDetails) {
             history.setServer_only_matchTotalShots(history.getServer_only_matchTotalShots() + 1);

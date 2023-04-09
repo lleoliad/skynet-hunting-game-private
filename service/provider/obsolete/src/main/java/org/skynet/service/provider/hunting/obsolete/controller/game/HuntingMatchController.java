@@ -653,7 +653,8 @@ public class HuntingMatchController {
             userDataSendToClient.setChapterEnteredCountMap(userData.getChapterEnteredCountMap());
 
             History history = userData.getHistory();
-            history.setWonMatchCount(history.getWonMatchCount() + 1);
+            history.setTotalMatchCount(history.getTotalMatchCount() + 1);
+            history.setMatchWonPercentage(history.getWonMatchCount() / history.getTotalMatchCount().floatValue());
 
             //确定进入哪场比赛和动物
             //因为上面章节进入次数已经+1了，这里-1
