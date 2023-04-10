@@ -2,6 +2,7 @@ package org.skynet.service.provider.hunting.login.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -21,6 +22,11 @@ public class LoginVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty("是否成功")
+    private Boolean success;
+    @ApiModelProperty("返回状态码")
+    private Integer code;
+
     @ApiModelProperty(value = "客户端用户数据")
     private ClientUserData userData;
 
@@ -37,6 +43,7 @@ public class LoginVO implements Serializable {
     private Boolean disableClientHuntingMatchReport;
 
     @ApiModelProperty(value = "最新的版本号")
+    @JsonProperty(value = "latestClientVersion")
     private String latestClientGameVersion;
 
     @ApiModelProperty(value = "标准0点时区偏移值")

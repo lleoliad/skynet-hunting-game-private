@@ -25,14 +25,14 @@ public class AppleAuthController {
     @ApiOperation(value = "玩家登录", notes = "")
     @PostMapping("/auth")
     @ResponseBody
-    public Result<?> auth(@ApiParam(name = "loginQuery", value = "玩家登录参数", required = true) @RequestBody LoginQuery loginQuery, HttpServletRequest request) {
+    public Object auth(@ApiParam(name = "loginQuery", value = "玩家登录参数", required = true) @RequestBody LoginQuery loginQuery, HttpServletRequest request) {
         return loginService.login(loginQuery);
     }
 
     @ApiOperation(value = "玩家登录", notes = "")
     @PostMapping("accountBind")
     @ResponseBody
-    public Result<?> accountBind(@ApiParam(name = "loginQuery", value = "玩家登录参数", required = true) @RequestBody LoginQuery loginQuery, HttpServletRequest request) {
+    public Object accountBind(@ApiParam(name = "loginQuery", value = "玩家登录参数", required = true) @RequestBody LoginQuery loginQuery, HttpServletRequest request) {
         return loginService.login(loginQuery);
     }
 }

@@ -10,10 +10,10 @@ import org.skynet.service.provider.hunting.obsolete.enums.ClientGameVersion;
 public class GameConfig {
 
     @ApiModelProperty(value = "最新的Android客户端版本")
-    public static final ClientGameVersion latestClientGameVersion_Android = ClientGameVersion._1_1_0_;
+    public static final ClientGameVersion latestClientGameVersion_Android = ClientGameVersion._1_0_14_;
 
     @ApiModelProperty(value = "最新的IOS客户端版本")
-    public static final ClientGameVersion latestClientGameVersion_IOS = ClientGameVersion._1_1_0_;
+    public static final ClientGameVersion latestClientGameVersion_IOS = ClientGameVersion._1_0_14_;
 
     @ApiModelProperty(value = "初始金币数量")
     public static final Long defaultCoinAmount = 1000L;

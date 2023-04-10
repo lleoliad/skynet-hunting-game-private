@@ -7,6 +7,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
@@ -52,165 +53,52 @@ public class AuthenticationController {
     private ObsoleteUserDataService obsoleteUserDataService;
 
 
+    @SneakyThrows
     @PostMapping("auth-getAuthenticationProviderBindGameAccount")
     @ApiOperation("玩家拉取账号信息")
     @RepeatSubmit(interval = 60000)
     public Map<String, Object> getAuthenticationProviderBindGameAccount(@RequestBody AuthenticationDTO request) {
 
-        try {
-            String cloudUrl = systemPropertiesConfig.getCloudUrl();
-            UserData bindPlayerData;
-            CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
-            obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
-            Map<String, Object> map = CommonUtils.responsePrepare(null);
-            AccountSummaryData accountSummaryData = new AccountSummaryData();
+        String cloudUrl = systemPropertiesConfig.getCloudUrl();
+        UserData bindPlayerData;
+        CommonUtils.requestProcess(request, null, systemPropertiesConfig.getSupportRecordModeClient());
+        obsoleteUserDataService.ensureUserDataIdempotence(request.getUserUid(), request.getUserDataUpdateCount(), request.getGameVersion());
+        Map<String, Object> map = CommonUtils.responsePrepare(null);
+        AccountSummaryData accountSummaryData = new AccountSummaryData();
 
 
-            //google账号登录
-            if (request.getAuthenticationProvider() == AuthenticationProvider.Google) {
-                log.warn("开始验证玩家谷歌账号");
-                //验证玩家登陆账号
-                obsoleteUserDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
-                AccountMapData googleAccountData = RedisDBOperation.selectGoogleAccountMapData(request.getProviderUserId());
-                if (googleAccountData == null) {
-                    log.warn("本地数据库不存在玩家数据，开始从远程拉取");
-                    //https://asia-south1-huntingmasterrecord.cloudfunctions.net/admin-downloadUserData  印度服
-                    //https://us-central1-wildhunthuntingclash.cloudfunctions.net/admin-downloadUserData  正式服
-                    String url = cloudUrl + "/admin-downloadUserData";
-                    GoogleIdUser googleIdUser = new GoogleIdUser("huF9NVzVKRQ^F&Nb8Cgmnhtl#Nvolu", request.getProviderUserId());
-                    bindPlayerData = HttpUtil.getUserDataFromCloud(url, googleIdUser);
-                    if (bindPlayerData == null) {
-                        log.info("当前谷歌账户：{}，未绑定任何游戏账号", request.getProviderUserId());
-                        map.put("bindPlayerData", null);
-                        return map;
-                    }
-                    AccountMapData googleAccountMapData = new AccountMapData(request.getProviderUserId(), bindPlayerData.getUuid());
-                    RedisDBOperation.insertGoogleAccountMapData(request.getProviderUserId(), googleAccountMapData);
-
-                    if (RedisDBOperation.checkKeyExist("User:" + bindPlayerData.getUuid())) {
-                        log.warn("本地仓库中的已经存在玩家数据");
-                        bindPlayerData = RedisDBOperation.selectUserData("User:" + bindPlayerData.getUuid());
-                    } else {
-                        log.warn("将远程仓库中的玩家数据存储到本地");
-                        RedisDBOperation.insertUserData(bindPlayerData);
-                    }
-
-                    String linkedPlayerUid = bindPlayerData.getUuid();
-                    log.info("当前google账号" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
-                    log.warn("当前google账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
-
-                    accountSummaryData.setUid(linkedPlayerUid);
-                    accountSummaryData.setPlayerName(bindPlayerData.getName());
-                    accountSummaryData.setTrophy(bindPlayerData.getTrophy());
-                    map.put("bindPlayerData", accountSummaryData);
+        //google账号登录
+        if (request.getAuthenticationProvider() == AuthenticationProvider.Google) {
+            log.warn("开始验证玩家谷歌账号");
+            //验证玩家登陆账号
+            obsoleteUserDataService.googleAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+            AccountMapData googleAccountData = RedisDBOperation.selectGoogleAccountMapData(request.getProviderUserId());
+            if (googleAccountData == null) {
+                log.warn("本地数据库不存在玩家数据，开始从远程拉取");
+                //https://asia-south1-huntingmasterrecord.cloudfunctions.net/admin-downloadUserData  印度服
+                //https://us-central1-wildhunthuntingclash.cloudfunctions.net/admin-downloadUserData  正式服
+                String url = cloudUrl + "/admin-downloadUserData";
+                GoogleIdUser googleIdUser = new GoogleIdUser("huF9NVzVKRQ^F&Nb8Cgmnhtl#Nvolu", request.getProviderUserId());
+                bindPlayerData = HttpUtil.getUserDataFromCloud(url, googleIdUser);
+                if (bindPlayerData == null) {
+                    log.info("当前谷歌账户：{}，未绑定任何游戏账号", request.getProviderUserId());
+                    map.put("bindPlayerData", null);
                     return map;
                 }
+                AccountMapData googleAccountMapData = new AccountMapData(request.getProviderUserId(), bindPlayerData.getUuid());
+                RedisDBOperation.insertGoogleAccountMapData(request.getProviderUserId(), googleAccountMapData);
 
-                log.warn("本地数据库存在玩家数据,直接从查找");
-                String linkedPlayerUid = googleAccountData.getLinkedPlayerUid();
-                bindPlayerData = RedisDBOperation.selectUserData("User:" + linkedPlayerUid);
-                log.info("当前登录的google账号：" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
+                if (RedisDBOperation.checkKeyExist("User:" + bindPlayerData.getUuid())) {
+                    log.warn("本地仓库中的已经存在玩家数据");
+                    bindPlayerData = RedisDBOperation.selectUserData("User:" + bindPlayerData.getUuid());
+                } else {
+                    log.warn("将远程仓库中的玩家数据存储到本地");
+                    RedisDBOperation.insertUserData(bindPlayerData);
+                }
+
+                String linkedPlayerUid = bindPlayerData.getUuid();
+                log.info("当前google账号" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
                 log.warn("当前google账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
-
-                accountSummaryData.setUid(linkedPlayerUid);
-                accountSummaryData.setPlayerName(bindPlayerData.getName());
-                accountSummaryData.setTrophy(bindPlayerData.getTrophy());
-                map.put("bindPlayerData", accountSummaryData);
-                return map;
-
-            } else if (request.getAuthenticationProvider() == AuthenticationProvider.Facebook) {
-                log.warn("开始验证玩家Facebook账号");
-
-                obsoleteUserDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
-
-                AccountMapData facebookAccountData = RedisDBOperation.selectFacebookAccountMapData(request.getProviderUserId());
-
-                if (facebookAccountData == null) {
-                    log.warn("本地数据库不存在玩家数据，开始从远程拉取");
-                    String url = cloudUrl + "/admin-downloadUserData";
-                    FacebookIdUser facebookIdUser = new FacebookIdUser("huF9NVzVKRQ^F&Nb8Cgmnhtl#Nvolu", request.getProviderUserId());
-                    bindPlayerData = HttpUtil.getUserDataFromCloud(url, facebookIdUser);
-                    if (bindPlayerData == null) {
-                        log.info("当前facebook账户：{}，未绑定任何游戏账号", request.getProviderUserId());
-                        map.put("bindPlayerData", null);
-                        return map;
-                    }
-                    //将facebookAccountMapData,存入map
-                    AccountMapData facebookAccountMapData = new AccountMapData(request.getProviderUserId(), bindPlayerData.getUuid());
-                    RedisDBOperation.insertFacebookAccountMapData(request.getProviderUserId(), facebookAccountMapData);
-
-                    if (RedisDBOperation.checkKeyExist("User:" + bindPlayerData.getUuid())) {
-                        log.warn("本地仓库中的已经存在玩家数据");
-                        bindPlayerData = RedisDBOperation.selectUserData("User:" + bindPlayerData.getUuid());
-                    } else {
-                        log.warn("将远程仓库中的玩家数据存储到本地");
-                        RedisDBOperation.insertUserData(bindPlayerData);
-                    }
-
-                    String linkedPlayerUid = bindPlayerData.getUuid();
-                    log.info("当前登录的facebook账号：" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
-                    log.warn("当前facebook账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
-
-                    accountSummaryData.setUid(linkedPlayerUid);
-                    accountSummaryData.setPlayerName(bindPlayerData.getName());
-                    accountSummaryData.setTrophy(bindPlayerData.getTrophy());
-                    map.put("bindPlayerData", accountSummaryData);
-                    return map;
-                }
-
-                log.warn("本地数据库存在玩家数据，直接进行恢复");
-                String linkedPlayerUid = facebookAccountData.getLinkedPlayerUid();
-                bindPlayerData = RedisDBOperation.selectUserData("User:" + linkedPlayerUid);
-                log.info("当前登录的facebook账号：" + request.getProviderUserId() + "对应的玩家账号" + linkedPlayerUid);
-                log.warn("当前facebook账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
-
-                accountSummaryData.setUid(linkedPlayerUid);
-                accountSummaryData.setPlayerName(bindPlayerData.getName());
-                accountSummaryData.setTrophy(bindPlayerData.getTrophy());
-                map.put("bindPlayerData", accountSummaryData);
-                return map;
-            } else if (request.getAuthenticationProvider() == AuthenticationProvider.GameCenter) {
-                log.warn("开始验证玩家gamecenter账号");
-                //验证玩家登陆账号
-                obsoleteUserDataService.gameCenterAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
-                AccountMapData gameCenterAccountData = RedisDBOperation.selectGameCenterAccountMapData(request.getProviderUserId());
-                if (gameCenterAccountData == null) {
-                    log.warn("本地数据库不存在玩家数据，开始从远程拉取");
-                    String url = cloudUrl + "/admin-downloadUserData";
-                    GameCenterIdUser gameCenterIdUser = new GameCenterIdUser("huF9NVzVKRQ^F&Nb8Cgmnhtl#Nvolu", request.getProviderUserId());
-                    bindPlayerData = HttpUtil.getUserDataFromCloud(url, gameCenterIdUser);
-                    if (bindPlayerData == null) {
-                        log.info("当前谷歌账户：{}，未绑定任何游戏账号", request.getProviderUserId());
-                        map.put("bindPlayerData", null);
-                        return map;
-                    }
-                    AccountMapData gameCenterAccountMapData = new AccountMapData(request.getProviderUserId(), bindPlayerData.getUuid());
-                    RedisDBOperation.insertGameCenterAccountMapData(request.getProviderUserId(), gameCenterAccountMapData);
-
-                    if (RedisDBOperation.checkKeyExist("User:" + bindPlayerData.getUuid())) {
-                        log.warn("本地仓库中的已经存在玩家数据");
-                        bindPlayerData = RedisDBOperation.selectUserData("User:" + bindPlayerData.getUuid());
-                    } else {
-                        log.warn("将远程仓库中的玩家数据存储到本地");
-                        RedisDBOperation.insertUserData(bindPlayerData);
-                    }
-
-                    String linkedPlayerUid = bindPlayerData.getUuid();
-                    log.info("当前gameCenter账号" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
-                    log.warn("当前gameCenter账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
-
-                    accountSummaryData.setUid(linkedPlayerUid);
-                    accountSummaryData.setPlayerName(bindPlayerData.getName());
-                    accountSummaryData.setTrophy(bindPlayerData.getTrophy());
-                    map.put("bindPlayerData", accountSummaryData);
-                    return map;
-                }
-
-                log.warn("本地数据库存在玩家数据,直接从查找");
-                String linkedPlayerUid = gameCenterAccountData.getLinkedPlayerUid();
-                bindPlayerData = RedisDBOperation.selectUserData("User:" + linkedPlayerUid);
-                log.info("当前登录的gamecenter账号：" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
-                log.warn("当前gamecenter账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
 
                 accountSummaryData.setUid(linkedPlayerUid);
                 accountSummaryData.setPlayerName(bindPlayerData.getName());
@@ -219,14 +107,121 @@ public class AuthenticationController {
                 return map;
             }
 
-            log.info("登录方式不为google或者facebook或者gameCenter");
+            log.warn("本地数据库存在玩家数据,直接从查找");
+            String linkedPlayerUid = googleAccountData.getLinkedPlayerUid();
+            bindPlayerData = RedisDBOperation.selectUserData("User:" + linkedPlayerUid);
+            log.info("当前登录的google账号：" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
+            log.warn("当前google账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
+
+            accountSummaryData.setUid(linkedPlayerUid);
+            accountSummaryData.setPlayerName(bindPlayerData.getName());
+            accountSummaryData.setTrophy(bindPlayerData.getTrophy());
+            map.put("bindPlayerData", accountSummaryData);
             return map;
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } else if (request.getAuthenticationProvider() == AuthenticationProvider.Facebook) {
+            log.warn("开始验证玩家Facebook账号");
+
+            obsoleteUserDataService.facebookAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+
+            AccountMapData facebookAccountData = RedisDBOperation.selectFacebookAccountMapData(request.getProviderUserId());
+
+            if (facebookAccountData == null) {
+                log.warn("本地数据库不存在玩家数据，开始从远程拉取");
+                String url = cloudUrl + "/admin-downloadUserData";
+                FacebookIdUser facebookIdUser = new FacebookIdUser("huF9NVzVKRQ^F&Nb8Cgmnhtl#Nvolu", request.getProviderUserId());
+                bindPlayerData = HttpUtil.getUserDataFromCloud(url, facebookIdUser);
+                if (bindPlayerData == null) {
+                    log.info("当前facebook账户：{}，未绑定任何游戏账号", request.getProviderUserId());
+                    map.put("bindPlayerData", null);
+                    return map;
+                }
+                //将facebookAccountMapData,存入map
+                AccountMapData facebookAccountMapData = new AccountMapData(request.getProviderUserId(), bindPlayerData.getUuid());
+                RedisDBOperation.insertFacebookAccountMapData(request.getProviderUserId(), facebookAccountMapData);
+
+                if (RedisDBOperation.checkKeyExist("User:" + bindPlayerData.getUuid())) {
+                    log.warn("本地仓库中的已经存在玩家数据");
+                    bindPlayerData = RedisDBOperation.selectUserData("User:" + bindPlayerData.getUuid());
+                } else {
+                    log.warn("将远程仓库中的玩家数据存储到本地");
+                    RedisDBOperation.insertUserData(bindPlayerData);
+                }
+
+                String linkedPlayerUid = bindPlayerData.getUuid();
+                log.info("当前登录的facebook账号：" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
+                log.warn("当前facebook账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
+
+                accountSummaryData.setUid(linkedPlayerUid);
+                accountSummaryData.setPlayerName(bindPlayerData.getName());
+                accountSummaryData.setTrophy(bindPlayerData.getTrophy());
+                map.put("bindPlayerData", accountSummaryData);
+                return map;
+            }
+
+            log.warn("本地数据库存在玩家数据，直接进行恢复");
+            String linkedPlayerUid = facebookAccountData.getLinkedPlayerUid();
+            bindPlayerData = RedisDBOperation.selectUserData("User:" + linkedPlayerUid);
+            log.info("当前登录的facebook账号：" + request.getProviderUserId() + "对应的玩家账号" + linkedPlayerUid);
+            log.warn("当前facebook账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
+
+            accountSummaryData.setUid(linkedPlayerUid);
+            accountSummaryData.setPlayerName(bindPlayerData.getName());
+            accountSummaryData.setTrophy(bindPlayerData.getTrophy());
+            map.put("bindPlayerData", accountSummaryData);
+            return map;
+        } else if (request.getAuthenticationProvider() == AuthenticationProvider.GameCenter) {
+            log.warn("开始验证玩家gamecenter账号");
+            //验证玩家登陆账号
+            obsoleteUserDataService.gameCenterAuthenticationValidate(request.getProviderUserId(), request.getIdToken());
+            AccountMapData gameCenterAccountData = RedisDBOperation.selectGameCenterAccountMapData(request.getProviderUserId());
+            if (gameCenterAccountData == null) {
+                log.warn("本地数据库不存在玩家数据，开始从远程拉取");
+                String url = cloudUrl + "/admin-downloadUserData";
+                GameCenterIdUser gameCenterIdUser = new GameCenterIdUser("huF9NVzVKRQ^F&Nb8Cgmnhtl#Nvolu", request.getProviderUserId());
+                bindPlayerData = HttpUtil.getUserDataFromCloud(url, gameCenterIdUser);
+                if (bindPlayerData == null) {
+                    log.info("当前谷歌账户：{}，未绑定任何游戏账号", request.getProviderUserId());
+                    map.put("bindPlayerData", null);
+                    return map;
+                }
+                AccountMapData gameCenterAccountMapData = new AccountMapData(request.getProviderUserId(), bindPlayerData.getUuid());
+                RedisDBOperation.insertGameCenterAccountMapData(request.getProviderUserId(), gameCenterAccountMapData);
+
+                if (RedisDBOperation.checkKeyExist("User:" + bindPlayerData.getUuid())) {
+                    log.warn("本地仓库中的已经存在玩家数据");
+                    bindPlayerData = RedisDBOperation.selectUserData("User:" + bindPlayerData.getUuid());
+                } else {
+                    log.warn("将远程仓库中的玩家数据存储到本地");
+                    RedisDBOperation.insertUserData(bindPlayerData);
+                }
+
+                String linkedPlayerUid = bindPlayerData.getUuid();
+                log.info("当前gameCenter账号" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
+                log.warn("当前gameCenter账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
+
+                accountSummaryData.setUid(linkedPlayerUid);
+                accountSummaryData.setPlayerName(bindPlayerData.getName());
+                accountSummaryData.setTrophy(bindPlayerData.getTrophy());
+                map.put("bindPlayerData", accountSummaryData);
+                return map;
+            }
+
+            log.warn("本地数据库存在玩家数据,直接从查找");
+            String linkedPlayerUid = gameCenterAccountData.getLinkedPlayerUid();
+            bindPlayerData = RedisDBOperation.selectUserData("User:" + linkedPlayerUid);
+            log.info("当前登录的gamecenter账号：" + request.getProviderUserId() + "对应的玩家账号：" + linkedPlayerUid);
+            log.warn("当前gamecenter账号绑定的游戏账号数据：{}", JSONUtil.toJsonStr(bindPlayerData));
+
+            accountSummaryData.setUid(linkedPlayerUid);
+            accountSummaryData.setPlayerName(bindPlayerData.getName());
+            accountSummaryData.setTrophy(bindPlayerData.getTrophy());
+            map.put("bindPlayerData", accountSummaryData);
+            return map;
         }
 
-
+        log.info("登录方式不为google或者facebook或者gameCenter");
+        return map;
     }
 
 

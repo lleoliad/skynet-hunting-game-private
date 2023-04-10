@@ -50,6 +50,9 @@ public class ServerOnly implements Serializable {
     @ApiModelProperty(value = "最近匹配过的ai profiles")
     List<Integer> latestMatchedAiProfileIds = new ArrayList<>();
 
+    @ApiModelProperty(value = "已经购买过的活动礼包key", notes = "groupId_index")
+    Boolean initializePromotionGiftPackagesV2 = false;
+
     @ApiModelProperty(value = "上一次每日签到钻石奖励领取时间")
     Long lastSigninDiamondRewardCollectTime = 0L;
 

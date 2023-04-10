@@ -1,7 +1,9 @@
 package org.skynet.service.provider.hunting.obsolete.service.impl;
 
+import cn.hutool.core.util.BooleanUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.ObjectUtils;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.common.exception.BusinessException;
@@ -699,12 +701,30 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
             return;
         }
 
-        List<PromotionEventPackageData> promotionEventPackagesData = userData.getPromotionEventPackagesData();
-        List<PromotionGiftPackageV2Data> promotionGiftPackagesV2Data = new ArrayList<>();
-        if (promotionEventPackagesData.size() != 0) {
+        Long standardTimeSecond = TimeUtils.getStandardTimeSecond();
+
+        // List<PromotionEventPackageData> promotionEventPackagesData = userData.getPromotionEventPackagesData();
+        // if (promotionEventPackagesData.size() != 0) {
+        if (ObjectUtils.isNotEmpty(userData.getPromotionGiftPackagesV2Data())) {
 //            userData.setPromotionGiftPackagesV2Data(promotionGiftPackagesV2Data);
+            List<PromotionGiftPackageV2Data> promotionGiftPackagesV2Data = userData.getPromotionGiftPackagesV2Data();
+            for (int i = promotionGiftPackagesV2Data.size() - 1; i >= 0; i--) {
+                PromotionGiftPackageV2Data giftPackagesV2Datum = promotionGiftPackagesV2Data.get(i);
+                if (standardTimeSecond > giftPackagesV2Datum.getExpireTime()) {
+                    promotionGiftPackagesV2Data.remove(i);
+                }
+            }
             return;
         }
+
+        Boolean initializePromotionGiftPackagesV2 = userData.getServerOnly().getInitializePromotionGiftPackagesV2();
+        if (BooleanUtil.isTrue(initializePromotionGiftPackagesV2)) {
+            return;
+        }
+
+        userData.getServerOnly().setInitializePromotionGiftPackagesV2(true);
+
+        List<PromotionGiftPackageV2Data> promotionGiftPackagesV2Data = new ArrayList<>();
 
         // //版本号数字之和，用来判断当前版本是否小于某一个版本
         // int gameVersionNum = 0;
@@ -788,7 +808,7 @@ public class PromotionEventPackageDataServiceImpl implements PromotionEventPacka
         for (PromotionGiftPackageV2Data data : promotionGiftPackagesV2Data) {
             String productName = data.getPackageId() + "_" + data.getPackageType();
             if (productNames.contains(productName)) {
-                throw new BusinessException("刷新活动礼包数据,有重复的packageId:" + data.getPackageId() + "packageType:" + data.getPackageType() + ",活动礼包数据: " + JSON.toJSONString(promotionEventPackagesData));
+                throw new BusinessException("刷新活动礼包数据,有重复的packageId:" + data.getPackageId() + "packageType:" + data.getPackageType() + ",活动礼包数据: " + JSON.toJSONString(promotionGiftPackagesV2Data));
             }
             productNames.add(productName);
         }

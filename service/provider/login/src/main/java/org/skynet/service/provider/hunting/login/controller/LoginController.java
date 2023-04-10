@@ -25,7 +25,7 @@ public class LoginController {
     @ApiOperation(value = "玩家登录", notes = "")
     @PostMapping
     @ResponseBody
-    public Result<?> login(@ApiParam(name = "loginQuery", value = "玩家登录参数", required = true) @RequestBody LoginQuery loginQuery, HttpServletRequest request) {
+    public Object login(@ApiParam(name = "loginQuery", value = "玩家登录参数", required = true) @RequestBody LoginQuery loginQuery, HttpServletRequest request) {
         return loginService.login(loginQuery);
     }
 }

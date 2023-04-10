@@ -943,9 +943,15 @@ public class RedisDBOperation {
         // String jsonString = (String) redisDBOperation.redisTemplate.opsForHash().get(key, deviceId);
         String jsonString = redisDBOperation.codisService.hget(key, deviceId);
 
-        if (jsonString != null)
+        if (jsonString != null) {
+            // return JSONObject.parseObject(jsonString, AccountMapData.class);
+            String content = jsonString;
+            if (content.charAt(0) == '"') {
+                content = content.substring(1, content.length() - 1);
+                content = content.replaceAll("\\\\", "");
+            }
             return JSONObject.parseObject(jsonString, AccountMapData.class);
-        else
+        }else
             return null;
     }
 
@@ -977,7 +983,15 @@ public class RedisDBOperation {
         Object object = redisDBOperation.codisService.hget(key, providerUserId);
         if (object == null)
             return null;
-        return JSONObject.parseObject((String) object, AccountMapData.class);
+        // return JSONObject.parseObject((String) object, AccountMapData.class);
+
+        String content = object.toString();
+        if (content.charAt(0) == '"') {
+            content = content.substring(1, content.length() - 1);
+            content = content.replaceAll("\\\\", "");
+        }
+
+        return JSONObject.parseObject(content, AccountMapData.class);
     }
 
     /*
@@ -1015,7 +1029,14 @@ public class RedisDBOperation {
         String jsonString = redisDBOperation.codisService.hget(key, providerUserId);
         if (jsonString == null)
             return null;
-        return JSONObject.parseObject(jsonString, AccountMapData.class);
+        // return JSONObject.parseObject(jsonString, AccountMapData.class);
+        String content = jsonString;
+        if (content.charAt(0) == '"') {
+            content = content.substring(1, content.length() - 1);
+            content = content.replaceAll("\\\\", "");
+        }
+
+        return JSONObject.parseObject(content, AccountMapData.class);
     }
 
     public static AccountMapData selectGameCenterAccountMapData(String providerUserId) {

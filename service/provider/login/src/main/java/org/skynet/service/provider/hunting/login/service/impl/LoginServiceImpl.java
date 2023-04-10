@@ -66,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
 
     @SneakyThrows
     @Override
-    public Result<LoginVO> login(LoginQuery loginQuery) {
+    public Object login(LoginQuery loginQuery) {
         String loginUserUid = null;
         ThreadLocalUtil.set(loginQuery.getServerTimeOffset());
 
@@ -223,6 +223,8 @@ public class LoginServiceImpl implements LoginService {
         }
 
         LoginVO loginVO = LoginVO.builder()
+                .code(0)
+                .success(true)
                 .userData(clientUserData)
                 .userToken(userToken)
                 .requestId(newRequestId)
@@ -239,6 +241,7 @@ public class LoginServiceImpl implements LoginService {
         if (isNewUser) {
             loginVO.setPrivateKey(privateKey);
         }
-        return Result.ok(loginVO);
+        // return Result.ok(loginVO);
+        return loginVO;
     }
 }

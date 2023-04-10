@@ -14,8 +14,10 @@ import com.google.api.services.androidpublisher.AndroidPublisherScopes;
 import com.google.api.services.androidpublisher.model.ProductPurchase;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.skynet.components.hunting.game.data.ChestOpenResult;
+import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.*;
 import org.skynet.service.provider.hunting.obsolete.DBOperation.RedisDBOperation;
@@ -30,7 +32,6 @@ import org.skynet.service.provider.hunting.obsolete.enums.GunLibraryType;
 import org.skynet.service.provider.hunting.obsolete.enums.OmitState;
 import org.skynet.service.provider.hunting.obsolete.enums.OrderState;
 import org.skynet.service.provider.hunting.obsolete.pojo.dto.IapReceiptValidateDTO;
-import org.skynet.components.hunting.game.data.GunReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.IAPPurchaseReward;
 import org.skynet.service.provider.hunting.obsolete.pojo.entity.ReceiptValidateResult;
 import org.skynet.service.provider.hunting.obsolete.pojo.environment.GameEnvironment;
@@ -573,41 +574,46 @@ public class IAPServiceImpl implements IAPService {
 //            内购活动礼包V2
             PromotionGiftPackageGroupV2TableValue promotionEventPackageGroupV2 = packageDataService.findUserPromotionEventPackageV2DataByPackageId(userData, gameVersion, productName);
             if (promotionEventPackageGroupV2 != null) {
+                Long standardTimeSecond = TimeUtils.getStandardTimeSecond();
                 ChestOpenResult chestOpenResult = null;
                 List<PromotionGiftPackageV2Data> giftPackagesV2Data = userData.getPromotionGiftPackagesV2Data();
-                for (PromotionGiftPackageV2Data giftPackagesV2Datum : giftPackagesV2Data) {
-                    if (Objects.equals(giftPackagesV2Datum.getPackageGroupId(), promotionEventPackageGroupV2.getId())) {
-                        if (giftPackagesV2Datum.getPackageType() == 1) {
-                            String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + giftPackagesV2Datum.getPackageType() + "_" + giftPackagesV2Datum.getPackageId();
-                            Map<String, PromotionGiftPackageV2TableValue> packageV2TableValueMap = GameEnvironment.promotionGiftPackageV2TableMap.get(gameVersion);
-                            PromotionGiftPackageV2TableValue promotionEventPackageV2 = packageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
-                            chestOpenResult = purchasePromotionEventPackageV2(userData, promotionEventPackageV2, purchaseKey, gameVersion, 0.0f);
+                if (ObjectUtils.isNotEmpty(giftPackagesV2Data)) {
+                    // for (PromotionGiftPackageV2Data giftPackagesV2Datum : giftPackagesV2Data) {
+                    for (int i = giftPackagesV2Data.size() - 1; i >= 0; i--) {
+                        PromotionGiftPackageV2Data giftPackagesV2Datum = giftPackagesV2Data.get(i);
+                        if (Objects.equals(giftPackagesV2Datum.getPackageGroupId(), promotionEventPackageGroupV2.getId()) && standardTimeSecond <= giftPackagesV2Datum.getExpireTime()) {
+                            if (giftPackagesV2Datum.getPackageType() == 1) {
+                                String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + giftPackagesV2Datum.getPackageType() + "_" + giftPackagesV2Datum.getPackageId();
+                                Map<String, PromotionGiftPackageV2TableValue> packageV2TableValueMap = GameEnvironment.promotionGiftPackageV2TableMap.get(gameVersion);
+                                PromotionGiftPackageV2TableValue promotionEventPackageV2 = packageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
+                                chestOpenResult = purchasePromotionEventPackageV2(userData, promotionEventPackageV2, purchaseKey, gameVersion, 0.0f);
 
-                            result.setChestOpenResult(chestOpenResult);
+                                result.setChestOpenResult(chestOpenResult);
 
-                            //这里update必须+1
-                            chestService.saveChestOpenResult(chestOpenResult, uuid, userData.getUpdateCount() + 1);
-                            increaseUserIapProductPurchaseCount(uuid, String.format("%s_%s_%s", IAPProductPrefix.promotionGiftPackageV2, productName, promotionEventPackageV2.getId()));
+                                //这里update必须+1
+                                chestService.saveChestOpenResult(chestOpenResult, uuid, userData.getUpdateCount() + 1);
+                                increaseUserIapProductPurchaseCount(uuid, String.format("%s_%s_%s", IAPProductPrefix.promotionGiftPackageV2, productName, promotionEventPackageV2.getId()));
 
-                            isPurchaseComplete = true;
-                            productPrice = promotionEventPackageGroupV2.getPrice();
-                        } else {
-                            String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + promotionEventPackageGroupV2.getPackageTypes().get(0) + "_" + giftPackagesV2Datum.getPackageId();
-                            Map<String, PromotionGunGiftPackageV2TableValue> gunGiftPackageV2TableValueMap = GameEnvironment.promotionGunGiftPackageV2TableMap.get(gameVersion);
-                            PromotionGunGiftPackageV2TableValue gunGiftPackageV2 = gunGiftPackageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
-                            chestOpenResult = promotionGunPackageRewardDelivery(gunGiftPackageV2, userData, gameVersion, purchaseKey, additionValue);
-                            result.setChestOpenResult(chestOpenResult);
+                                isPurchaseComplete = true;
+                                productPrice = promotionEventPackageGroupV2.getPrice();
+                            } else {
+                                String purchaseKey = promotionEventPackageGroupV2.getId() + "_" + promotionEventPackageGroupV2.getPackageTypes().get(0) + "_" + giftPackagesV2Datum.getPackageId();
+                                Map<String, PromotionGunGiftPackageV2TableValue> gunGiftPackageV2TableValueMap = GameEnvironment.promotionGunGiftPackageV2TableMap.get(gameVersion);
+                                PromotionGunGiftPackageV2TableValue gunGiftPackageV2 = gunGiftPackageV2TableValueMap.get(giftPackagesV2Datum.getPackageId().toString());
+                                chestOpenResult = promotionGunPackageRewardDelivery(gunGiftPackageV2, userData, gameVersion, purchaseKey, additionValue);
+                                result.setChestOpenResult(chestOpenResult);
 
-                            //这里update必须+1
-                            chestService.saveChestOpenResult(chestOpenResult, uuid, userData.getUpdateCount() + 1);
-                            increaseUserIapProductPurchaseCount(uuid, String.format("%s_%s_%s", IAPProductPrefix.promotionGunGiftPackageV2, productName, gunGiftPackageV2.getId()));
+                                //这里update必须+1
+                                chestService.saveChestOpenResult(chestOpenResult, uuid, userData.getUpdateCount() + 1);
+                                increaseUserIapProductPurchaseCount(uuid, String.format("%s_%s_%s", IAPProductPrefix.promotionGunGiftPackageV2, productName, gunGiftPackageV2.getId()));
 
-                            isPurchaseComplete = true;
-                            productPrice = promotionEventPackageGroupV2.getPrice();
+                                isPurchaseComplete = true;
+                                productPrice = promotionEventPackageGroupV2.getPrice();
+                            }
+
+                            giftPackagesV2Data.remove(i);
                         }
                     }
-
-
                 }
 
 

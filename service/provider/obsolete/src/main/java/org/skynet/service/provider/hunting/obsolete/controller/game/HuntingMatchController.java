@@ -21,6 +21,9 @@ import org.skynet.components.hunting.battle.query.CompleteQuery;
 import org.skynet.components.hunting.battle.query.MatchingQuery;
 import org.skynet.components.hunting.battle.service.BattleFeignService;
 import org.skynet.components.hunting.rank.league.message.AddCoinMessage;
+import org.skynet.components.hunting.rank.league.query.AddCoinsQuery;
+import org.skynet.components.hunting.rank.league.query.PlayerLoginQuery;
+import org.skynet.components.hunting.rank.league.service.RankLeagueFeignService;
 import org.skynet.components.hunting.user.dao.entity.UserData;
 import org.skynet.components.hunting.user.domain.ChapterWinChestData;
 import org.skynet.components.hunting.user.domain.History;
@@ -100,6 +103,9 @@ public class HuntingMatchController {
 
     @Resource
     private BattleFeignService battleFeignService;
+
+    @Resource
+    private RankLeagueFeignService rankLeagueFeignService;
 
 //    @PostMapping("/huntingMatch-confirmHuntingMatchComplete")
 //    @ApiOperation("确认章节比赛结束")
@@ -1268,19 +1274,29 @@ public class HuntingMatchController {
                 //     }});
                 // }
 
-                AddCoinMessage addCoinMessage = AddCoinMessage.builder().userId(request.getUserUid()).coin(addCount).build();
-                rocketMQTemplate.asyncSend(rankLeagueAddCoinTopic, addCoinMessage, new SendCallback() {
-                    @Override
-                    public void onSuccess(SendResult sendResult) {
-                        // log.info("async onSucess SendResult={}", sendResult);
-                        // log.info("发送增加段位赛金币成功：{}", addCoinMessage);
-                    }
+                // AddCoinMessage addCoinMessage = AddCoinMessage.builder().userId(request.getUserUid()).coin(addCount).build();
+                // rocketMQTemplate.asyncSend(rankLeagueAddCoinTopic, addCoinMessage, new SendCallback() {
+                //     @Override
+                //     public void onSuccess(SendResult sendResult) {
+                //         // log.info("async onSucess SendResult={}", sendResult);
+                //         // log.info("发送增加段位赛金币成功：{}", addCoinMessage);
+                //     }
+                //
+                //     @Override
+                //     public void onException(Throwable throwable) {
+                //         log.info("发送增加段位赛金币失败：{}", addCoinMessage);
+                //     }
+                // });
 
-                    @Override
-                    public void onException(Throwable throwable) {
-                        log.info("发送增加段位赛金币失败：{}", addCoinMessage);
-                    }
-                });
+                Result<?> rankLeagueLoginResult = rankLeagueFeignService.playerAddCoins(AddCoinsQuery.builder()
+                        .version(request.getGameVersion())
+                        .userId(userData.getUuid())
+                        .coin(addCount)
+                        .build());
+
+                if (rankLeagueLoginResult.getSuccess()) {
+                    sendToClientUserData.setPlayerRankData(rankLeagueLoginResult.getData());
+                }
             }
 
             return map;

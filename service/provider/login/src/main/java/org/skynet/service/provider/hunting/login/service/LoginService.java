@@ -5,5 +5,5 @@ import org.skynet.service.provider.hunting.login.data.LoginVO;
 import org.skynet.service.provider.hunting.login.query.LoginQuery;
 
 public interface LoginService {
-    Result<LoginVO> login(LoginQuery loginQuery);
+    Object login(LoginQuery loginQuery);
 }
